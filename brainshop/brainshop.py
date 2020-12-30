@@ -1,6 +1,6 @@
 from redbot.core import commands
 
-class Mycog(commands.Cog):
+class Brainshop(commands.Cog):
     """brainshop.ai cog"""
 
     @commands.command()
