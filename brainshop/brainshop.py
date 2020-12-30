@@ -1,4 +1,5 @@
 from redbot.core import commands
+import aiohttp 
 
 class Brainshop(commands.Cog):
     """brainshop.ai cog"""
@@ -16,6 +17,11 @@ class Brainshop(commands.Cog):
         brain_id = brain_info.get("brain_id")
         brain_key = brain_info.get("brain_key")
 
-        ## do request stuff here idk how
+        messagefix = message.replace(" ", "+")
 
-        await ctx.send("girl this doesn't work yet")
+        url= "http://api.brainshop.ai/get?bid=" + brain_id + "&key=" + brain_key + "&uid=" + str(ctx.author.id) + "&msg=" + messagefix
+
+        async with aiohttp.ClientSession() as session:
+            async with session.get(url) as request:
+                response = await request.json()
+                await ctx.send(response['cnt'])

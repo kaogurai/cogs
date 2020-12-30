@@ -11,3 +11,7 @@ these are still in beta, i would not install them
 
 [p]load <cog>
 ```
+
+credits:
+
+[oofcogs](https://github.com/OofChair/OofCogs) for helping me with aiohttp
