@@ -2,7 +2,7 @@ from redbot.core import commands
 import aiohttp
 
 class Brainshop(commands.Cog):
-    """brainshop.ai cog - for this to work, you will need to get a brain from https://brainshop.ai and [p]set api brainshopai brain_id <id> brain_key <key>"""
+    """brainshop.ai cog"""
 
     @commands.command()
     async def talk(self, ctx, message: str):
