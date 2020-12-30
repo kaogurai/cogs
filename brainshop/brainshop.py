@@ -5,7 +5,7 @@ class Brainshop(commands.Cog):
     """brainshop.ai cog - for this to work, you will need to get a brain from https://brainshop.ai and [p]set api brainshopai brain_id <id> brain_key <key>"""
 
     @commands.command()
-    async def talk(self, ctx):
+    async def talk(self, ctx, user: str):
         """Talk to a robot!"""
         # add code here
         brain_info = await self.bot.get_shared_api_tokens(brainshopai)
