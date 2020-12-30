@@ -15,7 +15,7 @@ class Brainshop(commands.Cog):
         if brain_info.get("brain_key") is None:
             return await ctx.send("The brain key has not been set.")
 
-        url = "http://api.brainshop.ai/get?bid={brain_id}&key={brain_key}&uid=[uid]&msg=[msg]"
+        url = "http://api.brainshop.ai/get?bid=", brain_info.get("brain_id"), "&key=", brain_info.get("brain_key"), "&uid=[uid]&msg=[msg]"
 
 
         await ctx.send(url)
