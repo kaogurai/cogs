@@ -3,6 +3,6 @@
     "install_msg": "Thanks for installing! Join discord.gg/p6ehU9qhg8 for any help.",
     "name": "kao",
     "short": "Cogs made for kaogurai.",
-    "description": "Cogs made for kaogurai. For the brainshop cog to work, you will need to get a brain from https://brainshop.ai and [p]set api brainshopai brain_id <id> brain_key <key>",
+    "description": "Cogs made for kaogurai.",
     "tags": ["ai"]
 }

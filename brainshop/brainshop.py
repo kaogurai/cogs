@@ -1,5 +1,6 @@
 from redbot.core import commands
 import aiohttp 
+import urllib.parse
 
 class Brainshop(commands.Cog):
     """brainshop.ai cog"""
@@ -17,9 +18,9 @@ class Brainshop(commands.Cog):
         brain_id = brain_info.get("brain_id")
         brain_key = brain_info.get("brain_key")
 
-        messagefix = message.replace(" ", "+")
+      #  messagefix = message.replace(" ", "+")
 
-        url= "http://api.brainshop.ai/get?bid=" + brain_id + "&key=" + brain_key + "&uid=" + str(ctx.author.id) + "&msg=" + messagefix
+        url= "http://api.brainshop.ai/get?bid=" + brain_id + "&key=" + brain_key + "&uid=" + str(ctx.author.id) + "&msg=" + urllib.parse.quote(message)
 
         async with aiohttp.ClientSession() as session:
             async with session.get(url) as request:
