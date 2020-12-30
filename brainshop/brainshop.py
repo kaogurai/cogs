@@ -9,9 +9,9 @@ class Brainshop(commands.Cog):
         """Talk to a robot!"""
         # add code here
         brain_info = await ctx.bot.get_shared_api_tokens(brainshopai)
-        if brainshopai.get("brain_id") is None:
+        if brain_info.get("brain_id") is None:
             return await ctx.send("The brain id has not been set.")
-        if brainshopai.get("brain_key") is None:
+        if brain_info.get("brain_key") is None:
             return await ctx.send("The brain key has not been set.")
 
         await ctx.send("no")
