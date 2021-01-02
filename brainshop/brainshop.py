@@ -26,7 +26,8 @@ class Brainshop(commands.Cog):
                 await ctx.send(response['cnt'])
         
     @commands.group()
-    @commands.mod()
+    @commands.guild_only()
+    @commands.admin()
     async def brainset(self, ctx):
         """Configure the AI! This does not currently work."""
          
