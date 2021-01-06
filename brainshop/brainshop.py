@@ -15,13 +15,16 @@ class Brainshop(commands.Cog):
             return await ctx.send("The brain id has not been set.")
         if brain_info.get("brain_key") is None:
             return await ctx.send("The brain key has not been set.")
-        brain_id = brain_info.get("brain_id")
-        brain_key = brain_info.get("brain_key")
+      #  brain_id = brain_info.get("brain_id")
+      #  brain_key = brain_info.get("brain_key")
 
-        url= "http://api.brainshop.ai/get?bid=" + brain_id + "&key=" + brain_key + "&uid=" + str(ctx.author.id) + "&msg=" + urllib.parse.quote(message)
+        url= "http://api.brainshop.ai/get"
+        self.headers = {"bid": brain_info.get("brain_id"), "key": brain_info.get("brain_key"), "uid": str(ctx.author.id), "msg": message}
+        
+       # ?bid=" + brain_id + "&key=" + brain_key + "&uid=" + str(ctx.author.id) + "&msg=" + urllib.parse.quote(message)
 
         async with aiohttp.ClientSession() as session:
-            async with session.get(url, headers = "bid", ) as request:
+            async with session.get(url, headers = self.headers ) as request:
                 response = await request.json()
                 await ctx.send(response['cnt'])
         
