@@ -21,7 +21,7 @@ class Brainshop(commands.Cog):
         url= "http://api.brainshop.ai/get?bid=" + brain_id + "&key=" + brain_key + "&uid=" + str(ctx.author.id) + "&msg=" + urllib.parse.quote(message)
 
         async with aiohttp.ClientSession() as session:
-            async with session.get(url) as request:
+            async with session.get(url, headers = "bid", ) as request:
                 response = await request.json()
                 await ctx.send(response['cnt'])
         
