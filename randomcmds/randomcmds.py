@@ -15,7 +15,7 @@ class Randomcmds(commands.Cog):
         embed=discord.Embed(description="maddie is a cool cat + is emotionally attached to this cat’s birthday party :revolving_hearts::revolving_hearts::revolving_hearts::revolving_hearts:", color=11985904, image = "https://cdn.discordapp.com/attachments/768663090337677315/796118254128332820/image0.jpg")
         ctx.send(embed=embed)
     @commands.command()
-    async def oof(self, ctx):
+    async def oofchair(self, ctx):
        ctx.send("oof is p cool :) he's also a bot developer! check out his bot here: http://pwnbot.xyz/")
     @commands.command()
     async def nicki(self, ctx):
