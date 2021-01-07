@@ -2,7 +2,7 @@
     "author" : ["alec#8068"],
     "install_msg" : "ty 4 installing",
     "name" : "brainshop",
-    "short" : "talk to a sobot",
+    "short" : "talk to a robot",
     "requirements" : ["aiohttp"],
     "hidden" : "true",
     "description" : "you will need to get a brain from https://brainshop.ai and [p]set api brainshopai brain_id <id> brain_key <key>",
