@@ -28,7 +28,7 @@ class Brainshop(commands.Cog):
     @commands.guild_only()
     @commands.admin()
     async def brainset(self, ctx):
-        """Configure the AI! This does not currently work."""
+        """Configure the AI! This is currently in developement and does not fully funcion yet."""
          
     
     @brainset.group()
@@ -46,13 +46,20 @@ class Brainshop(commands.Cog):
         msg = f"Sorry, I don't have permission to send messages in that channel. "
         return await ctx.send(msg)
 
-    @channel.command()
-    async def remove(self, ctx):
-        """Remove a channel for the AI to talk in."""
 
-    @channel.command()
-    async def list(self, ctx):
-        """View all the channels that the AI will talk in."""
+
+# TODO - config init or something like that ?? actually add the channel, and then add the listener for those channels
+
+
+
+
+ #   @channel.command()
+ #   async def remove(self, ctx):
+ #       """Remove a channel for the AI to talk in."""
+
+ #   @channel.command()
+ #   async def list(self, ctx):
+ #       """View all the channels that the AI will talk in."""
 
 # This is just the plan for these commands - they aren't implemented yet 
     
