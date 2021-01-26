@@ -42,7 +42,7 @@ class Brainshop(commands.Cog):
             channel = ctx.channel
         perms = await self._channel_perm_checker(channel)
         if (not perms):
-        msg = f"Sorry, I don't have permission to send messages in that channel. "
+            msg = f"Sorry, I don't have permission to send messages in that channel. "
         return await ctx.send(msg)
 
     @channel.command()
