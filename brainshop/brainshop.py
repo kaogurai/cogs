@@ -1,4 +1,5 @@
 from redbot.core import commands, config, checks
+import discord
 import aiohttp 
 import urllib.parse
 
