@@ -41,9 +41,9 @@ class Brainshop(commands.Cog):
         """Add a channel for the AI to talk in."""
         if not channel:
             channel = ctx.channel
-        perms = await self._channel_perm_checker(channel)
-        if (not perms):
-            msg = f"Sorry, I don't have permission to send messages in that channel. "
+        if not channel.permissions_for(channel.guild.me).send_messages:
+            return False
+        msg = f"Sorry, I don't have permission to send messages in that channel. "
         return await ctx.send(msg)
 
     @channel.command()
