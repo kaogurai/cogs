@@ -36,7 +36,7 @@ class Brainshop(commands.Cog):
         """Manage the channels the AI talks in."""
 
     @channel.command()
-    async def add(self, ctx):
+    async def add(self, ctx, channel: discord.TextChannel = None):
         """Add a channel for the AI to talk in."""
         if not channel:
             channel = ctx.channel
