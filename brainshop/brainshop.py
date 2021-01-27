@@ -65,7 +65,7 @@ class Brainshop(commands.Cog):
         if channel.id not in channel_list:
             channel_list.append(channel.id)
             await self.config.channels.set(channel_list)
-            await ctx.send(f"Okay, I've added {channel.mention} channel to the config.")
+            await ctx.send(f"Okay, I've added {channel.mention} to the config.")
         else:
             await ctx.send(f"{channel.mention} is already in the config! Did you mean to use the remove command?")
         
