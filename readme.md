@@ -12,9 +12,9 @@ these are still in beta, i would not install them
 [p]load <cog>
 ```
 
-| Name     | Status | Description                 |   |   |
-|----------|--------|-----------------------------|---|---|
-| AiTools  | Beta   | Brainshop.ai cog for RedBot |   |   |
+| Name     | Status | Description                 |
+|----------|--------|-----------------------------|
+| AiTools  | Beta   | Brainshop.ai cog for RedBot |
 
 
 credits:
