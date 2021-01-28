@@ -3,7 +3,7 @@ import discord
 import aiohttp 
 import urllib.parse
 
-class Brainshop(commands.Cog):
+class AiTools(commands.Cog):
     """brainshop.ai cog"""
 
     def __init__(self):
@@ -45,11 +45,11 @@ class Brainshop(commands.Cog):
     @commands.group()
     @commands.guild_only()
     @commands.admin()
-    async def brainset(self, ctx):
+    async def aiset(self, ctx):
         """Configure the AI! This is currently in developement and does not fully funcion yet."""
          
     
-    @brainset.group()
+    @aiset.group()
     @commands.admin()
     async def channel(self, ctx):
         """Manage the channels the AI talks in."""
@@ -93,7 +93,7 @@ class Brainshop(commands.Cog):
 
 # This is just the plan for these commands - they aren't implemented yet 
     
- #   @brainset.group()
+ #   @aiset.group()
  #   @commands.mod()
  #   async def blacklist(self, ctx):
  #       """Blacklist people from using the AI."""
