@@ -23,7 +23,7 @@ class Randomcmds(commands.Cog):
        """cool bot dev"""
        await ctx.send("oof is p cool :) he's also a bot developer! check out his bot here: http://pwnbot.xyz/")
 
-    @commands.command()
-    async def invite(self, ctx):
-       """invite me!"""
-       await ctx.send("oof is p cool :) he's also a bot developer! check out his bot here: http://pwnbot.xyz/")
+#    @commands.command()
+ #   async def invite(self, ctx):
+ #      """invite me!"""
+ #      await ctx.send("idk yet")
