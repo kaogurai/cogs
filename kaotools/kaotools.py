@@ -2,7 +2,7 @@ from redbot.core import commands
 import discord
 
 
-class Randomcmds(commands.Cog):
+class KaoTools(commands.Cog):
     """things that fit nowhere else"""
 
     @commands.command()
