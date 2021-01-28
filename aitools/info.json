@@ -1,7 +1,7 @@
 {
     "author" : ["alec#8068"],
     "install_msg" : "ty 4 installing",
-    "name" : "brainshop",
+    "name" : "AiTools",
     "short" : "talk to a robot",
     "requirements" : ["aiohttp"],
     "hidden" : "true",
