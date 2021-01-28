@@ -1,5 +1,5 @@
-from .brainshop import Brainshop
+from .aitools import AiTools
 
 
 def setup(bot):
-    bot.add_cog(Brainshop())
+    bot.add_cog(AiTools())
