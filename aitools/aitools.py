@@ -53,16 +53,12 @@ class AiTools(commands.Cog):
                 response = await request.json()
                 await message.channel.send(response['cnt'])
         
-
-        
-        
     @commands.group()
     @commands.guild_only()
     @commands.admin()
     async def aiset(self, ctx):
-        """Configure the AI! This is currently in developement and does not fully funcion yet."""
+        """configure the ai, and who has access to it."""
          
-    
     @aiset.group()
     @commands.admin()
     async def channel(self, ctx):
@@ -96,9 +92,18 @@ class AiTools(commands.Cog):
         else:
             await ctx.send(f"{channel.mention} wasn't in the config! Did you mean to use the add command?")
 
-#    @channel.command()
-#    async def list(self, ctx):
-#       """View all the channels that the AI will talk in."""
+    @channel.command()
+    async def list(self, ctx):
+      """View all the channels that the AI will talk in."""
+      channel_list = await self.config.channels()
+
+      if channel_list is None:
+        channel_list = "none"
+        
+      embed = discord.Embed(colour=ctx.me.color)
+      embed.title = (f"{ctx.guild.name}'s ai channels")
+      embed.add_field(name="channels", value=channel_list)
+      await ctx.send(embed=embed)
 
 
     
