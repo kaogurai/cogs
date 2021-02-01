@@ -57,14 +57,9 @@ class AiTools(commands.Cog):
     @commands.guild_only()
     @commands.admin()
     async def aiset(self, ctx):
-        """configure the ai, and who has access to it."""
+        """configure the ai channels"""
          
-    @aiset.group()
-    @commands.admin()
-    async def channel(self, ctx):
-        """Manage the channels the AI talks in."""
-
-    @channel.command()
+    @aiset.command()
     async def add(self, ctx, channel: discord.TextChannel):
         """Add a channel for the AI to talk in."""
         if not channel:
@@ -79,7 +74,7 @@ class AiTools(commands.Cog):
         else:
             await ctx.send(f"{channel.mention} is already in the config! Did you mean to use the remove command?")
         
-    @channel.command()
+    @aiset.command()
     async def remove(self, ctx, channel: discord.TextChannel):
         """Remove a channel for the AI to talk in."""
         if not channel:
