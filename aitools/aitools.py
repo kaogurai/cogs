@@ -9,7 +9,7 @@ class AiTools(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.config = Config.get_conf(self, identifier=6574837465473)
-        default_global = {"channels": []}
+        default_global = {"channels": [] }
         self.config.register_global(**default_global)
 
     @commands.command(aliases= ["ai"])
@@ -91,38 +91,3 @@ class AiTools(commands.Cog):
             await ctx.send(f"Okay, I've removed {channel.mention} from the config.")
         else:
             await ctx.send(f"{channel.mention} wasn't in the config! Did you mean to use the add command?")
-
-    @channel.command()
-    async def list(self, ctx):
-      """View all the channels that the AI will talk in."""
-      channel_list = await self.config.channels()
-
-      if channel_list is None:
-        channel_list = "none"
-        
-      embed = discord.Embed(colour=ctx.me.color)
-      embed.title = (f"{ctx.guild.name}'s ai channels")
-      embed.add_field(name="channels", value=channel_list)
-      await ctx.send(embed=embed)
-
-
-    
-
-
-
-# This is just the plan for these commands - they aren't implemented yet 
-    
- #   @aiset.group()
- #   @commands.mod()
- #   async def blacklist(self, ctx):
- #       """Blacklist people from using the AI."""
-
- #  @blacklist.command()
- #   async def add(self, ctx):
- #       """Add people to the blacklist."""
- #   @blacklist.command()
- #   async def remove(self, ctx):
- #       """Remove people from the blacklist."""
- #   @blacklist.command()
- #   async def list(self, ctx):
- #       """View the blacklist."""
