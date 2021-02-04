@@ -22,7 +22,7 @@ class KaoTools(commands.Cog):
     @commands.command()
     async def invite(self, ctx):
        """invite me!"""
-       embed = discord.Embed(title="Thanks for being using me!", colour=ctx.me.color, url="https://kaogurai.xyz")
+       embed = discord.Embed(title="Thanks for using me!", colour=ctx.me.color, url="https://kaogurai.xyz")
        embed.set_thumbnail(url= ctx.me.avatar_url)
        embed.add_field(name="Bot Invite", value=(f"[Click Here!](https://discord.com/oauth2/authorize?client_id={ctx.me.id}&scope=bot&permissions=2147483647)"), inline=True)
        embed.add_field(name="Support Server", value="[Click Here!](https://discord.gg/p6ehU9qhg8)", inline=True)
