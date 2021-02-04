@@ -11,9 +11,7 @@ class GetEmoji(commands.Cog):
     @commands.command()
     @commands.admin()
     async def emojiapiurl(self, ctx, url: str):
-        await ctx.send("soon")
-
-
+        await ctx.send("idk ill get to this soon")
 
     @commands.group()
     async def getemoji(self, ctx):
