@@ -9,7 +9,7 @@ class GetEmoji(commands.Cog):
         self.config.register_global(**default_global)
 
     @commands.command()
-    @commands.admin()
+    @commands.is_owner()
     async def emojiapiurl(self, ctx, url: str):
         await ctx.send("soon")
 
@@ -90,9 +90,9 @@ class GetEmoji(commands.Cog):
                 embed = discord.Embed(color = ctx.me.color)
                 embed.set_image(url = response['url'])
                 await ctx.send(embed = embed)
-    @getemoji.command()
+    @getemoji.command(aliases=["discord"])
     async def twitter(self, ctx, emoji: str):
-        """get an image of a twitter emoji"""
+        """get an image of a twitter/discord emoji"""
         url = await self.config.url()
         async with aiohttp.ClientSession() as session:
             async with session.get(url + '/emoji/image/twitter/' + emoji) as request:
