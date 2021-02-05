@@ -18,7 +18,7 @@ class KaoTools(commands.Cog):
                 pass
             self.bot.add_command(old_invite)
 
-        
+    @commands.bot_has_permissions(embed_links=True)
     @commands.command()
     async def invite(self, ctx):
        """invite me!"""
