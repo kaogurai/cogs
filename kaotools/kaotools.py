@@ -33,7 +33,8 @@ class KaoTools(commands.Cog):
         """emo kids lover"""
         await ctx.send("asia is the best person on this earth and loves videos of emo kids dancing")
         await ctx.send("https://cdn.discordapp.com/attachments/768663090337677315/795133511673053225/emokidsyummy.mp4")
-
+        
+    @commands.bot_has_permissions(embed_links=True)
     @commands.command()
     async def maddie(self, ctx):
         """cool cat"""

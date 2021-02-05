@@ -18,6 +18,7 @@ class GetEmoji(commands.Cog):
         """get custom emojis from different providers!"""
 
     @getemoji.command()
+    @commands.bot_has_permissions(embed_links=True)
     async def apple(self, ctx, emoji: str):
         """get an image of a apple emoji"""
         url = await self.config.url()
@@ -33,6 +34,7 @@ class GetEmoji(commands.Cog):
                 await ctx.send(embed = embed)
 
     @getemoji.command()
+    @commands.bot_has_permissions(embed_links=True)
     async def google(self, ctx, emoji: str):
         """get an image of a google emoji"""
         url = await self.config.url()
@@ -47,6 +49,7 @@ class GetEmoji(commands.Cog):
                 embed.set_image(url = response['url'])
                 await ctx.send(embed = embed)
     @getemoji.command()
+    @commands.bot_has_permissions(embed_links=True)
     async def samsung(self, ctx, emoji: str):
         """get an image of a samsung emoji"""
         url = await self.config.url()
@@ -61,6 +64,7 @@ class GetEmoji(commands.Cog):
                 embed.set_image(url = response['url'])
                 await ctx.send(embed = embed)
     @getemoji.command()
+    @commands.bot_has_permissions(embed_links=True)
     async def microsoft(self, ctx, emoji: str):
         """get an image of a microsoft emoji"""
         url = await self.config.url()
@@ -75,6 +79,7 @@ class GetEmoji(commands.Cog):
                 embed.set_image(url = response['url'])
                 await ctx.send(embed = embed)
     @getemoji.command()
+    @commands.bot_has_permissions(embed_links=True)
     async def whatsapp(self, ctx, emoji: str):
         """get an image of a whatsapp emoji"""
         url = await self.config.url()
@@ -89,6 +94,7 @@ class GetEmoji(commands.Cog):
                 embed.set_image(url = response['url'])
                 await ctx.send(embed = embed)
     @getemoji.command(aliases=["discord"])
+    @commands.bot_has_permissions(embed_links=True)
     async def twitter(self, ctx, emoji: str):
         """get an image of a twitter/discord emoji"""
         url = await self.config.url()
@@ -103,6 +109,7 @@ class GetEmoji(commands.Cog):
                 embed.set_image(url = response['url'])
                 await ctx.send(embed = embed)
     @getemoji.command()
+    @commands.bot_has_permissions(embed_links=True)
     async def facebook(self, ctx, emoji: str):
         """get an image of a facebook emoji"""
         url = await self.config.url()
@@ -117,6 +124,7 @@ class GetEmoji(commands.Cog):
                 embed.set_image(url = response['url'])
                 await ctx.send(embed = embed)
     @getemoji.command()
+    @commands.bot_has_permissions(embed_links=True)
     async def joypixels(self, ctx, emoji: str):
         """get an image of a joypixels emoji"""
         url = await self.config.url()
@@ -131,6 +139,7 @@ class GetEmoji(commands.Cog):
                 embed.set_image(url = response['url'])
                 await ctx.send(embed = embed)
     @getemoji.command()
+    @commands.bot_has_permissions(embed_links=True)
     async def openmoji(self, ctx, emoji: str):
         """get an image of a openmoji emoji"""
         url = await self.config.url()
@@ -145,6 +154,7 @@ class GetEmoji(commands.Cog):
                 embed.set_image(url = response['url'])
                 await ctx.send(embed = embed)
     @getemoji.command()
+    @commands.bot_has_permissions(embed_links=True)
     async def emojidex(self, ctx, emoji: str):
         """get an image of a emojidex emoji"""
         url = await self.config.url()
@@ -159,6 +169,7 @@ class GetEmoji(commands.Cog):
                 embed.set_image(url = response['url'])
                 await ctx.send(embed = embed)
     @getemoji.command()
+    @commands.bot_has_permissions(embed_links=True)
     async def lg(self, ctx, emoji: str):
         """get an image of a lg emoji"""
         url = await self.config.url()
@@ -173,6 +184,7 @@ class GetEmoji(commands.Cog):
                 embed.set_image(url = response['url'])
                 await ctx.send(embed = embed)
     @getemoji.command()
+    @commands.bot_has_permissions(embed_links=True)
     async def htc(self, ctx, emoji: str):
         """get an image of a htc emoji"""
         url = await self.config.url()
@@ -187,6 +199,7 @@ class GetEmoji(commands.Cog):
                 embed.set_image(url = response['url'])
                 await ctx.send(embed = embed)
     @getemoji.command()
+    @commands.bot_has_permissions(embed_links=True)
     async def softbank(self, ctx, emoji: str):
         """get an image of a softbank emoji"""
         url = await self.config.url()
@@ -201,6 +214,7 @@ class GetEmoji(commands.Cog):
                 embed.set_image(url = response['url'])
                 await ctx.send(embed = embed)
     @getemoji.command()
+    @commands.bot_has_permissions(embed_links=True)
     async def docomo(self, ctx, emoji: str):
         """get an image of a docomo emoji"""
         url = await self.config.url()
@@ -215,6 +229,7 @@ class GetEmoji(commands.Cog):
                 embed.set_image(url = response['url'])
                 await ctx.send(embed = embed)
     @getemoji.command()
+    @commands.bot_has_permissions(embed_links=True)
     async def mozilla(self, ctx, emoji: str):
         """get an image of a mozilla emoji"""
         url = await self.config.url()
@@ -229,6 +244,7 @@ class GetEmoji(commands.Cog):
                 embed.set_image(url = response['url'])
                 await ctx.send(embed = embed)
     @getemoji.command()
+    @commands.bot_has_permissions(embed_links=True)
     async def messenger(self, ctx, emoji: str):
         """get an image of a messenger emoji"""
         url = await self.config.url()
