@@ -11,7 +11,7 @@ class AiTools(commands.Cog):
         self.bot = bot
         self.config = Config.get_conf(self, identifier=6574837465473)
         default_guild = {"channels": [] }
-        self.config.register_global(**default_guild)
+        self.config.register_guild(**default_guild)
 
     @commands.command(aliases= ["ai", "robot"])
     async def talk(self, ctx, *, message: str):
