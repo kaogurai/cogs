@@ -30,7 +30,7 @@ class GetEmoji(commands.Cog):
                 if request is None:
                     return await ctx.send("Sorry, I seem to be having issues. Maybe try again")
                 response = await request.json()
-                embed = discord.Embed(color = ctx.me.color)
+                embed = discord.Embed(color = await ctx.embed_colour())
                 embed.set_image(url = response['url'])
                 await ctx.send(embed = embed)
 
@@ -46,7 +46,7 @@ class GetEmoji(commands.Cog):
                 if request is None:
                     return await ctx.send("Sorry, I seem to be having issues. Maybe try again")
                 response = await request.json()
-                embed = discord.Embed(color = ctx.me.color)
+                embed = discord.Embed(color = await ctx.embed_colour())
                 embed.set_image(url = response['url'])
                 await ctx.send(embed = embed)
     @getemoji.command()
@@ -61,7 +61,7 @@ class GetEmoji(commands.Cog):
                 if request is None:
                     return await ctx.send("Sorry, I seem to be having issues. Maybe try again")
                 response = await request.json()
-                embed = discord.Embed(color = ctx.me.color)
+                embed = discord.Embed(color = await ctx.embed_colour())
                 embed.set_image(url = response['url'])
                 await ctx.send(embed = embed)
     @getemoji.command()
@@ -76,7 +76,7 @@ class GetEmoji(commands.Cog):
                 if request is None:
                     return await ctx.send("Sorry, I seem to be having issues. Maybe try again")
                 response = await request.json()
-                embed = discord.Embed(color = ctx.me.color)
+                embed = discord.Embed(color = await ctx.embed_colour())
                 embed.set_image(url = response['url'])
                 await ctx.send(embed = embed)
     @getemoji.command()
@@ -91,7 +91,7 @@ class GetEmoji(commands.Cog):
                 if request is None:
                     return await ctx.send("Sorry, I seem to be having issues. Maybe try again")
                 response = await request.json()
-                embed = discord.Embed(color = ctx.me.color)
+                embed = discord.Embed(color = await ctx.embed_colour())
                 embed.set_image(url = response['url'])
                 await ctx.send(embed = embed)
     @getemoji.command(aliases=["discord"])
@@ -106,7 +106,7 @@ class GetEmoji(commands.Cog):
                 if request is None:
                     return await ctx.send("Sorry, I seem to be having issues. Maybe try again")
                 response = await request.json()
-                embed = discord.Embed(color = ctx.me.color)
+                embed = discord.Embed(color = await ctx.embed_colour())
                 embed.set_image(url = response['url'])
                 await ctx.send(embed = embed)
     @getemoji.command()
@@ -121,7 +121,7 @@ class GetEmoji(commands.Cog):
                 if request is None:
                     return await ctx.send("Sorry, I seem to be having issues. Maybe try again")
                 response = await request.json()
-                embed = discord.Embed(color = ctx.me.color)
+                embed = discord.Embed(color = await ctx.embed_colour())
                 embed.set_image(url = response['url'])
                 await ctx.send(embed = embed)
     @getemoji.command()
@@ -136,7 +136,7 @@ class GetEmoji(commands.Cog):
                 if request is None:
                     return await ctx.send("Sorry, I seem to be having issues. Maybe try again")
                 response = await request.json()
-                embed = discord.Embed(color = ctx.me.color)
+                embed = discord.Embed(color = await ctx.embed_colour())
                 embed.set_image(url = response['url'])
                 await ctx.send(embed = embed)
     @getemoji.command()
@@ -151,7 +151,7 @@ class GetEmoji(commands.Cog):
                 if request is None:
                     return await ctx.send("Sorry, I seem to be having issues. Maybe try again")
                 response = await request.json()
-                embed = discord.Embed(color = ctx.me.color)
+                embed = discord.Embed(color = await ctx.embed_colour())
                 embed.set_image(url = response['url'])
                 await ctx.send(embed = embed)
     @getemoji.command()
@@ -166,7 +166,7 @@ class GetEmoji(commands.Cog):
                 if request is None:
                     return await ctx.send("Sorry, I seem to be having issues. Maybe try again")
                 response = await request.json()
-                embed = discord.Embed(color = ctx.me.color)
+                embed = discord.Embed(color = await ctx.embed_colour())
                 embed.set_image(url = response['url'])
                 await ctx.send(embed = embed)
     @getemoji.command()
@@ -181,7 +181,7 @@ class GetEmoji(commands.Cog):
                 if request is None:
                     return await ctx.send("Sorry, I seem to be having issues. Maybe try again")
                 response = await request.json()
-                embed = discord.Embed(color = ctx.me.color)
+                embed = discord.Embed(color = await ctx.embed_colour())
                 embed.set_image(url = response['url'])
                 await ctx.send(embed = embed)
     @getemoji.command()
@@ -196,7 +196,7 @@ class GetEmoji(commands.Cog):
                 if request is None:
                     return await ctx.send("Sorry, I seem to be having issues. Maybe try again")
                 response = await request.json()
-                embed = discord.Embed(color = ctx.me.color)
+                embed = discord.Embed(color = await ctx.embed_colour())
                 embed.set_image(url = response['url'])
                 await ctx.send(embed = embed)
     @getemoji.command()
@@ -211,7 +211,7 @@ class GetEmoji(commands.Cog):
                 if request is None:
                     return await ctx.send("Sorry, I seem to be having issues. Maybe try again")
                 response = await request.json()
-                embed = discord.Embed(color = ctx.me.color)
+                embed = discord.Embed(color = await ctx.embed_colour())
                 embed.set_image(url = response['url'])
                 await ctx.send(embed = embed)
     @getemoji.command()
@@ -226,7 +226,7 @@ class GetEmoji(commands.Cog):
                 if request is None:
                     return await ctx.send("Sorry, I seem to be having issues. Maybe try again")
                 response = await request.json()
-                embed = discord.Embed(color = ctx.me.color)
+                embed = discord.Embed(color = await ctx.embed_colour())
                 embed.set_image(url = response['url'])
                 await ctx.send(embed = embed)
     @getemoji.command()
@@ -241,7 +241,7 @@ class GetEmoji(commands.Cog):
                 if request is None:
                     return await ctx.send("Sorry, I seem to be having issues. Maybe try again")
                 response = await request.json()  
-                embed = discord.Embed(color = ctx.me.color)
+                embed = discord.Embed(color = await ctx.embed_colour())
                 embed.set_image(url = response['url'])
                 await ctx.send(embed = embed)
     @getemoji.command()
@@ -256,6 +256,6 @@ class GetEmoji(commands.Cog):
                 if request is None:
                     return await ctx.send("Sorry, I seem to be having issues. Maybe try again")
                 response = await request.json()  
-                embed = discord.Embed(color = ctx.me.color)
+                embed = discord.Embed(color = await ctx.embed_colour())
                 embed.set_image(url = response['url'])
                 await ctx.send(embed = embed)
