@@ -13,8 +13,8 @@
 | Name     | Status | Description                 |
 |----------|--------|-----------------------------|
 | AiTools  | Stable | Brainshop.ai cog for RedBot |
-| GetEmoji | Stable | Scrapes EmojiPedia for images|
-| KaoTools | Unstable | Commands made for kaogurai|
+| GetEmoji | Stable | Scrapes EmojiPedia for images |
+| KaoTools | Unstable | Commands made for kaogurai |
 
 credits:
 [oofchair](https://github.com/OofChair/OofCogs) for helping me with aiohttp
