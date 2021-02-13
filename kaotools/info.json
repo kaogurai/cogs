@@ -3,6 +3,6 @@
     "install_msg" : "ty 4 installing",
     "name" : "KaoTools",
     "short" : "idk just things",
-    "hidden" : "true",
+    "hidden" : true,
     "description" : "girl why did u download this"
 }
