@@ -32,7 +32,7 @@ class KaoTools(commands.Cog):
         **Hey there!** <a:bounce:778449468717531166>
         My prefixes in this server are {humanize_list(await self.bot.get_prefix(message.channel))}
         You can view all my commands with `{(await self.bot.get_prefix(message.channel))[2]}help`
-        Need some help? Join my support server [here!](https://discord.gg/p6ehU9qhg8)
+        Need some help? Join my [support server!](https://discord.gg/p6ehU9qhg8)
         """)
         await message.channel.send(embed=embed)
 
