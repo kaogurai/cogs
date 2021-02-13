@@ -16,6 +16,7 @@ these are still in beta, i would not install them
 |----------|--------|-----------------------------|
 | AiTools  | Stable | Brainshop.ai cog for RedBot |
 | GetEmoji | Stable | Scrapes EmojiPedia for images|
+| KaoTools | Unstable | Commands made for kaogurai|
 
 
 credits:
