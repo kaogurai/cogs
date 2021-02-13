@@ -1,5 +1,7 @@
 from redbot.core import commands
+from redbot.core.utils.chat_formatting import humanize_list
 import discord
+import re
 
 old_invite = None
 
@@ -17,6 +19,22 @@ class KaoTools(commands.Cog):
             except:
                 pass
             self.bot.add_command(old_invite)
+
+    @commands.Cog.listener()
+    async def on_message_without_command(self, message: discord.Message):
+        if message.author.bot:
+            return
+        if not message.guild:
+            return
+        if not re.compile(rf"^<@!?{self.bot.user.id}>$").match(message.content):
+            return
+        embed = discord.Embed(colour= await self.bot.get_embed_colour(message.channel), description= f"""
+        **Hey there!** <a:bounce:778449468717531166>
+        My prefixes in this server are {humanize_list(await self.bot.get_prefix(message.channel))}
+        You can view all my commands with `{(await self.bot.get_prefix(message.channel))[2]}help`
+        Need some help? Join my support server [here!](https://discord.gg/p6ehU9qhg8)
+        """)
+        await message.channel.send(embed=embed)
 
     @commands.bot_has_permissions(embed_links=True)
     @commands.command()
