@@ -5,5 +5,5 @@
     "short" : "idk just things",
     "hidden" : true,
     "description" : "girl why did u download this",
-    "requirements" : ["re"]
+    "requirements" : ["regex"]
 }
