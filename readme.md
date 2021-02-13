@@ -1,7 +1,5 @@
 # kaogurai cogs
 
-these are still in beta, i would not install them
-
 ```
 [p]load downloader
 
@@ -11,6 +9,7 @@ these are still in beta, i would not install them
 
 [p]load <cog>
 ```
+
 
 | Name     | Status | Description                 |
 |----------|--------|-----------------------------|
