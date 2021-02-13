@@ -21,11 +21,13 @@ class AiTools(commands.Cog):
             return await ctx.send("The brain id has not been set.")
         if brain_info.get("brain_key") is None:
             return await ctx.send("The brain key has not been set.")
-
-        async with aiohttp.ClientSession() as session:
-            async with session.get("http://api.brainshop.ai/get?bid=" + brain_info.get("brain_id") + "&key=" + brain_info.get("brain_key") + "&uid=" + str(ctx.author.id) + "&msg=" + urllib.parse.quote(message)) as request:
-                response = await request.json()
-                await ctx.send(response['cnt'])
+        try:
+            async with aiohttp.ClientSession() as session:
+                async with session.get("http://api.brainshop.ai/get?bid=" + brain_info.get("brain_id") + "&key=" + brain_info.get("brain_key") + "&uid=" + str(ctx.author.id) + "&msg=" + urllib.parse.quote(message)) as request:
+                    response = await request.json()
+                    await ctx.send(response['cnt'])
+        except aiohttp.ClientConnectionError:
+            await ctx.send("Uh oh! The API I use is down, sorry!")
 
     @commands.Cog.listener()
     async def on_message_without_command(self, message: discord.Message):
@@ -45,10 +47,13 @@ class AiTools(commands.Cog):
         if brain_info.get("brain_key") is None:
             return await message.channel.send("The brain key has not been set.")
 
-        async with aiohttp.ClientSession() as session:
-            async with session.get("http://api.brainshop.ai/get?bid=" + brain_info.get("brain_id") + "&key=" + brain_info.get("brain_key") + "&uid=" + str(message.author.id) + "&msg=" + urllib.parse.quote(str(message.content))) as request:
-                response = await request.json()
-                await message.channel.send(response['cnt'])
+        try: 
+            async with aiohttp.ClientSession() as session:
+                async with session.get("http://api.brainshop.ai/get?bid=" + brain_info.get("brain_id") + "&key=" + brain_info.get("brain_key") + "&uid=" + str(message.author.id) + "&msg=" + urllib.parse.quote(str(message.content))) as request:
+                    response = await request.json()
+                    await message.channel.send(response['cnt'])
+        except aiohttp.ClientConnectionError:
+            await message.channel.send("Uh oh! The API I use is down, sorry!")
         
     @commands.group()
     @commands.guild_only()
