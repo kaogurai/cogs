@@ -19,4 +19,5 @@
 
 
 credits:
-[oofcogs](https://github.com/OofChair/OofCogs) for helping me with aiohttp
+[oofchair](https://github.com/OofChair/OofCogs) for helping me with aiohttp
+
