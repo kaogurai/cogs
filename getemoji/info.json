@@ -1,6 +1,6 @@
 {
     "author" : ["alec#8068"],
-    "install_msg" : "**THIS DOES NOT WORK BY ITSELF!!!!**\n you'll need to run this api server first: https://github.com/kaogurai/api",
+    "install_msg" : "**THIS DOES NOT WORK BY ITSELF!!!!**\n You will need to follow the instructions found here: https://github.com/kaogurai/cogs/tree/master/getemoji",
     "name" : "GetEmoji",
     "short" : "get emojis from different providers",
     "description" : "scrape emojipedia 4 cute images",
