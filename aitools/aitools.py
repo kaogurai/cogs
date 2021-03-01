@@ -95,7 +95,7 @@ class AiTools(commands.Cog):
 
     @aichannel.command()
     async def list(self, ctx):
-        """Remove all the channels the AI will talk in."""
+        """List all the channels the AI will talk in."""
         channel_list = await self.config.guild(ctx.guild).channels()
         if not channel_list: 
             await ctx.send("There's no channels in the config.")
