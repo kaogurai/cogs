@@ -100,5 +100,8 @@ class AiTools(commands.Cog):
         if not channel_list: 
             await ctx.send("There's no channels in the config.")
         else:
-            embed = discord.Embed(title = "AI Channel IDs", color = await ctx.embed_colour(), description = humanize_list(channel_list))
+            lolidk = ""
+            for obj in channel_list:
+                lolidk = lolidk + "\n <#" + str(obj) + "> - " + str(obj)
+            embed = discord.Embed(title = "AI Channels", color = await ctx.embed_colour(), description = lolidk)
             await ctx.send(embed=embed)
