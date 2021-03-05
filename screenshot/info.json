@@ -1,0 +1,9 @@
+{
+    "author" : ["alec#8068"],
+    "install_msg" : "ty 4 installing",
+    "name" : "Screenshot",
+    "short" : "takes a screenshot of a given url",
+    "hidden" : true,
+    "requirements" : ["pyppeteer"],
+    "description" : "takes a screenshot of a given url"
+}

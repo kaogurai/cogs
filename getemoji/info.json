@@ -4,5 +4,6 @@
     "name" : "GetEmoji",
     "short" : "get emojis from different providers",
     "description" : "scrape emojipedia 4 cute images",
+    "requirements" : ["aiohttp"],
     "tags" : ["emoji"]
 }
