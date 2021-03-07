@@ -79,6 +79,12 @@ class AutoAvatar(commands.Cog):
             await ctx.send(page)
 
     @commands.command()
+    @commands.is_owner()
+    async def forceavatar(self, ctx):
+        await self.change_avatar()
+        await ctx.send("Ok.")
+
+    @commands.command()
     async def submitavatar(self, ctx, link: str):
         if link.startswith('https://'):
             pass
