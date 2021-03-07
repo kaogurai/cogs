@@ -38,6 +38,7 @@ class AutoAvatar(commands.Cog):
     @commands.command()
     @commands.is_owner()
     async def addavatar(self, ctx, link: str):
+        """adds an avatar to the list"""
         all_avatars = await self.config.avatars()
         if link.startswith('https://'):
             pass
@@ -57,6 +58,7 @@ class AutoAvatar(commands.Cog):
     @commands.command()
     @commands.is_owner()
     async def removeavatar(self, ctx, link: str):
+        """removes an avatar from the list"""
         all_avatars = await self.config.avatars()
         if link in all_avatars:
             all_avatars.remove(link)
@@ -66,8 +68,8 @@ class AutoAvatar(commands.Cog):
             await ctx.send(f"{link} wasn't in my list of avatars, did you mean to add it?")
 
     @commands.command()
-    @commands.is_owner()
     async def listavatars(self, ctx):
+        """lists all links to rotating avatars"""
         all_avatars = await self.config.avatars()
         if not all_avatars:
             await ctx.send("Nothing. This might cause some errors, yikes!")
@@ -81,11 +83,13 @@ class AutoAvatar(commands.Cog):
     @commands.command()
     @commands.is_owner()
     async def forceavatar(self, ctx):
+        """force changes avatar"""
         await self.change_avatar()
         await ctx.send("Ok.")
 
     @commands.command()
     async def submitavatar(self, ctx, link: str):
+        """submits a avatar"""
         if link.startswith('https://'):
             pass
         else:
