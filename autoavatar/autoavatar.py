@@ -4,6 +4,7 @@ import discord
 import asyncio
 import random
 import aiohttp
+import datetime
 
 class AutoAvatar(commands.Cog):
     """automatically changes bot avatar"""
@@ -11,7 +12,7 @@ class AutoAvatar(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.config = Config.get_conf(self, identifier=696969696969494)
-        default_global = { "avatars": [ 'https://avatars.githubusercontent.com/u/23690422?s=400&v=4'] }
+        default_global = {"avatars": ['https://avatars.githubusercontent.com/u/23690422?s=400&v=4']}
         self.config.register_global(**default_global)
         self.avatar_task = asyncio.create_task(self.wait_for_avatar())
 
@@ -34,6 +35,11 @@ class AutoAvatar(commands.Cog):
             async with session.get(new_avatar) as request:
                 avatar = await request.read()
         await self.bot.user.edit(avatar=avatar)
+        channel = self.bot.get_channel(818684148847345714)
+        embed = discord.Embed(colour= await self.bot.get_embed_colour(channel), title= "New Avatar", timestamp=datetime.datetime.now())
+        embed.set_image(new_avatar)
+        await channel.send(embed=embed)
+
 
     @commands.command()
     @commands.is_owner()
@@ -51,7 +57,7 @@ class AutoAvatar(commands.Cog):
         if link not in all_avatars:
             all_avatars.append(link)
             await self.config.avatars.set(all_avatars)
-            await ctx.send(f"Okay, I've added {link} to list of avatars.")
+            await ctx.tick()
         else:
             await ctx.send(f"{link} was already in my list of avatars, did you mean to remove it?")
 
@@ -63,7 +69,7 @@ class AutoAvatar(commands.Cog):
         if link in all_avatars:
             all_avatars.remove(link)
             await self.config.avatars.set(all_avatars)
-            await ctx.send(f"Okay, I've removed {link} from my list of avatars.")
+            await ctx.tick()
         else:
             await ctx.send(f"{link} wasn't in my list of avatars, did you mean to add it?")
 
@@ -85,7 +91,7 @@ class AutoAvatar(commands.Cog):
     async def forceavatar(self, ctx):
         """force changes avatar"""
         await self.change_avatar()
-        await ctx.send("Ok.")
+        await ctx.tick()
 
     @commands.command()
     async def submitavatar(self, ctx, link: str):
@@ -99,5 +105,7 @@ class AutoAvatar(commands.Cog):
                 await ctx.send("That doesn't look like a valid link!")
                 return
         channel = self.bot.get_channel(818239460004855888)
-        await channel.send(f"Someone has submitted a new avatar! Here's the link: {link}")
-        await ctx.send("Thanks for the submission! It'll be taken into consideration.")
+        embed = discord.Embed(colour= await self.bot.get_embed_colour(channel), title= "Avatar Submission", timestamp=datetime.datetime.now())
+        embed.set_image(link)
+        await channel.send(embed=embed)
+        await ctx.tick()
