@@ -37,7 +37,7 @@ class AutoAvatar(commands.Cog):
         await self.bot.user.edit(avatar=avatar)
         channel = self.bot.get_channel(818684148847345714)
         embed = discord.Embed(colour= await self.bot.get_embed_colour(channel), title= "New Avatar", timestamp=datetime.datetime.now())
-        embed.set_image(new_avatar)
+        embed.set_image(url=new_avatar)
         await channel.send(embed=embed)
 
 
