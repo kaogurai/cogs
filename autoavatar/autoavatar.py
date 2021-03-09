@@ -13,6 +13,10 @@ class AutoAvatar(commands.Cog):
         self.config = Config.get_conf(self, identifier=696969696969494)
         default_global = { "avatars": [ 'https://avatars.githubusercontent.com/u/23690422?s=400&v=4'] }
         self.config.register_global(**default_global)
+        self.avatar_task = asyncio.create_task(self.wait_for_avatar())
+
+    def cog_unload(self):
+        self.avatar_task.cancel()
 
     async def wait_for_avatar(self):
         await self.bot.wait_until_red_ready()
