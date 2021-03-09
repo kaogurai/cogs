@@ -106,6 +106,6 @@ class AutoAvatar(commands.Cog):
                 return
         channel = self.bot.get_channel(818239460004855888)
         embed = discord.Embed(colour= await self.bot.get_embed_colour(channel), title= "Avatar Submission", timestamp=datetime.datetime.now())
-        embed.set_image(link)
+        embed.set_image(url=link)
         await channel.send(embed=embed)
         await ctx.tick()
