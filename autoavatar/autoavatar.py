@@ -12,7 +12,7 @@ class AutoAvatar(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.config = Config.get_conf(self, identifier=696969696969494)
-        default_global = {"avatars": ['https://avatars.githubusercontent.com/u/23690422?s=400&v=4']}
+        default_global = {"avatars": ['https://avatars.githubusercontent.com/u/23690422?s=400&v=4'], "current_avatar": ""}
         self.config.register_global(**default_global)
         self.avatar_task = asyncio.create_task(self.wait_for_avatar())
 
@@ -35,8 +35,9 @@ class AutoAvatar(commands.Cog):
             async with session.get(new_avatar) as request:
                 avatar = await request.read()
         await self.bot.user.edit(avatar=avatar)
+        await self.config.current_avatar.set(new_avatar)
         channel = self.bot.get_channel(818684148847345714)
-        embed = discord.Embed(colour= await self.bot.get_embed_colour(channel), title= "New Avatar", timestamp=datetime.datetime.now())
+        embed = discord.Embed(colour= await self.bot.get_embed_colour(channel), title= "Current Avatar", timestamp=datetime.datetime.now())
         embed.set_image(url=new_avatar)
         await channel.send(embed=embed)
 
@@ -92,6 +93,14 @@ class AutoAvatar(commands.Cog):
         """force changes avatar"""
         await self.change_avatar()
         await ctx.tick()
+
+    @commands.command()
+    @commands.bot_has_permissions(embed_links=True)
+    async def currentavatar(self,ctx):
+        avatar = await self.config.current_avatar()
+        embed = discord.Embed(colour= await self.bot.get_embed_colour(ctx.channel), title= "Current Avatar", timestamp=datetime.datetime.now())
+        embed.set_image(url=avatar)
+        await ctx.send(embed=embed)
 
     @commands.command()
     async def submitavatar(self, ctx, link: str):
