@@ -12,7 +12,12 @@ class AutoAvatar(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.config = Config.get_conf(self, identifier=696969696969494)
-        default_global = {"avatars": ['https://avatars.githubusercontent.com/u/23690422?s=400&v=4'], "current_avatar": ""}
+        default_global = {
+            "avatars": ['https://avatars.githubusercontent.com/u/23690422?s=400&v=4'], 
+            "current_avatar": "",
+            "current_channel": None,
+            "submission_channel": None
+        }
         self.config.register_global(**default_global)
         self.avatar_task = asyncio.create_task(self.wait_for_avatar())
 
@@ -24,7 +29,7 @@ class AutoAvatar(commands.Cog):
         while True:
             try:
                 await self.change_avatar()
-                await asyncio.sleep(3600)
+                await asyncio.sleep(3600) # in the future, i want to move this to a task
             except asyncio.CancelledError:
                 break
     
@@ -36,11 +41,38 @@ class AutoAvatar(commands.Cog):
                 avatar = await request.read()
         await self.bot.user.edit(avatar=avatar)
         await self.config.current_avatar.set(new_avatar)
-        channel = self.bot.get_channel(818684148847345714)
-        embed = discord.Embed(colour= await self.bot.get_embed_colour(channel), title= "My Current Avatar", timestamp=datetime.datetime.utcnow())
-        embed.set_image(url=new_avatar)
-        await channel.send(embed=embed)
+        if await self.config.current_channel() is None:
+            pass
+        else:
+            channel = self.bot.get_channel(await self.config.current_channel())
+            embed = discord.Embed(colour= await self.bot.get_embed_colour(channel), title= "My Current Avatar", timestamp=datetime.datetime.utcnow())
+            embed.set_image(url=new_avatar)
+            await channel.send(embed=embed)
 
+    @commands.group()
+    @commands.is_owner()
+    async def avatarchannel(self, ctx):
+        pass
+
+    @avatarchannel.command()
+    async def current(self, ctx, channel: discord.TextChannel=None):
+        if channel is None:
+            await self.config.current_channel.set(None)
+            await ctx.tick()
+        else:
+            await self.config.current_channel.set(channel.id)
+            await ctx.tick()
+
+    @avatarchannel.command()
+    async def submissions(self, ctx, channel: discord.TextChannel=None):
+        """sets the submission channel for the `[p]submitavatar` command
+           if no channel is provided, it will clear it"""
+        if channel is None:
+            await self.config.submission_channel.set(None)
+            await ctx.tick()
+        else:
+            await self.config.submission_channel.set(channel.id)
+            await ctx.tick()
 
     @commands.command()
     @commands.is_owner()
@@ -76,7 +108,7 @@ class AutoAvatar(commands.Cog):
 
     @commands.command()
     async def listavatars(self, ctx):
-        """lists all links to rotating avatars"""
+        """lists all links to the list of avatars"""
         all_avatars = await self.config.avatars()
         if not all_avatars:
             await ctx.send("Nothing. This might cause some errors, yikes!")
@@ -105,7 +137,7 @@ class AutoAvatar(commands.Cog):
 
     @commands.command()
     async def submitavatar(self, ctx, link: str):
-        """submits an avatar"""
+        """submits an avatar link"""
         if link.startswith('https://'):
             pass
         else:
@@ -114,8 +146,12 @@ class AutoAvatar(commands.Cog):
             else: 
                 await ctx.send("That doesn't look like a valid link!")
                 return
-        channel = self.bot.get_channel(818239460004855888)
-        embed = discord.Embed(colour= await self.bot.get_embed_colour(channel), title= "Avatar Submission", timestamp=datetime.datetime.utcnow())
-        embed.set_image(url=link)
-        await channel.send(embed=embed)
-        await ctx.tick()
+        if await self.config.submission_channel() is None:
+            await ctx.send("Ask the bot owner to set up the submissions channel!")
+            return
+        else:
+            channel = self.bot.get_channel(await self.config.submission_channel())
+            embed = discord.Embed(colour= await self.bot.get_embed_colour(channel), title= "Avatar Submission", timestamp=datetime.datetime.utcnow())
+            embed.set_image(url=link)
+            await channel.send(embed=embed)
+            await ctx.tick()

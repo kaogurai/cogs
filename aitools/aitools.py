@@ -60,6 +60,7 @@ class AiTools(commands.Cog):
     @commands.admin()
     async def aichannel(self, ctx):
         """Configure the channels the AI will talk in."""
+        pass
          
     @aichannel.command()
     async def add(self, ctx, channel: discord.TextChannel):

@@ -17,6 +17,7 @@ class GetEmoji(commands.Cog):
     @commands.group()
     async def getemoji(self, ctx):
         """get custom emojis from different providers!"""
+        pass
 
     @getemoji.command()
     @commands.bot_has_permissions(embed_links=True)
