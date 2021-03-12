@@ -52,10 +52,13 @@ class AutoAvatar(commands.Cog):
     @commands.group()
     @commands.is_owner()
     async def avatarchannel(self, ctx):
+        """commands to set the channel for the current avatar, and the avatar submissions"""
         pass
 
     @avatarchannel.command()
     async def current(self, ctx, channel: discord.TextChannel=None):
+        """sets the channel for the current avatar display
+           if no channel is provided, it will clear it"""
         if channel is None:
             await self.config.current_channel.set(None)
             await ctx.tick()
