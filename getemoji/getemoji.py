@@ -22,6 +22,7 @@ class GetEmoji(commands.Cog):
     @commands.bot_has_permissions(embed_links=True)
     async def apple(self, ctx, emoji: str):
         """get an image of a apple emoji"""
+        await ctx.trigger_typing()
         url = await self.config.url()
         try:
             async with aiohttp.ClientSession() as session:
@@ -39,6 +40,7 @@ class GetEmoji(commands.Cog):
     @commands.bot_has_permissions(embed_links=True)
     async def google(self, ctx, emoji: str):
         """get an image of a google emoji"""
+        await ctx.trigger_typing()
         url = await self.config.url()
         try:
             async with aiohttp.ClientSession() as session:
@@ -56,6 +58,7 @@ class GetEmoji(commands.Cog):
     @commands.bot_has_permissions(embed_links=True)
     async def samsung(self, ctx, emoji: str):
         """get an image of a samsung emoji"""
+        await ctx.trigger_typing()
         url = await self.config.url()
         try:
             async with aiohttp.ClientSession() as session:
@@ -73,6 +76,7 @@ class GetEmoji(commands.Cog):
     @commands.bot_has_permissions(embed_links=True)
     async def microsoft(self, ctx, emoji: str):
         """get an image of a microsoft emoji"""
+        await ctx.trigger_typing()
         url = await self.config.url()
         try:
             async with aiohttp.ClientSession() as session:
@@ -90,6 +94,7 @@ class GetEmoji(commands.Cog):
     @commands.bot_has_permissions(embed_links=True)
     async def whatsapp(self, ctx, emoji: str):
         """get an image of a whatsapp emoji"""
+        await ctx.trigger_typing()
         url = await self.config.url()
         try:
             async with aiohttp.ClientSession() as session:
@@ -107,6 +112,7 @@ class GetEmoji(commands.Cog):
     @commands.bot_has_permissions(embed_links=True)
     async def twitter(self, ctx, emoji: str):
         """get an image of a twitter/discord emoji"""
+        await ctx.trigger_typing()
         url = await self.config.url()
         try:
             async with aiohttp.ClientSession() as session:
@@ -124,6 +130,7 @@ class GetEmoji(commands.Cog):
     @commands.bot_has_permissions(embed_links=True)
     async def facebook(self, ctx, emoji: str):
         """get an image of a facebook emoji"""
+        await ctx.trigger_typing()
         url = await self.config.url()
         try:
             async with aiohttp.ClientSession() as session:
@@ -141,6 +148,7 @@ class GetEmoji(commands.Cog):
     @commands.bot_has_permissions(embed_links=True)
     async def joypixels(self, ctx, emoji: str):
         """get an image of a joypixels emoji"""
+        await ctx.trigger_typing()
         url = await self.config.url()
         try:
             async with aiohttp.ClientSession() as session:
@@ -158,6 +166,7 @@ class GetEmoji(commands.Cog):
     @commands.bot_has_permissions(embed_links=True)
     async def openmoji(self, ctx, emoji: str):
         """get an image of a openmoji emoji"""
+        await ctx.trigger_typing()
         url = await self.config.url()
         try:
             async with aiohttp.ClientSession() as session:
@@ -175,6 +184,7 @@ class GetEmoji(commands.Cog):
     @commands.bot_has_permissions(embed_links=True)
     async def emojidex(self, ctx, emoji: str):
         """get an image of a emojidex emoji"""
+        await ctx.trigger_typing()
         url = await self.config.url()
         try:
             async with aiohttp.ClientSession() as session:
@@ -192,6 +202,7 @@ class GetEmoji(commands.Cog):
     @commands.bot_has_permissions(embed_links=True)
     async def lg(self, ctx, emoji: str):
         """get an image of a lg emoji"""
+        await ctx.trigger_typing()
         url = await self.config.url()
         try:
             async with aiohttp.ClientSession() as session:
@@ -209,6 +220,7 @@ class GetEmoji(commands.Cog):
     @commands.bot_has_permissions(embed_links=True)
     async def htc(self, ctx, emoji: str):
         """get an image of a htc emoji"""
+        await ctx.trigger_typing()
         url = await self.config.url()
         try:
             async with aiohttp.ClientSession() as session:
@@ -226,6 +238,7 @@ class GetEmoji(commands.Cog):
     @commands.bot_has_permissions(embed_links=True)
     async def softbank(self, ctx, emoji: str):
         """get an image of a softbank emoji"""
+        await ctx.trigger_typing()
         url = await self.config.url()
         try:
             async with aiohttp.ClientSession() as session:
@@ -243,6 +256,7 @@ class GetEmoji(commands.Cog):
     @commands.bot_has_permissions(embed_links=True)
     async def docomo(self, ctx, emoji: str):
         """get an image of a docomo emoji"""
+        await ctx.trigger_typing()
         url = await self.config.url()
         try:
             async with aiohttp.ClientSession() as session:
@@ -260,6 +274,7 @@ class GetEmoji(commands.Cog):
     @commands.bot_has_permissions(embed_links=True)
     async def mozilla(self, ctx, emoji: str):
         """get an image of a mozilla emoji"""
+        await ctx.trigger_typing()
         url = await self.config.url()
         try:
             async with aiohttp.ClientSession() as session:
@@ -277,6 +292,7 @@ class GetEmoji(commands.Cog):
     @commands.bot_has_permissions(embed_links=True)
     async def messenger(self, ctx, emoji: str):
         """get an image of a messenger emoji"""
+        await ctx.trigger_typing()
         url = await self.config.url()
         try:
             async with aiohttp.ClientSession() as session:
