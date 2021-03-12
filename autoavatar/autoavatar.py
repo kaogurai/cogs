@@ -98,7 +98,7 @@ class AutoAvatar(commands.Cog):
     @commands.bot_has_permissions(embed_links=True)
     async def currentavatar(self,ctx):
         avatar = await self.config.current_avatar()
-        embed = discord.Embed(colour= await self.bot.get_embed_colour(ctx.channel), title= "Current Avatar", timestamp=datetime.datetime)
+        embed = discord.Embed(colour= await self.bot.get_embed_colour(ctx.channel), title= "Current Avatar", timestamp=datetime.datetime.utcnow())
         embed.set_image(url=avatar)
         await ctx.send(embed=embed)
 
@@ -114,7 +114,7 @@ class AutoAvatar(commands.Cog):
                 await ctx.send("That doesn't look like a valid link!")
                 return
         channel = self.bot.get_channel(818239460004855888)
-        embed = discord.Embed(colour= await self.bot.get_embed_colour(channel), title= "Avatar Submission", timestamp=datetime.datetime.now())
+        embed = discord.Embed(colour= await self.bot.get_embed_colour(channel), title= "Avatar Submission", timestamp=datetime.datetime.utcnow())
         embed.set_image(url=link)
         await channel.send(embed=embed)
         await ctx.tick()
