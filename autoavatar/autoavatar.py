@@ -37,7 +37,7 @@ class AutoAvatar(commands.Cog):
         await self.bot.user.edit(avatar=avatar)
         await self.config.current_avatar.set(new_avatar)
         channel = self.bot.get_channel(818684148847345714)
-        embed = discord.Embed(colour= await self.bot.get_embed_colour(channel), title= "Current Avatar", timestamp=datetime.datetime.now())
+        embed = discord.Embed(colour= await self.bot.get_embed_colour(channel), title= "Current Avatar", timestamp=datetime.datetime())
         embed.set_image(url=new_avatar)
         await channel.send(embed=embed)
 
@@ -98,7 +98,7 @@ class AutoAvatar(commands.Cog):
     @commands.bot_has_permissions(embed_links=True)
     async def currentavatar(self,ctx):
         avatar = await self.config.current_avatar()
-        embed = discord.Embed(colour= await self.bot.get_embed_colour(ctx.channel), title= "Current Avatar", timestamp=datetime.datetime.now())
+        embed = discord.Embed(colour= await self.bot.get_embed_colour(ctx.channel), title= "Current Avatar", timestamp=datetime.datetime)
         embed.set_image(url=avatar)
         await ctx.send(embed=embed)
 
