@@ -90,7 +90,7 @@ class AutoAvatar(commands.Cog):
     @commands.command()
     @commands.is_owner()
     async def forceavatar(self, ctx):
-        """force changes avatar"""
+        """force changes the bot avatar"""
         await self.change_avatar()
         await ctx.tick()
 
@@ -105,7 +105,7 @@ class AutoAvatar(commands.Cog):
 
     @commands.command()
     async def submitavatar(self, ctx, link: str):
-        """submits a avatar"""
+        """submits an avatar"""
         if link.startswith('https://'):
             pass
         else:
