@@ -19,6 +19,3 @@
 | Screenshot | Stable | Takes a screenshot of the given link |
 | SmartLyrics | Unfinished | Gets the lyrics of the song you're listening to |
 
-credits:
-[oofchair](https://github.com/OofChair/OofCogs) for helping me with aiohttp
-

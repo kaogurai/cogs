@@ -11,6 +11,7 @@ class KaoTools(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
+    # logic taken from https://github.com/maxbooiii/maxcogs/blob/master/ping/ping.py#L28
     def cog_unload(self):
         global old_invite
         if old_invite:
