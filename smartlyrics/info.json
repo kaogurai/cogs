@@ -1,8 +1,0 @@
-{
-    "author" : ["alec#8068"],
-    "name" : "SmartLyrics",
-    "install_msg" : "**Thanks for installing.**\n This cog isn't finished yet, so come back later!",
-    "short" : "get lyrics of your current playing song",
-    "description" : "get lyrics of your current playing song",
-    "hidden" : true
-}

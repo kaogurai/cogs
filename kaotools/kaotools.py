@@ -29,9 +29,11 @@ class KaoTools(commands.Cog):
             return
         if not re.compile(rf"^<@!?{self.bot.user.id}>$").match(message.content):
             return
+        prefixes = await self.bot.get_prefix(message.channel)
+        prefixes.remove(f'<@!{self.bot.user.id}> ')
         embed = discord.Embed(colour= await self.bot.get_embed_colour(message.channel), description= f"""
         **Hey there!** <a:bounce:778449468717531166>
-        My prefixes in this server are {humanize_list(await self.bot.get_prefix(message.channel))}
+        My prefixes in this server are {humanize_list(prefixes)}
         You can view all my commands with `{(await self.bot.get_prefix(message.channel))[2]}help`
         Need some help? Join my [support server!](https://discord.gg/p6ehU9qhg8)
         """)
