@@ -269,13 +269,13 @@ class AntiNSFW(commands.Cog):
             response = await request.json()
             return response['score']
     
-    @commands.Cog.listener()
+    @commands.Cog.listener() # for media filter
     async def on_message(self, message: discord.Message):
         if not message.guild:
             return
         if message.author.bot:
             return
-        if message.attachments and await self.config.guild(message.guild).enabled() is True:
+        if message.attachments and await self.config.guild(message.guild).enabled() is True and await self.config.guild(message.guild).filter_media():
             req = await self.config.guild(message.guild).requirement()
             for attachment in message.attachments:
                 score = await self.check_nsfw(attachment.url)
