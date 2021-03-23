@@ -1,0 +1,8 @@
+{
+    "author" : ["alec"],
+    "name" : "AntiNSFW",
+    "install_msg" : "**Thanks for installing!**",
+    "short" : "Detects & Deletes NSFW Content.",
+    "description" : "Detects & Deletes NSFW Content.",
+    "tags" : ["antinsfw", "nsfw"]
+}

@@ -1,5 +1,5 @@
 {
-    "author" : ["alec#8068"],
+    "author" : ["alec"],
     "name" : "KaoTools",
     "install_msg" : "**Warning:**\nThis cog is meant for the discord bot kaogurai#0881, and while it is open source, it's not recommended to be used.\n Many things have been hardcoded, and for that reason, I will not support this cog in **any** way.",
     "short" : "Simple Tools for Kaogurai",

@@ -11,8 +11,9 @@ class GetEmoji(commands.Cog):
     @commands.command()
     @commands.is_owner()
     async def emojiapiurl(self, ctx, url: str):
+        """set the url for the emoji api server"""
         await self.config.url.set(url)
-        await ctx.send(f"ok, i set the url to {url}")
+        await ctx.tick()
 
     @commands.group()
     async def getemoji(self, ctx):
