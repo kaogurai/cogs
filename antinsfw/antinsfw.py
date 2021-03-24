@@ -290,5 +290,5 @@ class AntiNSFW(commands.Cog):
                             await message.channel.send("Yikes, that wasn't SFW.")
                         except discord.errors.Forbidden:
                             await message.channel.send("I can't delete that, can you tell a admin to give me the Manage Messages permission?")
-        else:
-            await message.channel.send("Lol")
+            else:
+                await message.channel.send("Not the Multiple Attachments")
