@@ -27,6 +27,9 @@ class AntiNSFW(commands.Cog):
         self.config.register_guild(**default_guild)
         self.config.register_global(**default_global)
 
+    async def cog_unload(self):
+        await self.session.close()
+
     @commands.group()
     @commands.mod()
     async def antinsfw(self, ctx):
@@ -269,19 +272,24 @@ class AntiNSFW(commands.Cog):
             response = await request.json()
             return response['score']
     
-    @commands.Cog.listener() # for media filter
+    @commands.Cog.listener() # for media filter 
     async def on_message(self, message: discord.Message):
         if not message.guild:
             return
         if message.author.bot:
             return
-        if message.attachments and await self.config.guild(message.guild).enabled() is True and await self.config.guild(message.guild).filter_media():
+        if not message.attachments:
+            return
+        if await self.config.guild(message.guild).enabled() is True and await self.config.guild(message.guild).filter_media() is True:
             req = await self.config.guild(message.guild).requirement()
-            for attachment in message.attachments:
-                score = await self.check_nsfw(attachment.url)
-                if score > req:
-                    try:
-                        await message.delete()
-                        await message.channel.send("Yikes, that wasn't SFW.")
-                    except discord.errors.Forbidden:
-                        await message.channel.send("I can't delete that, can you tell a admin to give me the Manage Messages permission?")
+            if len(message.attachments) == 1:
+                for attachment in message.attachments:
+                    score = await self.check_nsfw(attachment.url)
+                    if score > req:
+                        try:
+                            await message.delete()
+                            await message.channel.send("Yikes, that wasn't SFW.")
+                        except discord.errors.Forbidden:
+                            await message.channel.send("I can't delete that, can you tell a admin to give me the Manage Messages permission?")
+        else:
+            await message.channel.send("Lol")
