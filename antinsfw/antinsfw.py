@@ -9,7 +9,6 @@ class AntiNSFW(commands.Cog):
 
     def __init__(self, bot):
         self.bot = bot
-        self.session = aiohttp.ClientSession()
         self.config = Config.get_conf(self, identifier=69696969696969000)
         default_guild = {
             "enabled": False,
@@ -27,8 +26,6 @@ class AntiNSFW(commands.Cog):
         self.config.register_guild(**default_guild)
         self.config.register_global(**default_global)
 
-    async def cog_unload(self):
-        await self.session.close()
 
     @commands.group()
     @commands.mod()
@@ -266,11 +263,13 @@ class AntiNSFW(commands.Cog):
             await ctx.tick()
 
     async def check_nsfw(self, link):
+        session = aiohttp.ClientSession()
         api = await self.config.api()
         url = api + '?url=' + link
-        async with self.session.get(url) as request:
+        async with session.get(url) as request:
             response = await request.json()
-            return response['score']
+        await session.close()
+        return response['score']
     
     @commands.Cog.listener() # for media filter 
     async def on_message(self, message: discord.Message):
