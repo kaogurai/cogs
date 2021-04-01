@@ -1,8 +1,7 @@
-from redbot.core import commands, Config, checks
+from redbot.core import commands, Config
 from redbot.core.utils.chat_formatting import humanize_list
 import discord
 import aiohttp 
-import urllib.parse
 
 class AntiNSFW(commands.Cog):
     """Detects & Deletes NSFW Content."""
@@ -17,6 +16,7 @@ class AntiNSFW(commands.Cog):
             "filter_emotes": True,
             "filter_links": True,
             "requirement": 0.85,
+            "deleted_message": "",
             "ignored_channels": [],
             "ignored_roles": [],
         }
@@ -269,7 +269,10 @@ class AntiNSFW(commands.Cog):
         async with session.get(url) as request:
             response = await request.json()
         await session.close()
-        return response['score']
+        if 'score' in response:
+            return response['score']
+        else:
+            return "Nah"
     
     @commands.Cog.listener() # for media filter 
     async def on_message(self, message: discord.Message):
@@ -282,13 +285,24 @@ class AntiNSFW(commands.Cog):
         if await self.config.guild(message.guild).enabled() is True and await self.config.guild(message.guild).filter_media() is True:
             req = await self.config.guild(message.guild).requirement()
             if len(message.attachments) == 1:
-                for attachment in message.attachments:
-                    score = await self.check_nsfw(attachment.url)
-                    if score > req:
-                        try:
-                            await message.delete()
-                            await message.channel.send("Yikes, that wasn't SFW.")
-                        except discord.errors.Forbidden:
-                            await message.channel.send("I can't delete that, can you tell a admin to give me the Manage Messages permission?")
+                attachment = message.attachments[0]
+                score = await self.check_nsfw(attachment.url)
+                if score > req:
+                    try:
+                        await message.delete()
+                        if await self.config.guild(message.guild).deleted_message():
+                            await message.channel.send(await self.config.guild(message.guild).deleted_message())
+                    except discord.errors.Forbidden:
+                        await message.channel.send("I can't delete that, can you tell a admin to give me the Manage Messages permission?")
             else:
                 await message.channel.send("Not the Multiple Attachments")
+
+"""
+TODO:
+test for more than 1 attachment
+respect the ignore settings & nsfw channel settings
+
+add emote filtering
+
+add link filtering
+"""

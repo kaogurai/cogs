@@ -97,6 +97,30 @@ class Scrobbler(commands.Cog):
                 # do something to handle it not working LMFAO
         await session.close()
 
+    async def set_nowplaying(self, track, artist, user):
+        fm_tokens = await self.bot.get_shared_api_tokens("lastfm")
+        api_key = fm_tokens.get('appid')
+        api_secret = fm_tokens.get('secret')
+        base_url = "https://ws.audioscrobbler.com/2.0/"
+        timestamp = time.time()
+        sk = await self.config.user(user).session_key()
+        params = {
+            'api_key': api_key,
+            'artist': artist,
+            'method': 'track.updateNowPlaying',
+            'sk': sk,
+            'timestamp': str(timestamp),
+            'track': track
+        }
+        hashed = hashRequest(params, api_secret)
+        params['api_sig'] = hashed
+        async with aiohttp.ClientSession() as session:
+            async with session.post(base_url, params=params) as request:
+                response = await request.text()
+                dict = xmltodict.parse(response, process_namespaces=True)
+                # do something to handle it not working LMFAO
+        await session.close()
+
     @commands.Cog.listener()
     async def on_red_audio_track_start(self, guild: discord.Guild, track: lavalink.Track, requester: discord.Member):
         if not (guild and track):
@@ -121,6 +145,7 @@ class Scrobbler(commands.Cog):
             else:
                 if await self.config.user(member).session_key():
                     await self.scrobble_song(track_title, track_artist, member)
+                    await self.set_nowplaying(track_title, track_artist, member)
 
 def hashRequest(obj, secretKey): # https://github.com/huberf/lastfm-scrobbler/blob/master/lastpy/__init__.py#L50
     string = ''
