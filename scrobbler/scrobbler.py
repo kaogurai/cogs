@@ -73,18 +73,22 @@ class Scrobbler(commands.Cog):
         await self.config.user(ctx.author).clear()
         await ctx.tick()
 
-    async def scrobble_song(self, track, artist, duration, user):
+    async def scrobble_song(self, track, artist, duration, user, requester):
         fm_tokens = await self.bot.get_shared_api_tokens("lastfm")
         api_key = fm_tokens.get('appid')
         api_secret = fm_tokens.get('secret')
         base_url = "https://ws.audioscrobbler.com/2.0/"
         timestamp = time.time()
         sk = await self.config.user(user).session_key()
+        if user == requester:
+            chosen = 1
+        else:
+            chosen = 0
         params = {
-            'albumArtist': artist,
             'api_key': api_key,
             'artist': artist,
-            'duration': (duration/1000),
+            'chosenByUser': chosen,
+            'duration': str(duration/1000),
             'method': 'track.scrobble',
             'sk': sk,
             'timestamp': str(timestamp),
@@ -97,9 +101,12 @@ class Scrobbler(commands.Cog):
                 response = await request.text()
                 dict = xmltodict.parse(response, process_namespaces=True)
                 # do something to handle it not working LMFAO
+                lol = self.bot.get_channel(800600678841319444)
+                await lol.send(dict)
+
         await session.close()
 
-    async def set_nowplaying(self, track, artist, duration, user):
+    async def set_nowplaying(self, track, artist, duration, user, requester):
         fm_tokens = await self.bot.get_shared_api_tokens("lastfm")
         api_key = fm_tokens.get('appid')
         api_secret = fm_tokens.get('secret')
@@ -107,10 +114,9 @@ class Scrobbler(commands.Cog):
         timestamp = time.time()
         sk = await self.config.user(user).session_key()
         params = {
-            'albumArtist': artist,
             'api_key': api_key,
             'artist': artist,
-            'duration': (duration/1000),
+            'duration': str(duration/1000),
             'method': 'track.updateNowPlaying',
             'sk': sk,
             'timestamp': str(timestamp),
@@ -148,8 +154,8 @@ class Scrobbler(commands.Cog):
                 continue
             else:
                 if await self.config.user(member).session_key():
-                    await self.scrobble_song(track_title, track_artist, track.length, member)
-                    await self.set_nowplaying(track_title, track_artist, track.length, member)
+                    await self.scrobble_song(track_title, track_artist, track.length, member, requester)
+                    await self.set_nowplaying(track_title, track_artist, track.length, member, requester)
 
 def hashRequest(obj, secretKey): # https://github.com/huberf/lastfm-scrobbler/blob/master/lastpy/__init__.py#L50
     string = ''
