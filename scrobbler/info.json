@@ -1,0 +1,9 @@
+{
+    "author" : ["alec"],
+    "name" : "Scrobbler",
+    "install_msg" : "**Thanks for installing!**",
+    "short" : "Scrobbles music from VC to https://last.fm",
+    "description" : "Scrobbles music from VC to https://last.fm",
+    "tags" : ["music", "audio", "lastfm", "scrobbler"],
+    "requirements" : ["xmltodict"]
+}
