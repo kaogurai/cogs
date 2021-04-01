@@ -101,9 +101,6 @@ class Scrobbler(commands.Cog):
                 response = await request.text()
                 dict = xmltodict.parse(response, process_namespaces=True)
                 # do something to handle it not working LMFAO
-                lol = self.bot.get_channel(800600678841319444)
-                await lol.send(dict)
-
         await session.close()
 
     async def set_nowplaying(self, track, artist, duration, user, requester):
