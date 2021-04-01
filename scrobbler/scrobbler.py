@@ -87,7 +87,7 @@ class Scrobbler(commands.Cog):
         params = {
             'api_key': api_key,
             'artist': artist,
-            'chosenByUser': chosen,
+            'chosenByUser': str(chosen),
             'duration': str(duration/1000),
             'method': 'track.scrobble',
             'sk': sk,
