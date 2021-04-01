@@ -73,7 +73,7 @@ class Scrobbler(commands.Cog):
         await self.config.user(ctx.author).clear()
         await ctx.tick()
 
-    async def scrobble_song(self, track, artist, user):
+    async def scrobble_song(self, track, artist, duration, user):
         fm_tokens = await self.bot.get_shared_api_tokens("lastfm")
         api_key = fm_tokens.get('appid')
         api_secret = fm_tokens.get('secret')
@@ -81,8 +81,10 @@ class Scrobbler(commands.Cog):
         timestamp = time.time()
         sk = await self.config.user(user).session_key()
         params = {
+            'albumArtist': artist,
             'api_key': api_key,
             'artist': artist,
+            'duration': duration,
             'method': 'track.scrobble',
             'sk': sk,
             'timestamp': str(timestamp),
@@ -97,7 +99,7 @@ class Scrobbler(commands.Cog):
                 # do something to handle it not working LMFAO
         await session.close()
 
-    async def set_nowplaying(self, track, artist, user):
+    async def set_nowplaying(self, track, artist, duration, user):
         fm_tokens = await self.bot.get_shared_api_tokens("lastfm")
         api_key = fm_tokens.get('appid')
         api_secret = fm_tokens.get('secret')
@@ -105,8 +107,10 @@ class Scrobbler(commands.Cog):
         timestamp = time.time()
         sk = await self.config.user(user).session_key()
         params = {
+            'albumArtist': artist,
             'api_key': api_key,
             'artist': artist,
+            'duration': duration,
             'method': 'track.updateNowPlaying',
             'sk': sk,
             'timestamp': str(timestamp),
@@ -144,8 +148,8 @@ class Scrobbler(commands.Cog):
                 continue
             else:
                 if await self.config.user(member).session_key():
-                    await self.scrobble_song(track_title, track_artist, member)
-                    await self.set_nowplaying(track_title, track_artist, member)
+                    await self.scrobble_song(track_title, track_artist, track.length, member)
+                    await self.set_nowplaying(track_title, track_artist, track.length, member)
 
 def hashRequest(obj, secretKey): # https://github.com/huberf/lastfm-scrobbler/blob/master/lastpy/__init__.py#L50
     string = ''
