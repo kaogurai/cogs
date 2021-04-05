@@ -8,6 +8,8 @@ class GetEmoji(commands.Cog):
         default_global = {"url": "http://localhost:6969/" }
         self.config.register_global(**default_global)
 
+    # im cringing looking at this rn, i'll eventually get to rewriting it <3
+    
     @commands.command()
     @commands.is_owner()
     async def emojiapiurl(self, ctx, url: str):
