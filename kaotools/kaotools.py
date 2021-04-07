@@ -42,7 +42,7 @@ class KaoTools(commands.Cog):
 
     @commands.bot_has_permissions(embed_links=True)
     @commands.command()
-    async def invite(self, ctx, bot: discord.Member=None):
+    async def invite(self, ctx, bot: discord.User=None):
         """Invite me or another bot!"""
         if id is None:
             embed = discord.Embed(title="Thanks for using me!", color=await ctx.embed_color(), url="https://kaogurai.xyz")
