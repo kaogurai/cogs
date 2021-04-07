@@ -19,19 +19,12 @@ class AutoAvatar(commands.Cog):
             "submission_channel": None
         }
         self.config.register_global(**default_global)
-        self.avatar_task.start()
+        self.change_avatar.start()
 
     def cog_unload(self):
-        self.avatar_task.cancel()
-    
-    @tasks.loop(hours=1.0)
-    async def avatar_task(self):
-        await self.change_avatar(self)
-    
-    @avatar_task.before_loop
-    async def before_task(self):
-        await self.bot.wait_until_red_ready()
-    
+        self.change_avatar.cancel()
+
+    @tasks.loop(seconds=15.0)
     async def change_avatar(self):
         all_avatars = await self.config.avatars()
         new_avatar = random.choice(all_avatars)
