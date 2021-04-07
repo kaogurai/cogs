@@ -1,5 +1,5 @@
 from redbot.core import commands, Config
-from redbot.core.utils.chat_formatting import humanize_list
+from discord.ext import tasks
 import discord
 import asyncio
 import random
@@ -19,19 +19,18 @@ class AutoAvatar(commands.Cog):
             "submission_channel": None
         }
         self.config.register_global(**default_global)
-        self.avatar_task = asyncio.create_task(self.wait_for_avatar())
+        self.avatar_task.start()
 
     def cog_unload(self):
         self.avatar_task.cancel()
-
+    
+    @tasks.loop(seconds=3600)
     async def wait_for_avatar(self):
+        await self.change_avatar(self)
+    
+    @wait_for_avatar.before_loop
+    async def before_waiting(self):
         await self.bot.wait_until_red_ready()
-        while True:
-            try:
-                await self.change_avatar()
-                await asyncio.sleep(3600) # in the future, i want to move this to a task
-            except asyncio.CancelledError:
-                break
     
     async def change_avatar(self):
         all_avatars = await self.config.avatars()
