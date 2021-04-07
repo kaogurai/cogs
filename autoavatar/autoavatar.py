@@ -29,7 +29,7 @@ class AutoAvatar(commands.Cog):
         await self.change_avatar(self)
     
     @avatar_task.before_loop
-    async def before_waiting(self):
+    async def before_task(self):
         await self.bot.wait_until_red_ready()
     
     async def change_avatar(self):
