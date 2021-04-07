@@ -44,7 +44,7 @@ class KaoTools(commands.Cog):
     @commands.command()
     async def invite(self, ctx, bot: discord.User=None):
         """Invite me or another bot!"""
-        if id is None:
+        if bot is None:
             embed = discord.Embed(title="Thanks for using me!", color=await ctx.embed_color(), url="https://kaogurai.xyz")
             embed.set_thumbnail(url= ctx.me.avatar_url)
             embed.add_field(name="Bot Invite", value=(f"[Click Here](https://discord.com/oauth2/authorize?client_id={ctx.me.id}&permissions=2113400063&scope=bot+applications.commands)"), inline=True)
