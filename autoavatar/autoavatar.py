@@ -24,7 +24,7 @@ class AutoAvatar(commands.Cog):
     def cog_unload(self):
         self.avatar_task.cancel()
     
-    @tasks.loop(seconds=3600)
+    @tasks.loop(seconds=660)
     async def avatar_task(self):
         await self.change_avatar(self)
     
@@ -137,8 +137,9 @@ class AutoAvatar(commands.Cog):
     async def currentavatar(self,ctx):
         """Displays the bot's current avatar."""
         avatar = await self.config.current_avatar()
-        embed = discord.Embed(colour= await self.bot.get_embed_colour(ctx.channel), title= "My Current Avatar", timestamp=datetime.datetime.utcnow())
+        embed = discord.Embed(colour= await self.bot.get_embed_colour(ctx.channel), title= "My Current Avatar", timestamp=self.avatar_task.next_iteration())
         embed.set_image(url=avatar)
+        embed.set_footer(text="The next avatar will appear at")
         await ctx.send(embed=embed)
 
     @commands.command()
