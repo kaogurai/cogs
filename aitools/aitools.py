@@ -69,7 +69,7 @@ class AiTools(commands.Cog):
         if channel.id not in channel_list:
             channel_list.append(channel.id)
             await self.config.guild(ctx.guild).channels.set(channel_list)
-            await ctx.send(f"Okay, I've added {channel.mention} to the config.")
+            await ctx.tick()
         else:
             await ctx.send(f"{channel.mention} was already in the config, did you mean to remove it?")
 
@@ -80,7 +80,7 @@ class AiTools(commands.Cog):
         if channel.id in channel_list:
             channel_list.remove(channel.id)
             await self.config.guild(ctx.guild).channels.set(channel_list)
-            await ctx.send(f"Okay, I've removed {channel.mention} from the config.")
+            await ctx.tick()
         else:
             await ctx.send(f"I couldn't find {channel.mention} in the config, did you mean to add it?")
 
@@ -92,7 +92,7 @@ class AiTools(commands.Cog):
             await ctx.send("There's no channels in the config.")
         else:
             await self.config.guild(ctx.guild).channels.set([])
-            await ctx.send("Ok, I've removed them all.")
+            await ctx.tick()
 
     @aichannel.command()
     async def list(self, ctx):
