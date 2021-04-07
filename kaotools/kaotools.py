@@ -42,7 +42,7 @@ class KaoTools(commands.Cog):
 
     @commands.bot_has_permissions(embed_links=True)
     @commands.command()
-    async def invite(self, ctx, id: str=None):
+    async def invite(self, ctx, bot: discord.Member=None):
         """Invite me or another bot!"""
         if id is None:
             embed = discord.Embed(title="Thanks for using me!", color=await ctx.embed_color(), url="https://kaogurai.xyz")
@@ -51,7 +51,7 @@ class KaoTools(commands.Cog):
             embed.add_field(name="Support Server", value="[Click Here](https://discord.gg/p6ehU9qhg8)", inline=True)
             await ctx.send(embed=embed)
         else:
-            embed = discord.Embed(title="Click here to invite that bot!", color=await ctx.embed_color(), url=f"https://discord.com/oauth2/authorize?client_id={id}&permissions=2113400063&scope=bot+applications.commands")
+            embed = discord.Embed(title="Click here to invite that bot!", color=await ctx.embed_color(), url=f"https://discord.com/oauth2/authorize?client_id={bot.id}&permissions=2113400063&scope=bot+applications.commands")
             await ctx.send(embed=embed)
 
     @commands.command()
