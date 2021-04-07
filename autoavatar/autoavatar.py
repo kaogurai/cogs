@@ -25,10 +25,10 @@ class AutoAvatar(commands.Cog):
         self.avatar_task.cancel()
     
     @tasks.loop(seconds=3600)
-    async def wait_for_avatar(self):
+    async def avatar_task(self):
         await self.change_avatar(self)
     
-    @wait_for_avatar.before_loop
+    @avatar_task.before_loop
     async def before_waiting(self):
         await self.bot.wait_until_red_ready()
     
