@@ -24,7 +24,7 @@ class AutoAvatar(commands.Cog):
     def cog_unload(self):
         self.change_avatar.cancel()
 
-    @tasks.loop(seconds=15.0)
+    @tasks.loop(hours=1.0)
     async def change_avatar(self):
         all_avatars = await self.config.avatars()
         new_avatar = random.choice(all_avatars)
