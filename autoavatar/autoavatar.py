@@ -24,7 +24,7 @@ class AutoAvatar(commands.Cog):
     def cog_unload(self):
         self.avatar_task.cancel()
     
-    @tasks.loop(seconds=660)
+    @tasks.loop(seconds=10)
     async def avatar_task(self):
         await self.change_avatar(self)
     
