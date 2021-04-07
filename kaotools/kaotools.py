@@ -7,7 +7,7 @@ import re
 old_invite = None
 
 class KaoTools(commands.Cog):
-    """general commands for kaogurai"""
+    """General commands for kaogurai"""
 
     def __init__(self, bot):
         self.bot = bot
@@ -56,7 +56,7 @@ class KaoTools(commands.Cog):
 
     @commands.command()
     async def debugerror(self, ctx, error_code: str):
-        """fetches error code information from hastebin."""
+        """Fetches error code information from hastebin."""
         async with aiohttp.ClientSession() as session:
             async with session.get(f"https://haste.kaogurai.xyz/raw/{error_code}") as request:
                 embed = discord.Embed(color=await ctx.embed_color())
@@ -67,21 +67,21 @@ class KaoTools(commands.Cog):
         
     @commands.command()
     async def asia(self, ctx):
-        """emo kids lover"""
+        """Emo kids lover"""
         await ctx.send("asia is the best person on this earth and loves videos of emo kids dancing")
         await ctx.send("https://cdn.discordapp.com/attachments/768663090337677315/795133511673053225/emokidsyummy.mp4")
         
     @commands.bot_has_permissions(embed_links=True)
     @commands.command()
     async def maddie(self, ctx):
-        """cool cat"""
+        """Cool Cat"""
         embed=discord.Embed(description="maddie is a cool cat + is emotionally attached to this cat’s birthday party :revolving_hearts::revolving_hearts::revolving_hearts::revolving_hearts:", color=11985904)
         embed.set_image(url="https://cdn.discordapp.com/attachments/768663090337677315/796118254128332820/image0.jpg")
         await ctx.send(embed=embed)
 
     @commands.command()
     async def oofchair(self, ctx):
-       """cool bot dev"""
+       """Cool bot dev"""
        await ctx.send("oof is p cool :) he's also a bot developer! check out his bot here: http://pwnbot.xyz/")
        
 def setup(bot):
