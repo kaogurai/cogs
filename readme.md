@@ -14,7 +14,7 @@
 |----------|--------|-----------------------------|
 | AiTools  | Stable | Brainshop.ai cog |
 | AntiNSFW  | Unfinished | Detects & deletes NSFW content |
-| AutoAvatar | Unstable | Changes bot avatar every hour |
+| AutoAvatar | Stable | Changes bot avatar every hour |
 | GetEmoji | Stable | Scrapes EmojiPedia for images |
 | KaoTools | Unsupported | Tools made for kaogurai |
  Scrobbler | Unstable | Scrobbles music in VC to Last.FM |
