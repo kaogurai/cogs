@@ -7,7 +7,7 @@ import aiohttp
 import datetime
 
 class AutoAvatar(commands.Cog):
-    """automatically changes bot avatar"""
+    """Automatically changes bot avatar every hour."""
 
     def __init__(self, bot):
         self.bot = bot
@@ -52,13 +52,15 @@ class AutoAvatar(commands.Cog):
     @commands.group()
     @commands.is_owner()
     async def avatarchannel(self, ctx):
-        """commands to set the channel for the current avatar, and the avatar submissions"""
+        """Commands to set the notification channels."""
         pass
 
     @avatarchannel.command()
     async def current(self, ctx, channel: discord.TextChannel=None):
-        """sets the channel for the current avatar display
-           if no channel is provided, it will clear it"""
+        """
+        Sets the channel for the current avatar display.
+        If no channel is provided, it will clear the set channel.
+        """
         if channel is None:
             await self.config.current_channel.set(None)
             await ctx.tick()
@@ -68,8 +70,10 @@ class AutoAvatar(commands.Cog):
 
     @avatarchannel.command()
     async def submissions(self, ctx, channel: discord.TextChannel=None):
-        """sets the submission channel for the `[p]submitavatar` command
-           if no channel is provided, it will clear it"""
+        """
+        Sets the submission channel for the `[p]submitavatar` command.
+        If no channel is provided, it will clear the set channel.
+        """
         if channel is None:
             await self.config.submission_channel.set(None)
             await ctx.tick()
@@ -80,7 +84,7 @@ class AutoAvatar(commands.Cog):
     @commands.command()
     @commands.is_owner()
     async def addavatar(self, ctx, link: str):
-        """adds an avatar to the list"""
+        """Adds an avatar link to the list of rotating avatars."""
         all_avatars = await self.config.avatars()
         if link.startswith('https://'):
             pass
@@ -100,7 +104,7 @@ class AutoAvatar(commands.Cog):
     @commands.command()
     @commands.is_owner()
     async def removeavatar(self, ctx, link: str):
-        """removes an avatar from the list"""
+        """Removes an avatar link from the list of rotating avatars."""
         all_avatars = await self.config.avatars()
         if link in all_avatars:
             all_avatars.remove(link)
@@ -111,7 +115,7 @@ class AutoAvatar(commands.Cog):
 
     @commands.command()
     async def listavatars(self, ctx):
-        """lists all links to the list of avatars"""
+        """Lists all links to the list of rotating avatars"""
         all_avatars = await self.config.avatars()
         if not all_avatars:
             await ctx.send("Nothing. This might cause some errors, yikes!")
@@ -125,14 +129,14 @@ class AutoAvatar(commands.Cog):
     @commands.command()
     @commands.is_owner()
     async def forceavatar(self, ctx):
-        """force changes the bot avatar"""
+        """Force changes the bot avatar."""
         await self.change_avatar()
         await ctx.tick()
 
     @commands.command()
     @commands.bot_has_permissions(embed_links=True)
     async def currentavatar(self,ctx):
-        """displays the bot's current avatar"""
+        """Displays the bot's current avatar."""
         avatar = await self.config.current_avatar()
         embed = discord.Embed(colour= await self.bot.get_embed_colour(ctx.channel), title= "My Current Avatar", timestamp=datetime.datetime.utcnow())
         embed.set_image(url=avatar)
@@ -140,7 +144,7 @@ class AutoAvatar(commands.Cog):
 
     @commands.command()
     async def submitavatar(self, ctx, link: str):
-        """submits an avatar link"""
+        """Submits a link to an avatar."""
         if link.startswith('https://'):
             pass
         else:
