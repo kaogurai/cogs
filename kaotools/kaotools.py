@@ -28,6 +28,10 @@ class KaoTools(commands.Cog):
             return
         if not message.guild:
             return
+        if not message.channel.permissions_for(message.guild.me).send_messages:
+            return
+        if await self.bot.allowed_by_whitelist_blacklist(who=message.author) is False:
+            return
         if not re.compile(rf"^<@!?{self.bot.user.id}>$").match(message.content):
             return
         prefixes = await self.bot.get_prefix(message.channel)
