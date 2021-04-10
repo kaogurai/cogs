@@ -139,8 +139,6 @@ class Scrobbler(commands.Cog):
         # thanks wyn - https://github.com/TheWyn/Wyn-RedV3Cogs/blob/master/lyrics/lyrics.py#L12-13
         renamed_track = regex.sub('', track.title).strip()
         track_array = renamed_track.split('-', 2)
-        if len(track_array) != 2:
-            return
         track_artist = track_array[0]
         track_title = track_array[1]
         voice_members = guild.me.voice.channel.members
@@ -151,8 +149,8 @@ class Scrobbler(commands.Cog):
                 continue
             else:
                 if await self.config.user(member).session_key():
-                    await self.scrobble_song(track_title, track_artist, track.length, member, requester)
                     await self.set_nowplaying(track_title, track_artist, track.length, member, requester)
+                    await self.scrobble_song(track_title, track_artist, track.length, member, requester)
 
 def hashRequest(obj, secretKey): # https://github.com/huberf/lastfm-scrobbler/blob/master/lastpy/__init__.py#L50
     string = ''
