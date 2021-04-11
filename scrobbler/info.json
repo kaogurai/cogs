@@ -1,9 +1,0 @@
-{
-    "author" : ["alec"],
-    "name" : "Scrobbler",
-    "install_msg" : "**Thanks for installing!**\n\nPlease read https://github.com/kaogurai/cogs/tree/master/scrobbler on how to set the cog up.",
-    "short" : "Scrobbles music from VC to https://last.fm",
-    "description" : "Scrobbles music from VC to https://last.fm",
-    "tags" : ["music", "audio", "lastfm", "scrobbler"],
-    "requirements" : ["xmltodict"]
-}

@@ -17,6 +17,5 @@
 | AutoAvatar | Stable | Changes bot avatar every hour |
 | GetEmoji | Stable | Scrapes EmojiPedia for images |
 | KaoTools | Unsupported | Tools made for kaogurai |
- Scrobbler | Unstable | Scrobbles music in VC to Last.FM |
 | Screenshot | Stable | Takes a screenshot of the given link |
 
