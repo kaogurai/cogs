@@ -63,7 +63,7 @@ class Scrobbler(commands.Cog):
                                 session_key = dict['lfm']['session']['key']
                                 await self.config.user(ctx.author).username.set(username)
                                 await self.config.user(ctx.author).session_key.set(session_key)
-                                await ctx.author.send(f"**Thanks!**\n\nYou've been successfully authenticated as `{username}` and I will now scrobble for you.\n\nIf you want me to stop scrobbling, use the `{ctx.clean_prefix}fmlogout` command!")
+                                await ctx.author.send(f"**Thanks!**\n\nYou've been successfully authenticated as `{username}` and I will now scrobble for you.\n\nIf you want me to stop scrobbling, use the `{ctx.clean_prefix}scrobbler logout` command!")
                             else:
                                 await ctx.author.send("An error has occured. Please try again later!")
                     await session.close()
