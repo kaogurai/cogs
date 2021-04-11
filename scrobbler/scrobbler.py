@@ -8,6 +8,7 @@ import re
 import asyncio
 import hashlib
 import xmltodict
+import discord
 
 class Scrobbler(commands.Cog):
     """Scrobbles music from VC to your https://last.fm account."""
@@ -17,6 +18,7 @@ class Scrobbler(commands.Cog):
         self.config = Config.get_conf(self, identifier=5959595935467387654783)
         default_user = {
             "failed_scrobbles": 0,
+            "scrobbles": 0,
             "username": None,
             "session_key": None
         }
@@ -25,9 +27,14 @@ class Scrobbler(commands.Cog):
     async def red_delete_data_for_user(self, *, requester, user_id):
         await self.config.user_from_id(user_id).clear()
 
-    @commands.command()
-    async def fmlogin(self, ctx):
-        """Authenticates your https://last.fm account to scrobble music in VC."""
+    @commands.group()
+    async def scrobbler(self, ctx):
+        """Commands to set up scrobbling in VC to your Last.FM account."""
+        pass
+
+    @scrobbler.command()
+    async def login(self, ctx):
+        """Authenticates your last.fm account."""
         fm_tokens = await self.bot.get_shared_api_tokens("lastfm")
         lastfm_api_key = fm_tokens.get("appid")
         lastfm_api_secret = fm_tokens.get("secret")
@@ -67,11 +74,35 @@ class Scrobbler(commands.Cog):
         except discord.Forbidden:
                 await ctx.send("I can't DM you.")
 
-    @commands.command()
-    async def fmlogout(self, ctx):
-        """Deauthenticates your https://last.fm account to scrobble music in VC."""
-        await self.config.user(ctx.author).clear()
-        await ctx.tick()
+    @scrobbler.command()
+    async def logout(self, ctx):
+        """
+        Deauthenticates your last.fm account.
+        This will remove the count of scrobbles I've done for you, but they will stay on your last.fm account.
+        """
+        await ctx.send("Are you sure you want to log out? I will no longer scrobble for you in VC.")
+        try:
+            pred = MessagePredicate.yes_or_no(ctx, user=ctx.message.author)
+            await ctx.bot.wait_for("message", check=pred, timeout=60)
+        except asyncio.TimeoutError:
+            await ctx.send("**You took too long!** Use the command again if you still want log out.")
+            return
+        if pred.result:
+            await self.config.user(ctx.author).clear()
+            await ctx.tick()
+        else:
+            await ctx.send("Ok, I will still scrobble for you.")
+
+    @scrobbler.command()
+    @commands.bot_has_permissions(embed_links=True)
+    async def info(self, ctx):
+        scrobbles = await self.config.user(ctx.author).scrobbles()
+        failed_scrobbles = await self.config.user(ctx.author).failed_scrobbles()
+        username = await self.config.user(ctx.author).username()
+        embed = discord.Embed(title="Scrobbler Information", color=await ctx.embed_color(), url= f'https://www.last.fm/user/{username}')
+        embed.add_field(name="VC Scrobbles", value=scrobbles)
+        embed.add_field(name="Failed VC Scrobbles", value=failed_scrobbles)
+        await ctx.send(embed=embed)
 
     async def scrobble_song(self, track, artist, duration, user, requester):
         fm_tokens = await self.bot.get_shared_api_tokens("lastfm")
@@ -99,11 +130,10 @@ class Scrobbler(commands.Cog):
         async with aiohttp.ClientSession() as session:
             async with session.post(base_url, params=params) as request:
                 response = await request.text()
-                dict = xmltodict.parse(response, process_namespaces=True)
-                # do something to handle it not working LMFAO
+                # do something to handle it not working LMFAO dict = xmltodict.parse(response, process_namespaces=True)
         await session.close()
 
-    async def set_nowplaying(self, track, artist, duration, user, requester):
+    async def set_nowplaying(self, track, artist, duration, user):
         fm_tokens = await self.bot.get_shared_api_tokens("lastfm")
         api_key = fm_tokens.get('appid')
         api_secret = fm_tokens.get('secret')
@@ -124,8 +154,7 @@ class Scrobbler(commands.Cog):
         async with aiohttp.ClientSession() as session:
             async with session.post(base_url, params=params) as request:
                 response = await request.text()
-                dict = xmltodict.parse(response, process_namespaces=True)
-                # do something to handle it not working LMFAO
+                # do something to handle it not working LMFAO dict = xmltodict.parse(response, process_namespaces=True)
         await session.close()
 
     @commands.Cog.listener()
@@ -149,7 +178,7 @@ class Scrobbler(commands.Cog):
                 continue
             else:
                 if await self.config.user(member).session_key():
-                    await self.set_nowplaying(track_title, track_artist, track.length, member, requester)
+                    await self.set_nowplaying(track_title, track_artist, track.length, member)
                     await self.scrobble_song(track_title, track_artist, track.length, member, requester)
 
 def hashRequest(obj, secretKey): # https://github.com/huberf/lastfm-scrobbler/blob/master/lastpy/__init__.py#L50
