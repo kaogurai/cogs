@@ -166,8 +166,7 @@ class Scrobbler(commands.Cog):
         hashed = hashRequest(params, api_secret)
         params['api_sig'] = hashed
         async with aiohttp.ClientSession() as session:
-            async with session.post(base_url, params=params):
-                pass
+            await session.post(base_url, params=params)
         await session.close()
 
     @commands.Cog.listener()
@@ -194,6 +193,30 @@ class Scrobbler(commands.Cog):
             else:
                 if await self.config.user(member).session_key():
                     await self.set_nowplaying(track_title, track_artist, track.length, member)
+
+    @commands.Cog.listener()
+    async def on_red_audio_track_end(self, guild: discord.Guild, track: lavalink.Track, requester: discord.Member):
+        if not (guild and track):
+            return
+        if track.length <= 30000:
+            return
+        regex = re.compile((r"((\[)|(\()).*(of?ficial|feat\.?|"
+                          r"ft\.?|audio|video|lyrics?|remix|HD).*(?(2)]|\))"), flags=re.I)
+        # thanks wyn - https://github.com/TheWyn/Wyn-RedV3Cogs/blob/master/lyrics/lyrics.py#L12-13
+        renamed_track = regex.sub('', track.title).strip()
+        track_array = renamed_track.split('-', 2)
+        if len(track_array) != 2:
+             return
+        track_artist = track_array[0]
+        track_title = track_array[1]
+        voice_members = guild.me.voice.channel.members
+        for member in voice_members:
+            if member == guild.me:
+                continue
+            elif member.bot is True:
+                continue
+            else:
+                if await self.config.user(member).session_key():
                     await self.scrobble_song(track_title, track_artist, track.length, member, requester)
 
 def hashRequest(obj, secretKey): # https://github.com/huberf/lastfm-scrobbler/blob/master/lastpy/__init__.py#L50

@@ -6,13 +6,13 @@ import asyncio
 import io
 
 class Screenshot(commands.Cog):
-    """screenshots a given link"""
+    """Screenshots a given link."""
     
     @commands.bot_has_permissions(attach_files=True)
     @commands.command()
     @commands.is_owner()
     async def screenshot(self, ctx, link: str, wait: int = 0):
-        """screenshots a given link"""
+        """Screenshots a given link."""
         if link.startswith('https://'):
             pass
         else:
