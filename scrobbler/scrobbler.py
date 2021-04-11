@@ -130,7 +130,21 @@ class Scrobbler(commands.Cog):
         async with aiohttp.ClientSession() as session:
             async with session.post(base_url, params=params) as request:
                 response = await request.text()
-                # do something to handle it not working LMFAO dict = xmltodict.parse(response, process_namespaces=True)
+                if request.status == 200:
+                    dict = xmltodict.parse(response, process_namespaces=True)
+                    diditwork = dict['lfm']['@status']
+                    if diditwork == 'ok':
+                        scrobbles = await self.config.user(user).scrobbles() 
+                        if not scrobbles:
+                            scrobbles = 0
+                        new_scrobbles = scrobbles + 1
+                        await self.config.user(user).scrobbles.set(new_scrobbles)
+                    else:
+                        failed_scrobbles = await self.config.user(user).failed_scrobbles()
+                        if not failed_scrobbles:
+                            failed_scrobbles = 0 
+                        new_failed_scrobbles = failed_scrobbles + 1
+                        await self.config.user(user).failed_scrobbles.set(new_failed_scrobbles)
         await session.close()
 
     async def set_nowplaying(self, track, artist, duration, user):
@@ -152,9 +166,8 @@ class Scrobbler(commands.Cog):
         hashed = hashRequest(params, api_secret)
         params['api_sig'] = hashed
         async with aiohttp.ClientSession() as session:
-            async with session.post(base_url, params=params) as request:
-                response = await request.text()
-                # do something to handle it not working LMFAO dict = xmltodict.parse(response, process_namespaces=True)
+            async with session.post(base_url, params=params):
+                pass
         await session.close()
 
     @commands.Cog.listener()
@@ -168,6 +181,8 @@ class Scrobbler(commands.Cog):
         # thanks wyn - https://github.com/TheWyn/Wyn-RedV3Cogs/blob/master/lyrics/lyrics.py#L12-13
         renamed_track = regex.sub('', track.title).strip()
         track_array = renamed_track.split('-', 2)
+        if len(track_array) != 2:
+             return
         track_artist = track_array[0]
         track_title = track_array[1]
         voice_members = guild.me.voice.channel.members
