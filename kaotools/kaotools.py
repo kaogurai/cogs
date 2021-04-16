@@ -41,7 +41,7 @@ class KaoTools(commands.Cog):
         **Hey there!** <a:bounce:778449468717531166>
         My prefixes in this server are {humanize_list(prefixes)}
         You can also mention me as a prefix!
-        You may type `{(await self.bot.get_prefix(message.channel))[2]}help` to view all commands!
+        Typing`{(await self.bot.get_prefix(message.channel))[2]}help` will show all commands!
         Need some help? Join my [support server!](https://discord.gg/p6ehU9qhg8)
         Looking to invite me? [Click here!](https://discord.com/oauth2/authorize?client_id={message.guild.me.id}&permissions=6441922047&scope=bot+applications.commands)
         """)
