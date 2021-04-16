@@ -40,8 +40,7 @@ class KaoTools(commands.Cog):
         embed = discord.Embed(colour= await self.bot.get_embed_colour(message.channel), description= f"""
         **Hey there!** <a:bounce:778449468717531166>
         My prefixes in this server are {humanize_list(prefixes)}
-        You can also mention me as a prefix!
-        If you're looking for all commands, type `{sorted_prefixes[0]}help`
+        You can type `{sorted_prefixes[0]}help` to view all commands!
         Need some help? Join my [support server!](https://discord.gg/p6ehU9qhg8)
         Looking to invite me? [Click here!](https://discord.com/oauth2/authorize?client_id={message.guild.me.id}&permissions=6441922047&scope=bot+applications.commands)
         """)
