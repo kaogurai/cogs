@@ -21,7 +21,7 @@ class AntiNSFW(commands.Cog):
             "ignored_roles": [],
         }
         default_global = {
-            "api": "https://nsfw.kaogurai.xyz/"
+            "api": "http://localhost:5000/"
         }
         self.config.register_guild(**default_guild)
         self.config.register_global(**default_global)

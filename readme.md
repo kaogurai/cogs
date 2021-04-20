@@ -13,9 +13,7 @@
 | Name     | Status | Description                 |
 |----------|--------|-----------------------------|
 | AiTools  | Stable | Brainshop.ai cog |
-| AntiNSFW  | Unfinished | Detects & deletes NSFW content |
-| AutoAvatar | Stable | Changes bot avatar every hour |
+| AutoAvatar | Unsupported | Changes bot avatar every hour |
 | GetEmoji | Stable | Scrapes EmojiPedia for images |
-| KaoTools | Unsupported | Tools made for kaogurai |
 | Screenshot | Stable | Takes a screenshot of the given link |
 

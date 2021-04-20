@@ -1,8 +1,8 @@
 {
-    "author" : ["alec"],
-    "name" : "AntiNSFW",
-    "install_msg" : "**Thanks for installing!**\n This cog uses emojis from the Martine Emotes server, you'll need to have your bot join that server for it to properly work. Here's the invite: discord.gg/eKxTEsF",
-    "short" : "Detects & Deletes NSFW Content.",
-    "description" : "Detects & Deletes NSFW Content.",
-    "tags" : ["antinsfw", "nsfw"]
+    "author": ["alec"],
+    "name": "AntiNSFW",
+    "install_msg": "**Thanks for installing!**\n This cog uses emojis from the Martine Emotes server, you'll need to have your bot join that server for it to properly work. Here's the invite: discord.gg/eKxTEsF\n\nThis cog is not functioning yet, and development has halted. Feel free to PR anything.",
+    "short": "Detects & Deletes NSFW Content.",
+    "description": "Detects & Deletes NSFW Content.",
+    "hidden": true
 }
