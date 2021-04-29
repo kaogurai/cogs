@@ -4,6 +4,11 @@ this cog lets you load up a bunch of avatars, and use a command to pick a random
 
 i recommend using bobloy's fifo cog to automatically do it 
 
+```
+[p]fifo add avatar newavatar
+[p]fifo addtrigger interval avatar 1h
+```
+
 users can use the you can use the `[p]currentavatar>` command to view the current avatar
 users can use the you can use the `[p]listavatars` command to view all avatars in the list
 users can use the you can use the `[p]submitavatar <link>` command to submit an avatar
