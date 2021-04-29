@@ -1,8 +1,8 @@
 # autoavatar cog
 
-this cog automatically changes the bot avatar every hour. it's not really suported as it can cause some bad things to happen if you don't know what you're doing.
+this cog lets you load up a bunch of avatars, and use a command to pick a random one
 
-once you load the cog, your bot avatar will automatically change to [this](https://avatars.githubusercontent.com/u/23690422?s=400&v=4)
+i recommend using bobloy's fifo cog to automatically do it 
 
 users can use the you can use the `[p]currentavatar>` command to view the current avatar
 users can use the you can use the `[p]listavatars` command to view all avatars in the list

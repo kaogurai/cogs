@@ -1,5 +1,4 @@
 from redbot.core import commands, Config
-from discord.ext import tasks
 import discord
 import random
 import aiohttp
@@ -18,27 +17,44 @@ class AutoAvatar(commands.Cog):
             "submission_channel": None
         }
         self.config.register_global(**default_global)
-        self.change_avatar.start()
 
-    def cog_unload(self):
-        self.change_avatar.cancel()
-
-    @tasks.loop(hours=1.0)
-    async def change_avatar(self):
+    async def change_avatar(self, ctx):
         all_avatars = await self.config.avatars()
         new_avatar = random.choice(all_avatars)
+
         async with aiohttp.ClientSession() as session:
-            async with session.get(new_avatar) as request:
-                avatar = await request.read()
-        await self.bot.user.edit(avatar=avatar)
+            try:
+                async with session.get(new_avatar) as request:
+                    avatar = await request.read()
+            except aiohttp.InvalidURL:
+                all_avatars.remove(new_avatar)
+                await self.config.avatars.set(all_avatars)
+                return 
+            except aiohttp.ClientError:
+                all_avatars.remove(new_avatar)
+                await self.config.avatars.set(all_avatars)
+                return 
+
+        try:
+            await self.bot.user.edit(avatar=avatar)
+        except discord.HTTPException:
+            return
+        except discord.InvalidArgument:
+            all_avatars.remove(new_avatar)
+            await self.config.avatars.set(all_avatars)
+            return 
+        
         await self.config.current_avatar.set(new_avatar)
-        if await self.config.current_channel() is None:
-            pass
-        else:
+
+        if await self.config.current_channel():
             channel = self.bot.get_channel(await self.config.current_channel())
             embed = discord.Embed(colour= await self.bot.get_embed_colour(channel), title= "My Current Avatar", timestamp=datetime.datetime.utcnow())
             embed.set_image(url=new_avatar)
-            await channel.send(embed=embed)
+            try:
+                await channel.send(embed=embed)
+            except discord.HTTPException:
+                await self.config.current_channel.set(None)
+                return
 
     @commands.group()
     @commands.is_owner()
@@ -119,9 +135,9 @@ class AutoAvatar(commands.Cog):
 
     @commands.command()
     @commands.is_owner()
-    async def forceavatar(self, ctx):
-        """Force changes the bot avatar."""
-        await self.change_avatar()
+    async def newavatar(self, ctx):
+        """Changes the bot avatar."""
+        await self.change_avatar(ctx)
         await ctx.tick()
 
     @commands.command()
