@@ -5,7 +5,7 @@ import aiohttp
 import datetime
 
 class AutoAvatar(commands.Cog):
-    """Automatically changes bot avatar every hour."""
+    """Chooses a random avatar to set from a preset list"""
 
     def __init__(self, bot):
         self.bot = bot
@@ -20,6 +20,9 @@ class AutoAvatar(commands.Cog):
 
     async def change_avatar(self, ctx):
         all_avatars = await self.config.avatars()
+
+        if all_avatars is None:
+            return
         new_avatar = random.choice(all_avatars)
 
         async with aiohttp.ClientSession() as session:
@@ -37,6 +40,7 @@ class AutoAvatar(commands.Cog):
 
         try:
             await self.bot.user.edit(avatar=avatar)
+            await ctx.tick()
         except discord.HTTPException:
             return
         except discord.InvalidArgument:
@@ -59,7 +63,9 @@ class AutoAvatar(commands.Cog):
     @commands.group()
     @commands.is_owner()
     async def avatarchannel(self, ctx):
-        """Commands to set the notification channels."""
+        """
+        Commands to set the avatar channels.
+        """
         pass
 
     @avatarchannel.command()
@@ -70,7 +76,7 @@ class AutoAvatar(commands.Cog):
         """
         if channel is None:
             await self.config.current_channel.set(None)
-            await ctx.tick()
+            await ctx.send("I have cleared the channel.")
         else:
             await self.config.current_channel.set(channel.id)
             await ctx.tick()
@@ -78,12 +84,12 @@ class AutoAvatar(commands.Cog):
     @avatarchannel.command()
     async def submissions(self, ctx, channel: discord.TextChannel=None):
         """
-        Sets the submission channel for the `[p]submitavatar` command.
+        Sets the channel for avatar submissions.
         If no channel is provided, it will clear the set channel.
         """
         if channel is None:
             await self.config.submission_channel.set(None)
-            await ctx.tick()
+            await ctx.send("I have cleared the channel.")
         else:
             await self.config.submission_channel.set(channel.id)
             await ctx.tick()
@@ -91,16 +97,22 @@ class AutoAvatar(commands.Cog):
     @commands.command()
     @commands.is_owner()
     async def addavatar(self, ctx, link: str):
-        """Adds an avatar link to the list of rotating avatars."""
+        """
+        Adds an avatar link.
+        """
         all_avatars = await self.config.avatars()
-        if link.startswith('https://'):
-            pass
-        else:
-            if link.startswith('http://'):
-                pass
-            else: 
-                await ctx.send("That doesn't look like a valid link!")
-                return
+
+        async with aiohttp.ClientSession() as session:
+            try:
+                async with session.get(link) as request:
+                    avatar = await request.read()
+            except aiohttp.InvalidURL:
+                await ctx.send("That's not a valid link.")
+                return 
+            except aiohttp.ClientError:
+                await ctx.send("That's not a valid link.")
+                return 
+            
         if link not in all_avatars:
             all_avatars.append(link)
             await self.config.avatars.set(all_avatars)
@@ -111,8 +123,15 @@ class AutoAvatar(commands.Cog):
     @commands.command()
     @commands.is_owner()
     async def removeavatar(self, ctx, link: str):
-        """Removes an avatar link from the list of rotating avatars."""
+        """
+        Removes an avatar link.
+        """
         all_avatars = await self.config.avatars()
+
+        if len(all_avatars) == 1:
+            await ctx.send("You can't remove this until you have more than one avatar remaining.")
+            return
+
         if link in all_avatars:
             all_avatars.remove(link)
             await self.config.avatars.set(all_avatars)
@@ -122,51 +141,53 @@ class AutoAvatar(commands.Cog):
 
     @commands.command()
     async def listavatars(self, ctx):
-        """Lists all links to the list of rotating avatars"""
+        """
+        Lists all bot avatars.
+        """
         all_avatars = await self.config.avatars()
-        if not all_avatars:
-            await ctx.send("Nothing. This might cause some errors, yikes!")
+
         paginator = discord.ext.commands.help.Paginator()
+
         for obj in all_avatars:
             paginator.add_line(obj)
-        await ctx.send('List of all bot avatars:')
+        
         for page in paginator.pages:
-            await ctx.send(page)
+            await ctx.author.send(page)
 
     @commands.command()
     @commands.is_owner()
     async def newavatar(self, ctx):
-        """Changes the bot avatar."""
+        """
+        Changes the bot avatar.
+        """
         await self.change_avatar(ctx)
-        await ctx.tick()
 
     @commands.command()
     @commands.bot_has_permissions(embed_links=True)
     async def currentavatar(self,ctx):
-        """Displays the bot's current avatar."""
+        """
+        Displays the bot's current avatar.
+        """
         avatar = await self.config.current_avatar()
         embed = discord.Embed(colour= await self.bot.get_embed_colour(ctx.channel), title= "My Current Avatar")
         embed.set_image(url=avatar)
-        embed.set_footer(text="The next avatar will appear at")
         await ctx.send(embed=embed)
 
     @commands.command()
     async def submitavatar(self, ctx, link: str):
-        """Submits a link to an avatar."""
-        if link.startswith('https://'):
-            pass
-        else:
-            if link.startswith('http://'):
-                pass
-            else: 
-                await ctx.send("That doesn't look like a valid link!")
-                return
+        """
+        Submits a link for an avatar suggestion.
+        """
         if await self.config.submission_channel() is None:
             await ctx.send("Ask the bot owner to set up the submissions channel!")
             return
         else:
-            channel = self.bot.get_channel(await self.config.submission_channel())
-            embed = discord.Embed(colour= await self.bot.get_embed_colour(channel), title= "Avatar Submission", timestamp=datetime.datetime.utcnow())
-            embed.set_image(url=link)
-            await channel.send(embed=embed)
-            await ctx.tick()
+            try:
+                channel = self.bot.get_channel(await self.config.submission_channel())
+                embed = discord.Embed(colour= await self.bot.get_embed_colour(channel), title= "New Avatar Submission", timestamp=datetime.datetime.utcnow())
+                embed.set_image(url=link)
+                await channel.send(embed=embed)
+                await ctx.tick()
+            except discord.HTTPException:
+                await ctx.send("That doesn't look like a valid link!")
+                return
