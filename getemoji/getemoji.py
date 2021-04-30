@@ -1,15 +1,18 @@
 from redbot.core import commands, Config, checks
-import aiohttp 
+import aiohttp
 import discord
+
 
 class GetEmoji(commands.Cog):
     def __init__(self):
-        self.config = Config.get_conf(self, identifier=6574839238457654839284756548392384756)
-        default_global = {"url": "http://localhost:6969/" }
+        self.config = Config.get_conf(
+            self, identifier=6574839238457654839284756548392384756
+        )
+        default_global = {"url": "http://localhost:6969/"}
         self.config.register_global(**default_global)
 
     # im cringing looking at this rn, i'll eventually get to rewriting it <3
-    
+
     @commands.command()
     @commands.is_owner()
     async def emojiapiurl(self, ctx, url: str):
@@ -30,13 +33,15 @@ class GetEmoji(commands.Cog):
         url = await self.config.url()
         try:
             async with aiohttp.ClientSession() as session:
-                async with session.get(url + 'emoji/image/apple/' + emoji) as request:
+                async with session.get(url + "emoji/image/apple/" + emoji) as request:
                     if request.status == 404:
-                        return await ctx.send("Sorry, I couldn't find that emoji from my API.")
+                        return await ctx.send(
+                            "Sorry, I couldn't find that emoji from my API."
+                        )
                     response = await request.json()
-                    embed = discord.Embed(color = await ctx.embed_colour())
-                    embed.set_image(url = response['url'])
-                    await ctx.send(embed = embed)
+                    embed = discord.Embed(color=await ctx.embed_colour())
+                    embed.set_image(url=response["url"])
+                    await ctx.send(embed=embed)
         except aiohttp.ClientConnectionError:
             await ctx.send("Sorry, the API isn't set up correctly.")
 
@@ -48,13 +53,15 @@ class GetEmoji(commands.Cog):
         url = await self.config.url()
         try:
             async with aiohttp.ClientSession() as session:
-                async with session.get(url + 'emoji/image/google/' + emoji) as request:
+                async with session.get(url + "emoji/image/google/" + emoji) as request:
                     if request.status == 404:
-                        return await ctx.send("Sorry, I couldn't find that emoji from my API.")
+                        return await ctx.send(
+                            "Sorry, I couldn't find that emoji from my API."
+                        )
                     response = await request.json()
-                    embed = discord.Embed(color = await ctx.embed_colour())
-                    embed.set_image(url = response['url'])
-                    await ctx.send(embed = embed)
+                    embed = discord.Embed(color=await ctx.embed_colour())
+                    embed.set_image(url=response["url"])
+                    await ctx.send(embed=embed)
         except aiohttp.ClientConnectionError:
             await ctx.send("Sorry, the API isn't set up correctly.")
 
@@ -66,13 +73,15 @@ class GetEmoji(commands.Cog):
         url = await self.config.url()
         try:
             async with aiohttp.ClientSession() as session:
-                async with session.get(url + 'emoji/image/samsung/' + emoji) as request:
+                async with session.get(url + "emoji/image/samsung/" + emoji) as request:
                     if request.status == 404:
-                        return await ctx.send("Sorry, I couldn't find that emoji from my API.")
+                        return await ctx.send(
+                            "Sorry, I couldn't find that emoji from my API."
+                        )
                     response = await request.json()
-                    embed = discord.Embed(color = await ctx.embed_colour())
-                    embed.set_image(url = response['url'])
-                    await ctx.send(embed = embed)
+                    embed = discord.Embed(color=await ctx.embed_colour())
+                    embed.set_image(url=response["url"])
+                    await ctx.send(embed=embed)
         except aiohttp.ClientConnectionError:
             await ctx.send("Sorry, the API isn't set up correctly.")
 
@@ -84,13 +93,17 @@ class GetEmoji(commands.Cog):
         url = await self.config.url()
         try:
             async with aiohttp.ClientSession() as session:
-                async with session.get(url + 'emoji/image/microsoft/' + emoji) as request:
+                async with session.get(
+                    url + "emoji/image/microsoft/" + emoji
+                ) as request:
                     if request.status == 404:
-                        return await ctx.send("Sorry, I couldn't find that emoji from my API.")
+                        return await ctx.send(
+                            "Sorry, I couldn't find that emoji from my API."
+                        )
                     response = await request.json()
-                    embed = discord.Embed(color = await ctx.embed_colour())
-                    embed.set_image(url = response['url'])
-                    await ctx.send(embed = embed)
+                    embed = discord.Embed(color=await ctx.embed_colour())
+                    embed.set_image(url=response["url"])
+                    await ctx.send(embed=embed)
         except aiohttp.ClientConnectionError:
             await ctx.send("Sorry, the API isn't set up correctly.")
 
@@ -102,13 +115,17 @@ class GetEmoji(commands.Cog):
         url = await self.config.url()
         try:
             async with aiohttp.ClientSession() as session:
-                async with session.get(url + 'emoji/image/whatsapp/' + emoji) as request:
+                async with session.get(
+                    url + "emoji/image/whatsapp/" + emoji
+                ) as request:
                     if request.status == 404:
-                        return await ctx.send("Sorry, I couldn't find that emoji from my API.")
+                        return await ctx.send(
+                            "Sorry, I couldn't find that emoji from my API."
+                        )
                     response = await request.json()
-                    embed = discord.Embed(color = await ctx.embed_colour())
-                    embed.set_image(url = response['url'])
-                    await ctx.send(embed = embed)
+                    embed = discord.Embed(color=await ctx.embed_colour())
+                    embed.set_image(url=response["url"])
+                    await ctx.send(embed=embed)
         except aiohttp.ClientConnectionError:
             await ctx.send("Sorry, the API isn't set up correctly.")
 
@@ -120,13 +137,15 @@ class GetEmoji(commands.Cog):
         url = await self.config.url()
         try:
             async with aiohttp.ClientSession() as session:
-                async with session.get(url + 'emoji/image/twitter/' + emoji) as request:
+                async with session.get(url + "emoji/image/twitter/" + emoji) as request:
                     if request.status == 404:
-                        return await ctx.send("Sorry, I couldn't find that emoji from my API.")
+                        return await ctx.send(
+                            "Sorry, I couldn't find that emoji from my API."
+                        )
                     response = await request.json()
-                    embed = discord.Embed(color = await ctx.embed_colour())
-                    embed.set_image(url = response['url'])
-                    await ctx.send(embed = embed)
+                    embed = discord.Embed(color=await ctx.embed_colour())
+                    embed.set_image(url=response["url"])
+                    await ctx.send(embed=embed)
         except aiohttp.ClientConnectionError:
             await ctx.send("Sorry, the API isn't set up correctly.")
 
@@ -138,13 +157,17 @@ class GetEmoji(commands.Cog):
         url = await self.config.url()
         try:
             async with aiohttp.ClientSession() as session:
-                async with session.get(url + 'emoji/image/facebook/' + emoji) as request:
+                async with session.get(
+                    url + "emoji/image/facebook/" + emoji
+                ) as request:
                     if request.status == 404:
-                        return await ctx.send("Sorry, I couldn't find that emoji from my API.")
+                        return await ctx.send(
+                            "Sorry, I couldn't find that emoji from my API."
+                        )
                     response = await request.json()
-                    embed = discord.Embed(color = await ctx.embed_colour())
-                    embed.set_image(url = response['url'])
-                    await ctx.send(embed = embed)
+                    embed = discord.Embed(color=await ctx.embed_colour())
+                    embed.set_image(url=response["url"])
+                    await ctx.send(embed=embed)
         except aiohttp.ClientConnectionError:
             await ctx.send("Sorry, the API isn't set up correctly.")
 
@@ -156,13 +179,17 @@ class GetEmoji(commands.Cog):
         url = await self.config.url()
         try:
             async with aiohttp.ClientSession() as session:
-                async with session.get(url + 'emoji/image/joypixels/' + emoji) as request:
+                async with session.get(
+                    url + "emoji/image/joypixels/" + emoji
+                ) as request:
                     if request.status == 404:
-                        return await ctx.send("Sorry, I couldn't find that emoji from my API.")
+                        return await ctx.send(
+                            "Sorry, I couldn't find that emoji from my API."
+                        )
                     response = await request.json()
-                    embed = discord.Embed(color = await ctx.embed_colour())
-                    embed.set_image(url = response['url'])
-                    await ctx.send(embed = embed)
+                    embed = discord.Embed(color=await ctx.embed_colour())
+                    embed.set_image(url=response["url"])
+                    await ctx.send(embed=embed)
         except aiohttp.ClientConnectionError:
             await ctx.send("Sorry, the API isn't set up correctly.")
 
@@ -174,13 +201,17 @@ class GetEmoji(commands.Cog):
         url = await self.config.url()
         try:
             async with aiohttp.ClientSession() as session:
-                async with session.get(url + 'emoji/image/openmoji/' + emoji) as request:
+                async with session.get(
+                    url + "emoji/image/openmoji/" + emoji
+                ) as request:
                     if request.status == 404:
-                        return await ctx.send("Sorry, I couldn't find that emoji from my API.")
+                        return await ctx.send(
+                            "Sorry, I couldn't find that emoji from my API."
+                        )
                     response = await request.json()
-                    embed = discord.Embed(color = await ctx.embed_colour())
-                    embed.set_image(url = response['url'])
-                    await ctx.send(embed = embed)
+                    embed = discord.Embed(color=await ctx.embed_colour())
+                    embed.set_image(url=response["url"])
+                    await ctx.send(embed=embed)
         except aiohttp.ClientConnectionError:
             await ctx.send("Sorry, the API isn't set up correctly.")
 
@@ -192,13 +223,17 @@ class GetEmoji(commands.Cog):
         url = await self.config.url()
         try:
             async with aiohttp.ClientSession() as session:
-                async with session.get(url + 'emoji/image/emojidex/' + emoji) as request:
+                async with session.get(
+                    url + "emoji/image/emojidex/" + emoji
+                ) as request:
                     if request.status == 404:
-                        return await ctx.send("Sorry, I couldn't find that emoji from my API.")
+                        return await ctx.send(
+                            "Sorry, I couldn't find that emoji from my API."
+                        )
                     response = await request.json()
-                    embed = discord.Embed(color = await ctx.embed_colour())
-                    embed.set_image(url = response['url'])
-                    await ctx.send(embed = embed)
+                    embed = discord.Embed(color=await ctx.embed_colour())
+                    embed.set_image(url=response["url"])
+                    await ctx.send(embed=embed)
         except aiohttp.ClientConnectionError:
             await ctx.send("Sorry, the API isn't set up correctly.")
 
@@ -210,13 +245,15 @@ class GetEmoji(commands.Cog):
         url = await self.config.url()
         try:
             async with aiohttp.ClientSession() as session:
-                async with session.get(url + 'emoji/image/lg/' + emoji) as request:
+                async with session.get(url + "emoji/image/lg/" + emoji) as request:
                     if request.status == 404:
-                        return await ctx.send("Sorry, I couldn't find that emoji from my API.")
+                        return await ctx.send(
+                            "Sorry, I couldn't find that emoji from my API."
+                        )
                     response = await request.json()
-                    embed = discord.Embed(color = await ctx.embed_colour())
-                    embed.set_image(url = response['url'])
-                    await ctx.send(embed = embed)
+                    embed = discord.Embed(color=await ctx.embed_colour())
+                    embed.set_image(url=response["url"])
+                    await ctx.send(embed=embed)
         except aiohttp.ClientConnectionError:
             await ctx.send("Sorry, the API isn't set up correctly.")
 
@@ -228,13 +265,15 @@ class GetEmoji(commands.Cog):
         url = await self.config.url()
         try:
             async with aiohttp.ClientSession() as session:
-                async with session.get(url + 'emoji/image/htc/' + emoji) as request:
+                async with session.get(url + "emoji/image/htc/" + emoji) as request:
                     if request.status == 404:
-                        return await ctx.send("Sorry, I couldn't find that emoji from my API.")
+                        return await ctx.send(
+                            "Sorry, I couldn't find that emoji from my API."
+                        )
                     response = await request.json()
-                    embed = discord.Embed(color = await ctx.embed_colour())
-                    embed.set_image(url = response['url'])
-                    await ctx.send(embed = embed)
+                    embed = discord.Embed(color=await ctx.embed_colour())
+                    embed.set_image(url=response["url"])
+                    await ctx.send(embed=embed)
         except aiohttp.ClientConnectionError:
             await ctx.send("Sorry, the API isn't set up correctly.")
 
@@ -246,13 +285,17 @@ class GetEmoji(commands.Cog):
         url = await self.config.url()
         try:
             async with aiohttp.ClientSession() as session:
-                async with session.get(url + 'emoji/image/softbank/' + emoji) as request:
+                async with session.get(
+                    url + "emoji/image/softbank/" + emoji
+                ) as request:
                     if request.status == 404:
-                        return await ctx.send("Sorry, I couldn't find that emoji from my API.")
+                        return await ctx.send(
+                            "Sorry, I couldn't find that emoji from my API."
+                        )
                     response = await request.json()
-                    embed = discord.Embed(color = await ctx.embed_colour())
-                    embed.set_image(url = response['url'])
-                    await ctx.send(embed = embed)
+                    embed = discord.Embed(color=await ctx.embed_colour())
+                    embed.set_image(url=response["url"])
+                    await ctx.send(embed=embed)
         except aiohttp.ClientConnectionError:
             await ctx.send("Sorry, the API isn't set up correctly.")
 
@@ -264,13 +307,15 @@ class GetEmoji(commands.Cog):
         url = await self.config.url()
         try:
             async with aiohttp.ClientSession() as session:
-                async with session.get(url + 'emoji/image/docomo/' + emoji) as request:
+                async with session.get(url + "emoji/image/docomo/" + emoji) as request:
                     if request.status == 404:
-                        return await ctx.send("Sorry, I couldn't find that emoji from my API.")
+                        return await ctx.send(
+                            "Sorry, I couldn't find that emoji from my API."
+                        )
                     response = await request.json()
-                    embed = discord.Embed(color = await ctx.embed_colour())
-                    embed.set_image(url = response['url'])
-                    await ctx.send(embed = embed)
+                    embed = discord.Embed(color=await ctx.embed_colour())
+                    embed.set_image(url=response["url"])
+                    await ctx.send(embed=embed)
         except aiohttp.ClientConnectionError:
             await ctx.send("Sorry, the API isn't set up correctly.")
 
@@ -282,13 +327,15 @@ class GetEmoji(commands.Cog):
         url = await self.config.url()
         try:
             async with aiohttp.ClientSession() as session:
-                async with session.get(url + 'emoji/image/mozilla/' + emoji) as request:
+                async with session.get(url + "emoji/image/mozilla/" + emoji) as request:
                     if request.status == 404:
-                        return await ctx.send("Sorry, I couldn't find that emoji from my API.")
+                        return await ctx.send(
+                            "Sorry, I couldn't find that emoji from my API."
+                        )
                     response = await request.json()
-                    embed = discord.Embed(color = await ctx.embed_colour())
-                    embed.set_image(url = response['url'])
-                    await ctx.send(embed = embed)
+                    embed = discord.Embed(color=await ctx.embed_colour())
+                    embed.set_image(url=response["url"])
+                    await ctx.send(embed=embed)
         except aiohttp.ClientConnectionError:
             await ctx.send("Sorry, the API isn't set up correctly.")
 
@@ -300,12 +347,16 @@ class GetEmoji(commands.Cog):
         url = await self.config.url()
         try:
             async with aiohttp.ClientSession() as session:
-                async with session.get(url + 'emoji/image/messenger/' + emoji) as request:
+                async with session.get(
+                    url + "emoji/image/messenger/" + emoji
+                ) as request:
                     if request.status == 404:
-                        return await ctx.send("Sorry, I couldn't find that emoji from my API.")
+                        return await ctx.send(
+                            "Sorry, I couldn't find that emoji from my API."
+                        )
                     response = await request.json()
-                    embed = discord.Embed(color = await ctx.embed_colour())
-                    embed.set_image(url = response['url'])
-                    await ctx.send(embed = embed)
+                    embed = discord.Embed(color=await ctx.embed_colour())
+                    embed.set_image(url=response["url"])
+                    await ctx.send(embed=embed)
         except aiohttp.ClientConnectionError:
             await ctx.send("Sorry, the API isn't set up correctly.")

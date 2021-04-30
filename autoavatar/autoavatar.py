@@ -4,6 +4,7 @@ import random
 import aiohttp
 import datetime
 
+
 class AutoAvatar(commands.Cog):
     """Chooses a random avatar to set from a preset list"""
 
@@ -11,10 +12,10 @@ class AutoAvatar(commands.Cog):
         self.bot = bot
         self.config = Config.get_conf(self, identifier=696969696969494)
         default_global = {
-            "avatars": ['https://avatars.githubusercontent.com/u/23690422?s=400&v=4'], 
+            "avatars": ["https://avatars.githubusercontent.com/u/23690422?s=400&v=4"],
             "current_avatar": "",
             "current_channel": None,
-            "submission_channel": None
+            "submission_channel": None,
         }
         self.config.register_global(**default_global)
 
@@ -32,11 +33,11 @@ class AutoAvatar(commands.Cog):
             except aiohttp.InvalidURL:
                 all_avatars.remove(new_avatar)
                 await self.config.avatars.set(all_avatars)
-                return 
+                return
             except aiohttp.ClientError:
                 all_avatars.remove(new_avatar)
                 await self.config.avatars.set(all_avatars)
-                return 
+                return
 
         try:
             await self.bot.user.edit(avatar=avatar)
@@ -46,13 +47,17 @@ class AutoAvatar(commands.Cog):
         except discord.InvalidArgument:
             all_avatars.remove(new_avatar)
             await self.config.avatars.set(all_avatars)
-            return 
-        
+            return
+
         await self.config.current_avatar.set(new_avatar)
 
         if await self.config.current_channel():
             channel = self.bot.get_channel(await self.config.current_channel())
-            embed = discord.Embed(colour= await self.bot.get_embed_colour(channel), title= "My Current Avatar", timestamp=datetime.datetime.utcnow())
+            embed = discord.Embed(
+                colour=await self.bot.get_embed_colour(channel),
+                title="My Current Avatar",
+                timestamp=datetime.datetime.utcnow(),
+            )
             embed.set_image(url=new_avatar)
             try:
                 await channel.send(embed=embed)
@@ -69,7 +74,7 @@ class AutoAvatar(commands.Cog):
         pass
 
     @avatarchannel.command()
-    async def current(self, ctx, channel: discord.TextChannel=None):
+    async def current(self, ctx, channel: discord.TextChannel = None):
         """
         Sets the channel for the current avatar display.
         If no channel is provided, it will clear the set channel.
@@ -82,7 +87,7 @@ class AutoAvatar(commands.Cog):
             await ctx.tick()
 
     @avatarchannel.command()
-    async def submissions(self, ctx, channel: discord.TextChannel=None):
+    async def submissions(self, ctx, channel: discord.TextChannel = None):
         """
         Sets the channel for avatar submissions.
         If no channel is provided, it will clear the set channel.
@@ -108,17 +113,19 @@ class AutoAvatar(commands.Cog):
                     avatar = await request.read()
             except aiohttp.InvalidURL:
                 await ctx.send("That's not a valid link.")
-                return 
+                return
             except aiohttp.ClientError:
                 await ctx.send("That's not a valid link.")
-                return 
-            
+                return
+
         if link not in all_avatars:
             all_avatars.append(link)
             await self.config.avatars.set(all_avatars)
             await ctx.tick()
         else:
-            await ctx.send(f"{link} was already in my list of avatars, did you mean to remove it?")
+            await ctx.send(
+                f"{link} was already in my list of avatars, did you mean to remove it?"
+            )
 
     @commands.command()
     @commands.is_owner()
@@ -129,7 +136,9 @@ class AutoAvatar(commands.Cog):
         all_avatars = await self.config.avatars()
 
         if len(all_avatars) == 1:
-            await ctx.send("You can't remove this until you have more than one avatar remaining.")
+            await ctx.send(
+                "You can't remove this until you have more than one avatar remaining."
+            )
             return
 
         if link in all_avatars:
@@ -137,7 +146,9 @@ class AutoAvatar(commands.Cog):
             await self.config.avatars.set(all_avatars)
             await ctx.tick()
         else:
-            await ctx.send(f"{link} wasn't in my list of avatars, did you mean to add it?")
+            await ctx.send(
+                f"{link} wasn't in my list of avatars, did you mean to add it?"
+            )
 
     @commands.command()
     async def listavatars(self, ctx):
@@ -150,7 +161,7 @@ class AutoAvatar(commands.Cog):
 
         for obj in all_avatars:
             paginator.add_line(obj)
-        
+
         for page in paginator.pages:
             await ctx.author.send(page)
 
@@ -164,12 +175,15 @@ class AutoAvatar(commands.Cog):
 
     @commands.command()
     @commands.bot_has_permissions(embed_links=True)
-    async def currentavatar(self,ctx):
+    async def currentavatar(self, ctx):
         """
         Displays the bot's current avatar.
         """
         avatar = await self.config.current_avatar()
-        embed = discord.Embed(colour= await self.bot.get_embed_colour(ctx.channel), title= "My Current Avatar")
+        embed = discord.Embed(
+            colour=await self.bot.get_embed_colour(ctx.channel),
+            title="My Current Avatar",
+        )
         embed.set_image(url=avatar)
         await ctx.send(embed=embed)
 
@@ -184,7 +198,11 @@ class AutoAvatar(commands.Cog):
         else:
             try:
                 channel = self.bot.get_channel(await self.config.submission_channel())
-                embed = discord.Embed(colour= await self.bot.get_embed_colour(channel), title= "New Avatar Submission", timestamp=datetime.datetime.utcnow())
+                embed = discord.Embed(
+                    colour=await self.bot.get_embed_colour(channel),
+                    title="New Avatar Submission",
+                    timestamp=datetime.datetime.utcnow(),
+                )
                 embed.set_image(url=link)
                 await channel.send(embed=embed)
                 await ctx.tick()

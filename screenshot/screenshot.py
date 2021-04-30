@@ -5,23 +5,24 @@ import discord
 import asyncio
 import io
 
+
 class Screenshot(commands.Cog):
     """Screenshots a given link."""
-    
+
     @commands.bot_has_permissions(attach_files=True)
     @commands.command()
     @commands.is_owner()
     async def screenshot(self, ctx, link: str, wait: int = 0):
         """Screenshots a given link."""
-        if link.startswith('https://'):
+        if link.startswith("https://"):
             pass
         else:
-            if link.startswith('http://'):
+            if link.startswith("http://"):
                 pass
-            else: 
+            else:
                 await ctx.send("That doesn't look like a valid link!")
                 return
-            
+
         browser = await launch()
         page = await browser.newPage()
         try:
