@@ -1,5 +1,5 @@
 {
-    "author": ["alec#8068"],
+    "author": ["alec#8068 (749112024633704481)"],
     "name": "SmartLyrics",
     "install_msg": "**Thanks for installing.**\n\nYou must have a KSoft.SI API Key for this to work. Use `[p]set api ksofisi api_key <key>` to set it.",
     "short": "Gets lyrics for your current song.",
