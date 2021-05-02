@@ -1,8 +1,8 @@
 {
-    "author" : ["alec"],
-    "name" : "GetEmoji",
-    "install_msg" : "**Thanks for installing!**\n Keep in mind, at this time, this cog will NOT function unless you are hosting this api: https://github.com/kaogurai/api\n It will default to look for the API at http://localhost:6969/, but you can change this with the `[p]emojiapiurl` command.",
-    "short" : "Get images of emojis from multiple providers.",
-    "description" : "This cog uses a self-hosted API server to scrape emojipedia and return images of certain emojis.",
-    "tags" : ["emoji", "emotes"]
+    "author": ["alec#8068"],
+    "name": "GetEmoji",
+    "install_msg": "**Thanks for installing!**\n Keep in mind, at this time, this cog will NOT function unless you are hosting this api: https://github.com/kaogurai/api\n It will default to look for the API at http://localhost:6969/, but you can change this with the `[p]emojiapiurl` command.",
+    "short": "Get images of emojis from multiple providers.",
+    "description": "This cog uses a self-hosted API server to scrape emojipedia and return images of certain emojis.",
+    "tags": ["emoji", "emotes"]
 }

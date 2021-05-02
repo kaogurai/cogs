@@ -16,4 +16,5 @@
 | AutoAvatar | Stable | Picks random bot avatar |
 | GetEmoji | Stable | Scrapes EmojiPedia for images |
 | Screenshot | Stable | Takes a screenshot of the given link |
+| SmartLyrics | Stable | Get lyrics of your current song from 4 different sources |
 
