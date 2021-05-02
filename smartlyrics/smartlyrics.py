@@ -122,7 +122,7 @@ class SmartLyrics(commands.Cog):
                         await self.create_menu(ctx, results, "Voice Channel")
                         return
                     else:
-                        await ctx.send(f"Nothing was found for `{query}`")
+                        await ctx.send(f"Nothing was found for `{renamed_title}`")
                         return
 
         if modcog and modcog.handle_listening(ctx.author)[0]:
@@ -135,7 +135,7 @@ class SmartLyrics(commands.Cog):
                 await self.create_menu(ctx, results, "Spotify")
                 return
             else:
-                await ctx.send(f"Nothing was found for `{query}`")
+                await ctx.send(f"Nothing was found for `{removed_line}`")
                 return
 
         if lastfmcog and await lastfmcog.config.user(ctx.author).lastfm_username():
@@ -152,7 +152,7 @@ class SmartLyrics(commands.Cog):
                 )
             except:
                 await ctx.send(
-                    "Uh oh, there was an error accessing your last.fm account."
+                    "Uh oh, there was an error accessing your Last.FM account."
                 )
                 return
 
@@ -167,7 +167,7 @@ class SmartLyrics(commands.Cog):
                 await self.create_menu(ctx, results, "Last.fm")
                 return
             else:
-                await ctx.send(f"Nothing was found for `{query}`")
+                await ctx.send(f"Nothing was found for `{trackname}`")
                 return
 
         await ctx.send("Please provide a query to search.")
