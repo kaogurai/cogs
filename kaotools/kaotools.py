@@ -1,5 +1,6 @@
 from redbot.core import commands
 from redbot.core.utils.chat_formatting import humanize_list
+from redbot.core.utils.menus import menu, DEFAULT_CONTROLS
 import discord
 import aiohttp
 import re
@@ -147,6 +148,18 @@ class KaoTools(commands.Cog):
         videos = await self.search_youtube(video)
         if videos:
             await ctx.send(videos[0]["info"]["uri"])
+        else:
+            await ctx.send("Nothing found.")
+
+    @commands.command(aliases=["yts", "ytsearch"])
+    async def youtubesearch(self, ctx, *, video: str):
+        """Search for a youtube video"""
+        results = await self.search_youtube(video)
+        if results:
+            videos = []
+            for obj in results:
+                videos.append(obj["info"]["uri"])
+            await menu(ctx, videos, DEFAULT_CONTROLS, timeout=60)
         else:
             await ctx.send("Nothing found.")
 
