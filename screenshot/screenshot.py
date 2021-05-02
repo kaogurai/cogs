@@ -25,7 +25,9 @@ class Screenshot(commands.Cog):
             await browser.close()
             return
         except Exception:
-            await ctx.send("Sorry, I ran into an issue! Make sure to include http:// or https:// at the beginning of the link.")
+            await ctx.send(
+                "Sorry, I ran into an issue! Make sure to include http:// or https:// at the beginning of the link."
+            )
             await browser.close()
             return
 

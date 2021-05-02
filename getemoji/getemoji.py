@@ -131,13 +131,13 @@ class GetEmoji(commands.Cog):
                 url + f"emoji/image/{vendor}/" + emoji
             ) as request:
                 if request.status == 404:
-                    await ctx.send(
-                        "Sorry, I couldn't find that emoji from my API."
-                    )
+                    await ctx.send("Sorry, I couldn't find that emoji from my API.")
                     return
                 response = await request.json()
                 embed = discord.Embed(color=await ctx.embed_colour())
                 embed.set_image(url=response["url"])
                 await ctx.send(embed=embed)
         except:
-            await ctx.send("Uh oh, an error occured. Make sure the API is listening on the correct port.")
+            await ctx.send(
+                "Uh oh, an error occured. Make sure the API is listening on the correct port."
+            )
