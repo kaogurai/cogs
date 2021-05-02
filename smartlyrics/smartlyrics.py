@@ -14,6 +14,7 @@ class SmartLyrics(commands.Cog):
 
     def __init__(self, bot):
         self.bot = bot
+        self.session = aiohttp.ClientSession()
         self.regex = re.compile(
             (
                 r"((\[)|(\()).*(of?ficial|feat\.?|"
@@ -23,17 +24,18 @@ class SmartLyrics(commands.Cog):
         )
         # thanks wyn - https://github.com/TheWyn/Wyn-RedV3Cogs/blob/master/lyrics/lyrics.py#L12-13
 
+    def cog_unload(self):
+        self.bot.loop.create_task(self.session.close())
+
     async def get_lyrics(self, query):
         ksoft_keys = await self.bot.get_shared_api_tokens("ksoftsi")
         key = ksoft_keys.get("api_key")
         url = "https://api.ksoft.si/lyrics/search"
         headers = {"Authorization": "Bearer " + key}
         params = {"q": query, "limit": 1}
-        session = aiohttp.ClientSession()
-        async with session.get(url, params=params, headers=headers) as request:
+        async with self.session.get(url, params=params, headers=headers) as request:
             if request.status == 200:
                 results = await request.json()
-                await session.close()
                 try:
                     return [
                         results["data"][0]["lyrics"],
@@ -43,9 +45,7 @@ class SmartLyrics(commands.Cog):
                     ]
                 except IndexError:
                     return
-            else:
-                await session.close()
-                return
+        return
 
     async def create_menu(self, ctx, results, source=None):
         embeds = []

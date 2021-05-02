@@ -10,6 +10,7 @@ class AutoAvatar(commands.Cog):
 
     def __init__(self, bot):
         self.bot = bot
+        self.session = aiohttp.ClientSession()
         self.config = Config.get_conf(self, identifier=696969696969494)
         default_global = {
             "avatars": ["https://avatars.githubusercontent.com/u/23690422?s=400&v=4"],
@@ -19,6 +20,9 @@ class AutoAvatar(commands.Cog):
         }
         self.config.register_global(**default_global)
 
+    def cog_unload(self):
+        self.bot.loop.create_task(self.session.close())
+
     async def change_avatar(self, ctx):
         all_avatars = await self.config.avatars()
 
@@ -26,18 +30,17 @@ class AutoAvatar(commands.Cog):
             return
         new_avatar = random.choice(all_avatars)
 
-        async with aiohttp.ClientSession() as session:
-            try:
-                async with session.get(new_avatar) as request:
-                    avatar = await request.read()
-            except aiohttp.InvalidURL:
-                all_avatars.remove(new_avatar)
-                await self.config.avatars.set(all_avatars)
-                return
-            except aiohttp.ClientError:
-                all_avatars.remove(new_avatar)
-                await self.config.avatars.set(all_avatars)
-                return
+        try:
+            async with self.session.get(new_avatar) as request:
+                avatar = await request.read()
+        except aiohttp.InvalidURL:
+            all_avatars.remove(new_avatar)
+            await self.config.avatars.set(all_avatars)
+            return
+        except aiohttp.ClientError:
+            all_avatars.remove(new_avatar)
+            await self.config.avatars.set(all_avatars)
+            return
 
         try:
             await self.bot.user.edit(avatar=avatar)
@@ -107,16 +110,14 @@ class AutoAvatar(commands.Cog):
         """
         all_avatars = await self.config.avatars()
 
-        async with aiohttp.ClientSession() as session:
-            try:
-                async with session.get(link) as request:
-                    avatar = await request.read()
-            except aiohttp.InvalidURL:
-                await ctx.send("That's not a valid link.")
-                return
-            except aiohttp.ClientError:
-                await ctx.send("That's not a valid link.")
-                return
+        try:
+            await self.session.get(link)
+        except aiohttp.InvalidURL:
+            await ctx.send("That's not a valid link.")
+            return
+        except aiohttp.ClientError:
+            await ctx.send("That's not a valid link.")
+            return
 
         if link not in all_avatars:
             all_avatars.append(link)

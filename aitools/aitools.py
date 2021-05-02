@@ -10,9 +10,13 @@ class AiTools(commands.Cog):
 
     def __init__(self, bot):
         self.bot = bot
+        self.session = aiohttp.ClientSession()
         self.config = Config.get_conf(self, identifier=6574837465473)
         default_guild = {"channels": []}
         self.config.register_guild(**default_guild)
+
+    def cog_unload(self):
+        self.bot.loop.create_task(self.session.close())
 
     @commands.command(aliases=["ai", "robot"])
     async def talk(self, ctx, *, message: str):
@@ -23,21 +27,20 @@ class AiTools(commands.Cog):
         if brain_info.get("brain_key") is None:
             return await ctx.send("The brain key has not been set.")
         try:
-            async with aiohttp.ClientSession() as session:
-                async with session.get(
-                    "http://api.brainshop.ai/get?bid="
-                    + brain_info.get("brain_id")
-                    + "&key="
-                    + brain_info.get("brain_key")
-                    + "&uid="
-                    + str(ctx.author.id)
-                    + "&msg="
-                    + urllib.parse.quote(message)
-                ) as request:
-                    response = await request.json()
-                    await ctx.send(response["cnt"])
-        except aiohttp.ClientConnectionError:
-            await ctx.send("Uh oh! The API I use is down, sorry!")
+            async with self.session.get(
+                "http://api.brainshop.ai/get?bid="
+                + brain_info.get("brain_id")
+                + "&key="
+                + brain_info.get("brain_key")
+                + "&uid="
+                + str(ctx.author.id)
+                + "&msg="
+                + urllib.parse.quote(message)
+            ) as request:
+                response = await request.json()
+                await ctx.send(response["cnt"])
+        except:
+            await ctx.send("Uh oh, an error occured!")
 
     @commands.Cog.listener()
     async def on_message_without_command(self, message: discord.Message):
@@ -62,21 +65,20 @@ class AiTools(commands.Cog):
             return await message.channel.send("The brain key has not been set.")
 
         try:
-            async with aiohttp.ClientSession() as session:
-                async with session.get(
-                    "http://api.brainshop.ai/get?bid="
-                    + brain_info.get("brain_id")
-                    + "&key="
-                    + brain_info.get("brain_key")
-                    + "&uid="
-                    + str(message.author.id)
-                    + "&msg="
-                    + urllib.parse.quote(str(message.content))
-                ) as request:
-                    response = await request.json()
-                    await message.channel.send(response["cnt"])
-        except aiohttp.ClientConnectionError:
-            await message.channel.send("Uh oh! The API I use is down, sorry!")
+            async with self.session.get(
+                "http://api.brainshop.ai/get?bid="
+                + brain_info.get("brain_id")
+                + "&key="
+                + brain_info.get("brain_key")
+                + "&uid="
+                + str(message.author.id)
+                + "&msg="
+                + urllib.parse.quote(str(message.content))
+            ) as request:
+                response = await request.json()
+                await message.channel.send(response["cnt"])
+        except:
+            await message.channel.send("Uh oh, an error occured!")
 
     @commands.group()
     @commands.guild_only()

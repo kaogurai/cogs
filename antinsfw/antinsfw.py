@@ -9,6 +9,7 @@ class AntiNSFW(commands.Cog):
 
     def __init__(self, bot):
         self.bot = bot
+        self.session = aiohttp.ClientSession()
         self.config = Config.get_conf(self, identifier=69696969696969000)
         default_guild = {
             "enabled": False,
@@ -24,6 +25,9 @@ class AntiNSFW(commands.Cog):
         default_global = {"api": "http://localhost:5000/"}
         self.config.register_guild(**default_guild)
         self.config.register_global(**default_global)
+
+    def cog_unload(self):
+        self.bot.loop.create_task(self.session.close())
 
     @commands.group()
     @commands.mod()
@@ -323,12 +327,10 @@ class AntiNSFW(commands.Cog):
             await ctx.tick()
 
     async def check_nsfw(self, link):
-        session = aiohttp.ClientSession()
         api = await self.config.api()
         url = api + "?url=" + link
-        async with session.get(url) as request:
+        async with self.session.get(url) as request:
             response = await request.json()
-        await session.close()
         if "score" in response:
             return response["score"]
         else:
