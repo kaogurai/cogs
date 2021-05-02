@@ -14,15 +14,8 @@ class Screenshot(commands.Cog):
     @commands.is_owner()
     async def screenshot(self, ctx, link: str, wait: int = 0):
         """Screenshots a given link."""
-        if link.startswith("https://"):
-            pass
-        else:
-            if link.startswith("http://"):
-                pass
-            else:
-                await ctx.send("That doesn't look like a valid link!")
-                return
 
+        await ctx.trigger_typing()
         browser = await launch()
         page = await browser.newPage()
         try:
@@ -31,6 +24,11 @@ class Screenshot(commands.Cog):
             await ctx.send("Sorry, I couldn't find anything at that link!")
             await browser.close()
             return
+        except Exception:
+            await ctx.send("Sorry, I ran into an issue! Make sure to include http:// or https:// at the beginning of the link.")
+            await browser.close()
+            return
+
         await asyncio.sleep(wait)
         result = await page.screenshot()
         await browser.close()
