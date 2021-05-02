@@ -12,6 +12,7 @@ class KaoTools(commands.Cog):
 
     def __init__(self, bot):
         self.bot = bot
+        self.session = aiohttp.ClientSession()
 
     # logic taken from https://github.com/maxbooiii/maxcogs/blob/master/ping/ping.py#L28
     def cog_unload(self):
@@ -22,6 +23,23 @@ class KaoTools(commands.Cog):
             except:
                 pass
             self.bot.add_command(old_invite)
+        self.bot.loop.create_task(self.session.close())
+
+    async def search_youtube(self, query):
+        """Make a Get call to FAKE youtube data api (HEHE)."""
+        params = {"identifier": "ytsearch:" + query}
+        headers = {"Authorization": "youshallnotpass", "Accept": "application/json"}
+        async with self.session.get(
+            "http://localhost:2333/loadtracks", params=params, headers=headers
+        ) as request:
+            if request.status == 200:
+                response = await request.json()
+                try:
+                    return response["tracks"]
+                except:
+                    return
+            else:
+                return
 
     @commands.Cog.listener()
     async def on_message_without_command(self, message: discord.Message):
@@ -85,15 +103,13 @@ class KaoTools(commands.Cog):
     @commands.command()
     async def debugerror(self, ctx, error_code: str):
         """Fetches error code information from hastebin."""
-        async with aiohttp.ClientSession() as session:
-            async with session.get(
-                f"https://haste.kaogurai.xyz/raw/{error_code}"
-            ) as request:
-                embed = discord.Embed(color=await ctx.embed_color())
-                embed.description = f"```yaml\n{await request.text()}```"
-                embed.set_footer(text=f"Error Code: {error_code}")
-                await ctx.send(embed=embed)
-        await session.close()
+        async with self.session.get(
+            f"https://haste.kaogurai.xyz/raw/{error_code}"
+        ) as request:
+            embed = discord.Embed(color=await ctx.embed_color())
+            embed.description = f"```yaml\n{await request.text()}```"
+            embed.set_footer(text=f"Error Code: {error_code}")
+            await ctx.send(embed=embed)
 
     @commands.command()
     async def asia(self, ctx):
@@ -124,6 +140,15 @@ class KaoTools(commands.Cog):
         await ctx.send(
             "oof is p cool :) he's also a bot developer! check out his bot here: http://pwnbot.xyz/"
         )
+
+    @commands.command(aliases=["yt"])
+    async def youtube(self, ctx, *, video: str):
+        """Search for a youtube video"""
+        videos = await self.search_youtube(video)
+        if videos:
+            await ctx.send(videos[0]["info"]["uri"])
+        else:
+            await ctx.send("Nothing found.")
 
 
 def setup(bot):
