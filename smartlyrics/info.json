@@ -1,7 +1,7 @@
 {
     "author": ["alec#8068"],
     "name": "SmartLyrics",
-    "install_msg": "**Thanks for installing.**\n\n You must have a KSoft.SI API Key for this to work. Use `[p]set api ksofisi api_key <key> to set it.",
+    "install_msg": "**Thanks for installing.**\n\n You must have a KSoft.SI API Key for this to work. Use `[p]set api ksofisi api_key <key>` to set it.",
     "short": "takes a screenshot of a given url",
     "description": "Gets lyrics for your current song through four different sources.",
     "tags": ["lyrics", "music"]
