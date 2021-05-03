@@ -169,18 +169,20 @@ class KaoTools(commands.Cog):
         else:
             await ctx.send("Nothing found.")
 
-    @commands.command()       
+    @commands.command()
     async def poll(self, ctx, *, question: str):
-        if not ctx.channel.permissions_for(ctx.me).add_reactions and not ctx.channel.permissions_for(ctx.me).use_external_emojis:
-            await ctx.send("Please give me permissions to react, and react with external emojis.")
+        if (
+            not ctx.channel.permissions_for(ctx.me).add_reactions
+            and not ctx.channel.permissions_for(ctx.me).use_external_emojis
+        ):
+            await ctx.send(
+                "Please give me permissions to react, and react with external emojis."
+            )
             return
         message = await ctx.send(f"**{ctx.author} asks:** " + question)
         await message.add_reaction("👍")
         await message.add_reaction("<:idk:838887174345588796")
         await message.add_reaction("👎")
-
-
-    
 
 
 def setup(bot):
