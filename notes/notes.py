@@ -4,6 +4,8 @@ import arrow
 
 
 class Notes(commands.Cog):
+    """View """
+
     def __init__(self, bot):
         self.bot = bot
         self.config = Config.get_conf(self, identifier=49494928388538483242032)
@@ -51,23 +53,42 @@ class Notes(commands.Cog):
         # TODO: remove it from config
 
     async def get_note(self, ctx, user, note: int):
-        pass  # TODO
+        pass  
 
     async def get_notes(self, ctx, user):
-        pass  # TODO
+        pass 
 
     @commands.command(aliases=["addnote"])
     @commands.mod_or_permissions(ban_members=True)
     async def note(self, ctx, user: discord.Member, reason: str):
+        if user == ctx.author:
+            await ctx.send("You can't add a note to yourself.")
+            return
+        if user.top_role >= ctx.author.top_role and ctx.author != ctx.guild.owner:
+            await ctx.send("You can't add a note to that user.")
+            return
+        if user == ctx.guild.owner:
+            await ctx.send("You can't add a note to that user.")
+            return
         if len(reason) > 500:
             await ctx.send("Notes can't be larger than 500 characters.")
             return
+        # check if duplicate note exists
         await self.write_note(ctx, user, ctx.author, reason)
         await ctx.send(f"I have noted **{reason}** for **{user}**.")
 
     @commands.command(aliases=["deletenote", "removenote"])
     @commands.mod_or_permissions(ban_members=True)
     async def delnote(self, ctx, user: discord.Member, note: int):
+        if user == ctx.author:
+            await ctx.send("You can't remove note from yourself.")
+            return
+        if user.top_role >= ctx.author.top_role and ctx.author != ctx.guild.owner:
+            await ctx.send("You can't remove a note from that user.")
+            return
+        if user == ctx.guild.owner:
+            await ctx.send("You can't remove a note from that user.")
+            return
         # check if note exists
         note = await self.get_note(note)
         await self.burn_note(ctx, user, ctx.author, note)
@@ -76,4 +97,5 @@ class Notes(commands.Cog):
     @commands.command(aliases=["viewnotes", "listnotes"])
     @commands.mod_or_permissions(ban_members=True)
     async def notes(self, ctx, user: discord.Member):
-        await ctx.send("Not Ready")
+        notes = await self.get_notes(self, ctx, user)
+        await ctx.send(notes) # make better
