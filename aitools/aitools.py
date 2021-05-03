@@ -82,7 +82,7 @@ class AiTools(commands.Cog):
 
     @commands.group()
     @commands.guild_only()
-    @commands.mod_or_permissions(manage_server=True)
+    @commands.mod_or_permissions(manage_guild=True)
     async def aichannel(self, ctx):
         """Configure the channels the AI will talk in."""
         pass

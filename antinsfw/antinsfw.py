@@ -30,7 +30,7 @@ class AntiNSFW(commands.Cog):
         self.bot.loop.create_task(self.session.close())
 
     @commands.group()
-    @commands.mod_or_permissions(manage_server=True)
+    @commands.mod_or_permissions(manage_guild=True)
     async def antinsfw(self, ctx):
         """Configures NSFW Detection"""
         pass
