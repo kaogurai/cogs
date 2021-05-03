@@ -1,0 +1,9 @@
+{
+    "author": ["alec#8068 (749112024633704481)"],
+    "name": "Notes",
+    "install_msg": "**Thanks for installing!**",
+    "short": "Write notes on users for moderators to share.",
+    "description": "Write notes on users for moderators to share about past experiences.",
+    "tags": ["notes", "note", "mod", "moderators"],
+    "hidden": true
+}
