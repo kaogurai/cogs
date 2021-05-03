@@ -13,7 +13,7 @@ class AutoAvatar(commands.Cog):
         self.session = aiohttp.ClientSession()
         self.config = Config.get_conf(self, identifier=696969696969494)
         default_global = {
-            "avatars": ["https://avatars.githubusercontent.com/u/23690422?s=400&v=4"],
+            "avatars": [],
             "current_avatar": "",
             "current_channel": None,
             "submission_channel": None,
@@ -26,8 +26,10 @@ class AutoAvatar(commands.Cog):
     async def change_avatar(self, ctx):
         all_avatars = await self.config.avatars()
 
-        if all_avatars is None:
+        if not all_avatars:
+            await ctx.send("You haven't added any avatars yet.")
             return
+
         new_avatar = random.choice(all_avatars)
 
         try:
@@ -135,12 +137,6 @@ class AutoAvatar(commands.Cog):
         Removes an avatar link.
         """
         all_avatars = await self.config.avatars()
-
-        if len(all_avatars) == 1:
-            await ctx.send(
-                "You can't remove this until you have more than one avatar remaining."
-            )
-            return
 
         if link in all_avatars:
             all_avatars.remove(link)
