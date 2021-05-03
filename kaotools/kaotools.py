@@ -144,7 +144,10 @@ class KaoTools(commands.Cog):
 
     @commands.command(aliases=["yt"])
     async def youtube(self, ctx, *, video: str):
-        """Search for a youtube video"""
+        """
+        Search for a youtube video.
+        Inspired by Aikaterna's YouTube cog
+        """
         videos = await self.search_youtube(video)
         if videos:
             await ctx.send(videos[0]["info"]["uri"])
@@ -153,7 +156,10 @@ class KaoTools(commands.Cog):
 
     @commands.command(aliases=["yts", "ytsearch"])
     async def youtubesearch(self, ctx, *, video: str):
-        """Search for a youtube video"""
+        """
+        Search for a youtube video with a menu of results.
+        Inspired by Aikaterna's YouTube cog
+        """
         results = await self.search_youtube(video)
         if results:
             videos = []
@@ -162,6 +168,19 @@ class KaoTools(commands.Cog):
             await menu(ctx, videos, DEFAULT_CONTROLS, timeout=60)
         else:
             await ctx.send("Nothing found.")
+
+    @commands.command()       
+    async def poll(self, ctx, *, question: str):
+        if not ctx.channel.permissions_for(ctx.me).add_reactions and not ctx.channel.permissions_for(ctx.me).use_external_emojis:
+            await ctx.send("Please give me permissions to react, and react with external emojis.")
+            return
+        message = await ctx.send(f"**{ctx.author} asks:** " + question)
+        await message.add_reaction("👍")
+        await message.add_reaction("<:idk:838887174345588796")
+        await message.add_reaction("👎")
+
+
+    
 
 
 def setup(bot):
