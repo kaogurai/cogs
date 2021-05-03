@@ -4,7 +4,7 @@ import arrow
 
 
 class Notes(commands.Cog):
-    """View """
+    """Write notes on users for moderators to share."""
 
     def __init__(self, bot):
         self.bot = bot
@@ -53,14 +53,15 @@ class Notes(commands.Cog):
         # TODO: remove it from config
 
     async def get_note(self, ctx, user, note: int):
-        pass  
+        pass
 
     async def get_notes(self, ctx, user):
-        pass 
+        pass
 
     @commands.command(aliases=["addnote"])
     @commands.mod_or_permissions(ban_members=True)
     async def note(self, ctx, user: discord.Member, reason: str):
+        """Create a note on a user."""
         if user == ctx.author:
             await ctx.send("You can't add a note to yourself.")
             return
@@ -80,6 +81,10 @@ class Notes(commands.Cog):
     @commands.command(aliases=["deletenote", "removenote"])
     @commands.mod_or_permissions(ban_members=True)
     async def delnote(self, ctx, user: discord.Member, note: int):
+        """
+        Remove a note from a user
+        Use the index from `[p]notes <user>`
+        """
         if user == ctx.author:
             await ctx.send("You can't remove note from yourself.")
             return
@@ -97,5 +102,6 @@ class Notes(commands.Cog):
     @commands.command(aliases=["viewnotes", "listnotes"])
     @commands.mod_or_permissions(ban_members=True)
     async def notes(self, ctx, user: discord.Member):
+        """View notes on a user."""
         notes = await self.get_notes(self, ctx, user)
-        await ctx.send(notes) # make better
+        await ctx.send(notes)  # make better
