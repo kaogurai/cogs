@@ -171,6 +171,7 @@ class KaoTools(commands.Cog):
 
     @commands.command()
     async def poll(self, ctx, *, question: str):
+        """Create a poll!"""
         if (
             not ctx.channel.permissions_for(ctx.me).add_reactions
             and not ctx.channel.permissions_for(ctx.me).use_external_emojis

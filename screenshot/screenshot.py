@@ -10,7 +10,7 @@ class Screenshot(commands.Cog):
     """Screenshots a given link."""
 
     @commands.bot_has_permissions(attach_files=True)
-    @commands.command()
+    @commands.command(aliases="ss")
     @commands.is_owner()
     async def screenshot(self, ctx, link: str, wait: int = 0):
         """Screenshots a given link."""
