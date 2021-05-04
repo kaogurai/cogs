@@ -70,7 +70,7 @@ class KaoTools(commands.Cog):
         await message.channel.send(embed=embed)
 
     @commands.bot_has_permissions(embed_links=True)
-    @commands.command()
+    @commands.command(aliases="support")
     async def invite(self, ctx, bot: discord.User = None):
         """Invite me or another bot!"""
         if bot is None:
