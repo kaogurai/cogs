@@ -9,7 +9,7 @@ old_invite = None
 
 
 class KaoTools(commands.Cog):
-    """General commands for kaogurai!"""
+    """Random tools for [botname] that fit nowhere else."""
 
     def __init__(self, bot):
         self.bot = bot
