@@ -15,15 +15,7 @@ class KaoTools(commands.Cog):
         self.bot = bot
         self.session = aiohttp.ClientSession()
 
-    # logic taken from https://github.com/maxbooiii/maxcogs/blob/master/ping/ping.py#L28
     def cog_unload(self):
-        global old_invite
-        if old_invite:
-            try:
-                self.bot.remove_command("invite")
-            except:
-                pass
-            self.bot.add_command(old_invite)
         self.bot.loop.create_task(self.session.close())
 
     async def search_youtube(self, query):
@@ -68,38 +60,6 @@ class KaoTools(commands.Cog):
         """,
         )
         await message.channel.send(embed=embed)
-
-    @commands.bot_has_permissions(embed_links=True)
-    @commands.command(aliases=["support"])
-    async def invite(self, ctx, bot: discord.User = None):
-        """Invite me or another bot!"""
-        if bot is None:
-            embed = discord.Embed(
-                title="Thanks for using me!",
-                color=await ctx.embed_color(),
-                url="https://kaogurai.xyz",
-            )
-            embed.set_thumbnail(url=ctx.me.avatar_url)
-            embed.add_field(
-                name="Bot Invite",
-                value=(
-                    f"[Click Here](https://discord.com/oauth2/authorize?client_id={ctx.me.id}&permissions=6441922047&scope=bot+applications.commands)"
-                ),
-                inline=True,
-            )
-            embed.add_field(
-                name="Support Server",
-                value="[Click Here](https://discord.gg/p6ehU9qhg8)",
-                inline=True,
-            )
-            await ctx.send(embed=embed)
-        else:
-            embed = discord.Embed(
-                title="Click here to invite that bot!",
-                color=await ctx.embed_color(),
-                url=f"https://discord.com/oauth2/authorize?client_id={bot.id}&permissions=6441922047&scope=bot+applications.commands",
-            )
-            await ctx.send(embed=embed)
 
     @commands.command()
     async def debugerror(self, ctx, error_code: str):
@@ -171,7 +131,7 @@ class KaoTools(commands.Cog):
 
     @commands.command()
     async def poll(self, ctx, *, question: str):
-        """Create a poll!"""
+        """Create a simple poll!"""
         if (
             not ctx.channel.permissions_for(ctx.me).add_reactions
             and not ctx.channel.permissions_for(ctx.me).use_external_emojis
@@ -184,12 +144,3 @@ class KaoTools(commands.Cog):
         await message.add_reaction("👍")
         await message.add_reaction("<:idk:838887174345588796")
         await message.add_reaction("👎")
-
-
-def setup(bot):
-    kaotools = KaoTools(bot)
-    global old_invite
-    old_invite = bot.get_command("invite")
-    if old_invite:
-        bot.remove_command(old_invite.name)
-    bot.add_cog(kaotools)

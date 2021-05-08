@@ -21,7 +21,7 @@ class Screenshot(commands.Cog):
         await ctx.trigger_typing()
         browser = await launch()
         page = await browser.newPage()
-        await page.setViewport({'width':1280, 'height':720})
+        await page.setViewport({"width": 1280, "height": 720})
         try:
             await page.goto(link)
         except pyppeteer.page.PageError:
