@@ -70,18 +70,11 @@ class AutoAvatar(commands.Cog):
                 await self.config.current_channel.set(None)
                 return
 
-    @commands.group()
+    @commands.command()
     @commands.is_owner()
-    async def avatarchannel(self, ctx):
+    async def avatarchannel(self, ctx, channel: discord.TextChannel = None):
         """
-        Commands to set the avatar channels.
-        """
-        pass
-
-    @avatarchannel.command()
-    async def current(self, ctx, channel: discord.TextChannel = None):
-        """
-        Sets the channel for the current avatar display.
+        Sets the channel for the current avatar.
         If no channel is provided, it will clear the set channel.
         """
         if channel is None:
@@ -89,19 +82,6 @@ class AutoAvatar(commands.Cog):
             await ctx.send("I have cleared the channel.")
         else:
             await self.config.current_channel.set(channel.id)
-            await ctx.tick()
-
-    @avatarchannel.command()
-    async def submissions(self, ctx, channel: discord.TextChannel = None):
-        """
-        Sets the channel for avatar submissions.
-        If no channel is provided, it will clear the set channel.
-        """
-        if channel is None:
-            await self.config.submission_channel.set(None)
-            await ctx.send("I have cleared the channel.")
-        else:
-            await self.config.submission_channel.set(channel.id)
             await ctx.tick()
 
     @commands.command()
@@ -154,13 +134,21 @@ class AutoAvatar(commands.Cog):
         """
         all_avatars = await self.config.avatars()
 
+        if not all_avatars:
+            await ctx.send("I do not have any avatars saved.")
+            return
+
         paginator = discord.ext.commands.help.Paginator()
 
         for obj in all_avatars:
             paginator.add_line(obj)
 
         for page in paginator.pages:
-            await ctx.author.send(page)
+            try:
+                await ctx.author.send(page)
+            except:
+                await ctx.send("I can't DM you.")
+                break
 
     @commands.command()
     @commands.is_owner()
@@ -183,26 +171,3 @@ class AutoAvatar(commands.Cog):
         )
         embed.set_image(url=avatar)
         await ctx.send(embed=embed)
-
-    @commands.command()
-    async def submitavatar(self, ctx, link: str):
-        """
-        Submits a link for an avatar suggestion.
-        """
-        if await self.config.submission_channel() is None:
-            await ctx.send("Ask the bot owner to set up the submissions channel!")
-            return
-        else:
-            try:
-                channel = self.bot.get_channel(await self.config.submission_channel())
-                embed = discord.Embed(
-                    colour=await self.bot.get_embed_colour(channel),
-                    title="New Avatar Submission",
-                    timestamp=datetime.datetime.utcnow(),
-                )
-                embed.set_image(url=link)
-                await channel.send(embed=embed)
-                await ctx.tick()
-            except discord.HTTPException:
-                await ctx.send("That doesn't look like a valid link!")
-                return
