@@ -72,7 +72,7 @@ class KaoTools(commands.Cog):
             embed.set_footer(text=f"Error Code: {error_code}")
             await ctx.send(embed=embed)
 
-    @commands.command()
+    @commands.command(hidden=True)
     async def asia(self, ctx):
         """Emo kids lover"""
         await ctx.send(
@@ -83,9 +83,9 @@ class KaoTools(commands.Cog):
         )
 
     @commands.bot_has_permissions(embed_links=True)
-    @commands.command()
+    @commands.command(hidden=True)
     async def maddie(self, ctx):
-        """Cool Cat"""
+        """Cool Cat :)"""
         embed = discord.Embed(
             description="maddie is a cool cat + is emotionally attached to this cat’s birthday party :revolving_hearts::revolving_hearts::revolving_hearts::revolving_hearts:",
             color=11985904,
@@ -95,7 +95,7 @@ class KaoTools(commands.Cog):
         )
         await ctx.send(embed=embed)
 
-    @commands.command()
+    @commands.command(hidden=True)
     async def oofchair(self, ctx):
         """Cool bot dev"""
         await ctx.send(
@@ -131,7 +131,7 @@ class KaoTools(commands.Cog):
 
     @commands.command()
     async def poll(self, ctx, *, question: str):
-        """Create a simple poll!"""
+        """Create a simple poll."""
         if (
             not ctx.channel.permissions_for(ctx.me).add_reactions
             and not ctx.channel.permissions_for(ctx.me).use_external_emojis
