@@ -81,7 +81,7 @@ class SmartLyrics(commands.Cog):
     @commands.command(aliases=["l", "ly"])
     async def lyrics(self, ctx, *, query: str = None):
         """
-        Gets the lyrics for your current song through 4 different sources.
+        Gets the lyrics for your current song.
 
         If a query (song name) is provided, it will immediately search that.
         Next, it checks if you are in VC and a song is playing.
