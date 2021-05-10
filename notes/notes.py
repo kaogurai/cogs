@@ -59,6 +59,7 @@ class Notes(commands.Cog):
         pass
 
     @commands.command(aliases=["addnote"])
+    @commands.guild()
     @commands.mod_or_permissions(ban_members=True)
     async def note(self, ctx, user: discord.Member, reason: str):
         """Create a note on a user."""
@@ -79,6 +80,7 @@ class Notes(commands.Cog):
         await ctx.send(f"I have noted **{reason}** for **{user}**.")
 
     @commands.command(aliases=["deletenote", "removenote"])
+    @commands.guild()
     @commands.mod_or_permissions(ban_members=True)
     async def delnote(self, ctx, user: discord.Member, note: int):
         """
@@ -100,6 +102,7 @@ class Notes(commands.Cog):
         await ctx.send(f"I have removed the note **{note}** from **{ctx.author}** ")
 
     @commands.command(aliases=["viewnotes", "listnotes"])
+    @commands.guild()
     @commands.mod_or_permissions(ban_members=True)
     async def notes(self, ctx, user: discord.Member):
         """View notes on a user."""
