@@ -15,8 +15,7 @@ class AutoAvatar(commands.Cog):
         default_global = {
             "avatars": [],
             "current_avatar": "",
-            "current_channel": None,
-            "submission_channel": None,
+            "current_channel": None
         }
         self.config.register_global(**default_global)
 
