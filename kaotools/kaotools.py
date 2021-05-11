@@ -5,6 +5,7 @@ import discord
 import aiohttp
 import re
 
+old_invite = None
 
 class KaoTools(commands.Cog):
     """Random tools for kaogurai that fit nowhere else."""
@@ -15,6 +16,14 @@ class KaoTools(commands.Cog):
 
     def cog_unload(self):
         self.bot.loop.create_task(self.session.close())
+        # command remove logic - https://github.com/maxbooiii/maxcogs/blob/master/ping/ping.py#L28
+        global old_invite
+        if old_invite:
+            try:
+                self.bot.remove_command("invite")
+            except:
+                pass
+            self.bot.add_command(old_invite)
 
     async def search_youtube(self, query):
         """Make a Get call to FAKE youtube data api (HEHE)."""
@@ -174,3 +183,11 @@ class KaoTools(commands.Cog):
                 url=f"https://discord.com/oauth2/authorize?client_id={bot.id}&permissions=6441922047&scope=bot+applications.commands",
             )
             await ctx.send(embed=embed)
+
+def setup(bot):
+    kaotools = KaoTools(bot)
+    global old_invite
+    old_invite = bot.get_command("invite")
+    if old_invite:
+        bot.remove_command(old_invite.name)
+    bot.add_cog(kaotools)
