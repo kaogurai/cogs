@@ -66,7 +66,6 @@ class AutoAvatar(commands.Cog):
             try:
                 await channel.send(embed=embed)
             except discord.HTTPException:
-                await self.config.current_channel.set(None)
                 return
 
     @commands.command()
