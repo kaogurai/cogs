@@ -78,6 +78,7 @@ class SmartLyrics(commands.Cog):
             await ctx.send(embed=embeds[0])
 
     @commands.bot_has_permissions(embed_links=True)
+    @commands.guild_only()
     @commands.command(aliases=["l", "ly"])
     async def lyrics(self, ctx, *, query: str = None):
         """
@@ -112,8 +113,8 @@ class SmartLyrics(commands.Cog):
 
         if ctx.author.voice and ctx.guild.me.voice:
             if ctx.author.voice.channel == ctx.guild.me.voice.channel:
-                if audiocog and await get_player(ctx):
-                    player = await get_player(ctx)
+                player = await get_player(ctx)
+                if audiocog and player and player.current:
                     title = player.current.title
                     regex_title = self.regex.sub("", title).strip()
                     renamed_title = regex_title.replace("-", " ")

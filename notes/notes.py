@@ -9,26 +9,31 @@ class Notes(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.config = Config.get_conf(self, identifier=49494928388538483242032)
-        default_user = {}
+        default_user = {"notes": None}
         self.config.register_global(**default_user)
         self.register_casetypes = self.bot.loop.create_task(self.register_casetypes())
 
     async def register_casetypes(self):
-        casetypes = [
-            {"name": "note", "default_setting": True, "image": "🗒", "case_str": "Note"},
-            {
-                "name": "note_burned",
-                "default_setting": True,
-                "image": "🔥",
-                "case_str": "Note Burned",
-            },
-        ]
         try:
-            await modlog.register_casetype(casetypes)
+            await modlog.register_casetype(
+                name="note",
+                default_setting=True,
+                image="🗒",
+                case_str="Note",
+            )
+        except RuntimeError:
+            pass
+        try:
+            await modlog.register_casetype(
+                name="note_burned",
+                default_setting=True,
+                image="🔥",
+                case_str="Note Burned",
+            )
         except RuntimeError:
             pass
 
-    async def write_note(self, ctx, user, moderator, reason):
+    async def write_note(self, ctx, user, moderator, reason: str):
         await modlog.create_case(
             guild=ctx.guild,
             bot=self.bot,
@@ -38,7 +43,16 @@ class Notes(commands.Cog):
             moderator=moderator,
             reason=reason,
         )
-        # TODO: add it to config
+        user_notes = await self.config.user(user).notes()
+        if user_notes is None:
+            await self.config.user(user).notes.set({ctx.guild.id: [reason]})
+        else:
+            guild_notes = user_notes.get(str(ctx.guild.id))
+            if guild_notes:
+                pass  # idk do harder stuff
+            else:
+                user_notes[ctx.guild.id] = [reason]
+                await self.config.user(user).notes.set(user_notes)
 
     async def burn_note(self, ctx, user, moderator, old_note_reason):
         await modlog.create_case(
@@ -58,10 +72,10 @@ class Notes(commands.Cog):
     async def get_notes(self, ctx, user):
         pass
 
+    @commands.guild_only()
     @commands.command(aliases=["addnote"])
-    @commands.guild()
     @commands.mod_or_permissions(ban_members=True)
-    async def note(self, ctx, user: discord.Member, reason: str):
+    async def note(self, ctx, user: discord.Member, *, reason: str):
         """Create a note on a user."""
         if user == ctx.author:
             await ctx.send("You can't add a note to yourself.")
@@ -80,7 +94,7 @@ class Notes(commands.Cog):
         await ctx.send(f"I have noted **{reason}** for **{user}**.")
 
     @commands.command(aliases=["deletenote", "removenote"])
-    @commands.guild()
+    @commands.guild_only()
     @commands.mod_or_permissions(ban_members=True)
     async def delnote(self, ctx, user: discord.Member, note: int):
         """
@@ -102,7 +116,7 @@ class Notes(commands.Cog):
         await ctx.send(f"I have removed the note **{note}** from **{ctx.author}** ")
 
     @commands.command(aliases=["viewnotes", "listnotes"])
-    @commands.guild()
+    @commands.guild_only()
     @commands.mod_or_permissions(ban_members=True)
     async def notes(self, ctx, user: discord.Member):
         """View notes on a user."""

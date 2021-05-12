@@ -7,6 +7,7 @@ import re
 
 old_invite = None
 
+
 class KaoTools(commands.Cog):
     """Random tools for kaogurai that fit nowhere else."""
 
@@ -183,6 +184,7 @@ class KaoTools(commands.Cog):
                 url=f"https://discord.com/oauth2/authorize?client_id={bot.id}&permissions=6441922047&scope=bot+applications.commands",
             )
             await ctx.send(embed=embed)
+
 
 def setup(bot):
     kaotools = KaoTools(bot)

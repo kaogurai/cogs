@@ -12,11 +12,7 @@ class AutoAvatar(commands.Cog):
         self.bot = bot
         self.session = aiohttp.ClientSession()
         self.config = Config.get_conf(self, identifier=696969696969494)
-        default_global = {
-            "avatars": [],
-            "current_avatar": "",
-            "current_channel": None
-        }
+        default_global = {"avatars": [], "current_avatar": "", "current_channel": None}
         self.config.register_global(**default_global)
 
     def cog_unload(self):
