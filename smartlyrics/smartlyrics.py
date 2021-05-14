@@ -117,7 +117,7 @@ class SmartLyrics(commands.Cog):
                 if audiocog and player and player.current:
                     title = player.current.title
                     regex_title = self.regex.sub("", title).strip()
-                    renamed_title = regex_title.replace("-", " ")
+                    renamed_title = regex_title.replace("-", "")
                     results = await self.get_lyrics(renamed_title)
                     if results:
                         await self.create_menu(ctx, results, "Voice Channel")
@@ -128,9 +128,9 @@ class SmartLyrics(commands.Cog):
 
         if modcog and modcog.handle_listening(ctx.author)[0]:
             statustext = modcog.handle_listening(ctx.author)[0].strip("Listening:")
-            removed_spotify = statustext.split("(")[0]
+            removed_spotify = statustext.split("(https://")[0]
             removed_brackets = removed_spotify[2:-1]
-            removed_line = removed_brackets.replace("|", " ")
+            removed_line = removed_brackets.replace("|", "")
             results = await self.get_lyrics(removed_line)
             if results:
                 await self.create_menu(ctx, results, "Spotify")
