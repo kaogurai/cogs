@@ -126,10 +126,11 @@ class Notes(commands.Cog):
             return
         embeds = []
         for index, page in enumerate(notes):
+            author = self.bot.get_user(page['author'])
             embed = discord.Embed(
                 color=await ctx.embed_color(),
-                title=f"Note",
-                description=page,
+                title=f"Note by {author}",
+                description=page['note'],
             )
             if len(notes) != 1:
                 embed.set_footer(text=f"Note {index + 1}/{len(notes)}")
