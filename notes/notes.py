@@ -35,6 +35,7 @@ class Notes(commands.Cog):
             pass # this means it's already been registered
 
     async def write_note(self, ctx, user, moderator, reason: str):
+        """Create a modlog case and add it to the user's config."""
         await modlog.create_case(
             guild=ctx.guild,
             bot=self.bot,
@@ -55,6 +56,7 @@ class Notes(commands.Cog):
         await self.config.member(user).notes.set(user_notes)
 
     async def burn_note(self, ctx, user, moderator, notes, note):
+        """Create a modlog case and remove it from the user's config."""
         old_note = notes[note]
         old_note_text = old_note['note']
         await modlog.create_case(
@@ -75,7 +77,7 @@ class Notes(commands.Cog):
     @commands.command(aliases=["addnote"])
     @commands.mod_or_permissions(ban_members=True)
     async def note(self, ctx, user: discord.Member, *, reason: str):
-        """Create a note on a user."""
+        """Add a note to a user."""
         if user == ctx.author:
             await ctx.send("You can't add a note to yourself.")
             return
@@ -119,7 +121,7 @@ class Notes(commands.Cog):
     @commands.guild_only()
     @commands.mod_or_permissions(ban_members=True)
     async def notes(self, ctx, user: discord.Member):
-        """View notes on a user."""
+        """View a user's notes."""
         notes = await self.config.member(user).notes()
         if notes is None:
             await ctx.send("That user has no notes.")
