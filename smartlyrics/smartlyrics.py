@@ -47,6 +47,19 @@ class SmartLyrics(commands.Cog):
                     return
         return
 
+    # adapted https://github.com/kaogurai/core/blob/V3/edge/redbot/cogs/mod/names.py#L71
+    def handle_listening(self, user):
+        l_acts = [c for c in user.activities if c.type == discord.ActivityType.listening]
+        if not l_acts:
+            return None, discord.ActivityType.listening
+        l_act = l_acts[0]
+        if isinstance(l_act, discord.Spotify):
+            act = ("{artist} {title}").format(
+                artist=discord.utils.escape_markdown(l_act.artist) if l_act.artist else "",
+                title=discord.utils.escape_markdown(l_act.title),
+            )
+        return act, discord.ActivityType.listening
+
     async def create_menu(self, ctx, results, source=None):
         embeds = []
         embed_content = [p for p in pagify(results[0], page_length=750)]
@@ -101,7 +114,6 @@ class SmartLyrics(commands.Cog):
                 return
 
         audiocog = self.bot.get_cog("Audio")
-        modcog = self.bot.get_cog("Mod")
         lastfmcog = self.bot.get_cog("LastFM")
 
         async def get_player(ctx):
@@ -125,18 +137,15 @@ class SmartLyrics(commands.Cog):
                     else:
                         await ctx.send(f"Nothing was found for `{renamed_title}`")
                         return
+        statustext = self.handle_listening(ctx.author)[0]
 
-        if modcog and modcog.handle_listening(ctx.author)[0]:
-            statustext = modcog.handle_listening(ctx.author)[0].strip("Listening:")
-            removed_spotify = statustext.split("(https://")[0]
-            removed_brackets = removed_spotify[2:-1]
-            removed_line = removed_brackets.replace("|", "")
-            results = await self.get_lyrics(removed_line)
+        if statustext:
+            results = await self.get_lyrics(statustext)
             if results:
                 await self.create_menu(ctx, results, "Spotify")
                 return
             else:
-                await ctx.send(f"Nothing was found for `{removed_line}`")
+                await ctx.send(f"Nothing was found for `{statustext}`")
                 return
 
         if lastfmcog and await lastfmcog.config.user(ctx.author).lastfm_username():
