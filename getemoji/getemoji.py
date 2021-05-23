@@ -1,6 +1,7 @@
-from redbot.core import commands, Config
 import aiohttp
 import discord
+
+from redbot.core import Config, commands
 
 
 class GetEmoji(commands.Cog):

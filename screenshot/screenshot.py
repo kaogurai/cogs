@@ -1,9 +1,11 @@
-from redbot.core import commands, Config, checks
-from pyppeteer import launch
-import pyppeteer
-import discord
 import asyncio
 import io
+
+import discord
+import pyppeteer
+from pyppeteer import launch
+
+from redbot.core import Config, checks, commands
 
 
 class Screenshot(commands.Cog):

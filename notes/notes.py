@@ -1,7 +1,8 @@
-from redbot.core import commands, Config, modlog
-from redbot.core.utils.menus import DEFAULT_CONTROLS, menu
 import discord
+
 import arrow
+from redbot.core import Config, commands, modlog
+from redbot.core.utils.menus import DEFAULT_CONTROLS, menu
 
 
 class Notes(commands.Cog):
@@ -23,7 +24,7 @@ class Notes(commands.Cog):
                 case_str="Note",
             )
         except RuntimeError:
-            pass # this means it's already been registered
+            pass  # this means it's already been registered
         try:
             await modlog.register_casetype(
                 name="note_burned",
@@ -32,7 +33,7 @@ class Notes(commands.Cog):
                 case_str="Note Burned",
             )
         except RuntimeError:
-            pass # this means it's already been registered
+            pass  # this means it's already been registered
 
     async def write_note(self, ctx, user, moderator, reason: str):
         """Create a modlog case and add it to the user's config."""
@@ -47,18 +48,14 @@ class Notes(commands.Cog):
         )
         user_notes = await self.config.member(user).notes()
         user_notes.append(
-            {
-                'note': reason,
-                'author': moderator.id,
-                'message': ctx.message.id
-            }
+            {"note": reason, "author": moderator.id, "message": ctx.message.id}
         )
         await self.config.member(user).notes.set(user_notes)
 
     async def burn_note(self, ctx, user, moderator, notes, note):
         """Create a modlog case and remove it from the user's config."""
         old_note = notes[note]
-        old_note_text = old_note['note']
+        old_note_text = old_note["note"]
         await modlog.create_case(
             guild=ctx.guild,
             bot=self.bot,
@@ -71,7 +68,6 @@ class Notes(commands.Cog):
         notes.remove(old_note)
         await self.config.member(user).notes.set(notes)
         return old_note_text
-
 
     @commands.guild_only()
     @commands.command(aliases=["addnote"])
@@ -112,8 +108,10 @@ class Notes(commands.Cog):
             return
         notes = await self.config.member(user).notes()
         if note <= len(notes) and note >= 1:
-            old_note_text = await self.burn_note(ctx, user, ctx.author, notes, note-1)
-            await ctx.send(f"I have removed the note **{old_note_text}** from **{user}**.")
+            old_note_text = await self.burn_note(ctx, user, ctx.author, notes, note - 1)
+            await ctx.send(
+                f"I have removed the note **{old_note_text}** from **{user}**."
+            )
         else:
             await ctx.send("That note doesn't seem to exist.")
 
@@ -128,11 +126,11 @@ class Notes(commands.Cog):
             return
         embeds = []
         for index, page in enumerate(notes):
-            author = self.bot.get_user(page['author'])
+            author = self.bot.get_user(page["author"])
             embed = discord.Embed(
                 color=await ctx.embed_color(),
                 title=f"Note by {author}",
-                description=page['note'],
+                description=page["note"],
             )
             if len(notes) != 1:
                 embed.set_footer(text=f"Note {index + 1}/{len(notes)}")

@@ -1,8 +1,10 @@
-from redbot.core import commands, Config, checks
-from redbot.core.utils.chat_formatting import humanize_list
-import discord
-import aiohttp
 import urllib.parse
+
+import aiohttp
+import discord
+
+from redbot.core import Config, commands
+from redbot.core.utils.chat_formatting import humanize_list
 
 
 class AiTools(commands.Cog):

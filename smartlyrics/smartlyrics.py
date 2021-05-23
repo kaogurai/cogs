@@ -1,10 +1,12 @@
+import re
+
+import aiohttp
+import discord
+import lavalink
+
 from redbot.core import commands
 from redbot.core.utils.chat_formatting import pagify
 from redbot.core.utils.menus import DEFAULT_CONTROLS, menu
-import discord
-import aiohttp
-import lavalink
-import re
 
 
 class SmartLyrics(commands.Cog):
@@ -49,13 +51,17 @@ class SmartLyrics(commands.Cog):
 
     # adapted https://github.com/kaogurai/core/blob/V3/edge/redbot/cogs/mod/names.py#L71
     def handle_listening(self, user):
-        l_acts = [c for c in user.activities if c.type == discord.ActivityType.listening]
+        l_acts = [
+            c for c in user.activities if c.type == discord.ActivityType.listening
+        ]
         if not l_acts:
             return None, discord.ActivityType.listening
         l_act = l_acts[0]
         if isinstance(l_act, discord.Spotify):
             act = ("{artist} {title}").format(
-                artist=discord.utils.escape_markdown(l_act.artist) if l_act.artist else "",
+                artist=discord.utils.escape_markdown(l_act.artist)
+                if l_act.artist
+                else "",
                 title=discord.utils.escape_markdown(l_act.title),
             )
         return act, discord.ActivityType.listening
@@ -137,6 +143,7 @@ class SmartLyrics(commands.Cog):
                     else:
                         await ctx.send(f"Nothing was found for `{renamed_title}`")
                         return
+
         statustext = self.handle_listening(ctx.author)[0]
 
         if statustext:

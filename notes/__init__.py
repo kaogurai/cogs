@@ -1,4 +1,5 @@
 from redbot.core.bot import Red
+
 from .notes import Notes
 
 

@@ -1,8 +1,10 @@
-from redbot.core import commands, Config
-import discord
-import random
-import aiohttp
 import datetime
+import random
+
+import aiohttp
+import discord
+
+from redbot.core import Config, commands
 
 
 class AutoAvatar(commands.Cog):
