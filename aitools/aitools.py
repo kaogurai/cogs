@@ -1,10 +1,11 @@
+import asyncio
 import urllib.parse
 
 import aiohttp
 import discord
 
 from redbot.core import Config, commands
-from redbot.core.utils.chat_formatting import humanize_list
+from redbot.core.utils.predicates import MessagePredicate
 
 
 class AiTools(commands.Cog):
@@ -120,10 +121,24 @@ class AiTools(commands.Cog):
         """Remove all the channels the AI will talk in."""
         channel_list = await self.config.guild(ctx.guild).channels()
         if not channel_list:
-            await ctx.send("There's no channels in the config.")
+            await ctx.send("The AI is not set to talk in any channels.")
         else:
-            await self.config.guild(ctx.guild).channels.set([])
-            await ctx.tick()
+            try:
+                await ctx.send(
+                    "Are you sure you want to clear all the channels that the ai talks in? Respond with yes or no."
+                )
+                predictate = MessagePredicate.yes_or_no(ctx, user=ctx.author)
+                await ctx.bot.wait_for("message", check=predictate, timeout=30)
+            except asyncio.TimeoutError:
+                await ctx.send(
+                    "You never responded, please use the command again to clear all the channels."
+                )
+                return
+            if predictate.result:
+                await self.config.guild(ctx.guild).channels.clear()
+                await ctx.tick()
+            else:
+                await ctx.send("Ok, I won't clear any channels.")
 
     @aichannel.command()
     async def list(self, ctx):

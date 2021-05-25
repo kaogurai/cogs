@@ -1,8 +1,11 @@
+import asyncio
+
 import discord
 
 import arrow
 from redbot.core import Config, commands, modlog
 from redbot.core.utils.menus import DEFAULT_CONTROLS, menu
+from redbot.core.utils.predicates import MessagePredicate
 
 
 class Notes(commands.Cog):
@@ -24,7 +27,7 @@ class Notes(commands.Cog):
                 case_str="Note",
             )
         except RuntimeError:
-            pass  # this means it's already been registered
+            pass
         try:
             await modlog.register_casetype(
                 name="note_burned",
@@ -33,7 +36,16 @@ class Notes(commands.Cog):
                 case_str="Note Burned",
             )
         except RuntimeError:
-            pass  # this means it's already been registered
+            pass
+        try:
+            await modlog.register_casetype(
+                name="notes_cleared",
+                default_setting=True,
+                image="🔥",
+                case_str="Notes Cleared",
+            )
+        except RuntimeError:
+            pass
 
     async def write_note(self, ctx, user, moderator, reason: str):
         """Create a modlog case and add it to the user's config."""
@@ -68,6 +80,20 @@ class Notes(commands.Cog):
         notes.remove(old_note)
         await self.config.member(user).notes.set(notes)
         return old_note_text
+
+    async def clear_notes(self, ctx, user, moderator, notes):
+        """Create a modlog case and clear all notes from the user's config."""
+        numberofnotes = str(len(notes))
+        await modlog.create_case(
+            guild=ctx.guild,
+            bot=self.bot,
+            created_at=arrow.utcnow(),
+            action_type="notes_cleared",
+            user=user,
+            moderator=moderator,
+            reason=f"{numberofnotes} notes cleared",
+        )
+        await self.config.member(user).notes.clear()
 
     @commands.guild_only()
     @commands.command(aliases=["addnote"])
@@ -114,6 +140,41 @@ class Notes(commands.Cog):
             )
         else:
             await ctx.send("That note doesn't seem to exist.")
+
+    @commands.command(aliases=["removeallnotes"])
+    @commands.guild_only()
+    @commands.mod_or_permissions(ban_members=True)
+    async def clearnotes(self, ctx, user: discord.Member):
+        """Clear all of a user's notes."""
+        notes = self.config.member(user).notes()
+        if not notes:
+            await ctx.send("That user doesn't have any notes.")
+        else:
+            if user == ctx.author:
+                await ctx.send("You can't clear your own suggestions.")
+                return
+            if user.top_role >= ctx.author.top_role and ctx.author != ctx.guild.owner:
+                await ctx.send("You can't clear that user's notes.")
+                return
+            if user == ctx.guild.owner:
+                await ctx.send("You can't clear that user's notes.")
+                return
+            try:
+                await ctx.send(
+                    "Are you sure you want to clear all of that user's notes? Respond with yes or no."
+                )
+                predictate = MessagePredicate.yes_or_no(ctx, user=ctx.author)
+                await ctx.bot.wait_for("message", check=predictate, timeout=30)
+            except asyncio.TimeoutError:
+                await ctx.send(
+                    "You never responded, please use the command again to clear all of that user's notes."
+                )
+                return
+            if predictate.result:
+                await self.clear_notes(ctx, user, ctx.author, notes)
+                await ctx.send(f"I have cleared all of the notes for **{user}**.")
+            else:
+                await ctx.send("Ok, I won't clear that user's notes.")
 
     @commands.command(aliases=["viewnotes", "listnotes"])
     @commands.guild_only()
