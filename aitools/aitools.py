@@ -55,6 +55,8 @@ class AiTools(commands.Cog):
             return
         if await self.bot.allowed_by_whitelist_blacklist(who=message.author) is False:
             return
+        if await self.bot.cog_disabled_in_guild(self, message.guild):
+            return
         channel_list = await self.config.guild(message.guild).channels()
         if not channel_list:
             return
