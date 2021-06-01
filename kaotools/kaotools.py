@@ -156,7 +156,7 @@ class KaoTools(commands.Cog):
         await message.add_reaction("👎")
 
     @commands.bot_has_permissions(embed_links=True)
-    @commands.command(aliases=["support"])
+    @commands.command(aliases=["support", "inv"])
     async def invite(self, ctx, bot: discord.User = None):
         """Invite me or another bot!"""
         if bot is None:
