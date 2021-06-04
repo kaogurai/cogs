@@ -59,6 +59,8 @@ class KaoTools(commands.Cog):
         prefixes = await self.bot.get_prefix(message.channel)
         prefixes.remove(f"<@!{self.bot.user.id}> ")
         sorted_prefixes = sorted(prefixes, key=len)
+        if len(sorted_prefixes) > 500:
+            return
         embed = discord.Embed(
             colour=await self.bot.get_embed_colour(message.channel),
             description=f"""
