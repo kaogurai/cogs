@@ -354,7 +354,8 @@ class AntiNSFW(commands.Cog):
             if len(message.attachments) == 1:
                 attachment = message.attachments[0]
                 score = await self.check_nsfw(attachment.url)
-                # it wont always have a score
+                if score is None:
+                    return
                 if score > req:
                     try:
                         await message.delete()
@@ -366,6 +367,4 @@ class AntiNSFW(commands.Cog):
                         await message.channel.send(
                             "I can't delete that, can you tell a admin to give me the Manage Messages permission?"
                         )
-            else:
-                await message.channel.send("Not the Multiple Attachments")
-                # like actually do something for multiple attachments lol
+# like actually do something for multiple attachments lol
