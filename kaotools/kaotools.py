@@ -144,6 +144,8 @@ class KaoTools(commands.Cog):
     @commands.command()
     async def poll(self, ctx, *, question: str):
         """Create a simple poll."""
+        if len(question) > 2000:
+            return
         if (
             not ctx.channel.permissions_for(ctx.me).add_reactions
             and not ctx.channel.permissions_for(ctx.me).use_external_emojis

@@ -111,6 +111,8 @@ class SmartLyrics(commands.Cog):
         If all of these provide nothing, it will simply ask you to name a song.
         """
         if query:
+            if len(query) > 2000:
+                return 
             results = await self.get_lyrics(query)
             if results:
                 await self.create_menu(ctx, results)
