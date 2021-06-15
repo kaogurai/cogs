@@ -47,7 +47,7 @@ class SmartLyrics(commands.Cog):
                     ]
                 except IndexError:
                     return
-        return
+            return
 
     # adapted https://github.com/kaogurai/core/blob/V3/edge/redbot/cogs/mod/names.py#L71
     def handle_listening(self, user):
