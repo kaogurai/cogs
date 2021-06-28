@@ -1,6 +1,5 @@
 import aiohttp
 import discord
-
 from redbot.core import Config, commands
 from redbot.core.utils.chat_formatting import humanize_list
 
@@ -367,4 +366,6 @@ class AntiNSFW(commands.Cog):
                         await message.channel.send(
                             "I can't delete that, can you tell a admin to give me the Manage Messages permission?"
                         )
+
+
 # like actually do something for multiple attachments lol

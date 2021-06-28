@@ -3,7 +3,6 @@ import re
 import aiohttp
 import discord
 import lavalink
-
 from redbot.core import commands
 from redbot.core.utils.chat_formatting import pagify
 from redbot.core.utils.menus import DEFAULT_CONTROLS, menu
@@ -112,7 +111,7 @@ class SmartLyrics(commands.Cog):
         """
         if query:
             if len(query) > 2000:
-                return 
+                return
             results = await self.get_lyrics(query)
             if results:
                 await self.create_menu(ctx, results)

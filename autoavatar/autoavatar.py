@@ -3,7 +3,6 @@ import random
 
 import aiohttp
 import discord
-
 from redbot.core import Config, commands
 from redbot.core.utils.chat_formatting import pagify
 
@@ -15,7 +14,11 @@ class AutoAvatar(commands.Cog):
         self.bot = bot
         self.session = aiohttp.ClientSession()
         self.config = Config.get_conf(self, identifier=696969696969494)
-        default_global = {"avatars": [], "current_avatar": None, "current_channel": None}
+        default_global = {
+            "avatars": [],
+            "current_avatar": None,
+            "current_channel": None,
+        }
         self.config.register_global(**default_global)
 
     def cog_unload(self):
@@ -138,10 +141,10 @@ class AutoAvatar(commands.Cog):
         origin = ""
 
         for link in all_avatars:
-            toappend =  "<" + link + ">" + "\n"
-            origin+=toappend
-        
-        pages = [p for p in pagify(text=origin, delims='\n')]
+            toappend = "<" + link + ">" + "\n"
+            origin += toappend
+
+        pages = [p for p in pagify(text=origin, delims="\n")]
 
         for page in pages:
             try:

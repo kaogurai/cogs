@@ -1,8 +1,7 @@
 import asyncio
 
-import discord
-
 import arrow
+import discord
 from redbot.core import Config, commands, modlog
 from redbot.core.utils.menus import DEFAULT_CONTROLS, menu
 from redbot.core.utils.predicates import MessagePredicate

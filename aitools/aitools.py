@@ -3,7 +3,6 @@ import urllib.parse
 
 import aiohttp
 import discord
-
 from redbot.core import Config, commands
 from redbot.core.utils.predicates import MessagePredicate
 
@@ -153,7 +152,7 @@ class AiTools(commands.Cog):
             for obj in channel_list:
                 lolidk = lolidk + "\n <#" + str(obj) + "> - " + str(obj)
             if len(lolidk) > 4000:
-                return # no sane person has this many and it's not worth adding a paginator
+                return  # no sane person has this many and it's not worth adding a paginator
             embed = discord.Embed(
                 title="AI Channels", color=await ctx.embed_colour(), description=lolidk
             )

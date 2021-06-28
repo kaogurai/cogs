@@ -4,7 +4,6 @@ import io
 import discord
 import pyppeteer
 from pyppeteer import launch
-
 from redbot.core import Config, checks, commands
 
 
