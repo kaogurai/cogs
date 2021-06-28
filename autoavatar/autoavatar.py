@@ -5,6 +5,7 @@ import aiohttp
 import discord
 
 from redbot.core import Config, commands
+from redbot.core.utils.chat_formatting import pagify
 
 
 class AutoAvatar(commands.Cog):
@@ -14,7 +15,7 @@ class AutoAvatar(commands.Cog):
         self.bot = bot
         self.session = aiohttp.ClientSession()
         self.config = Config.get_conf(self, identifier=696969696969494)
-        default_global = {"avatars": [], "current_avatar": "", "current_channel": None}
+        default_global = {"avatars": [], "current_avatar": None, "current_channel": None}
         self.config.register_global(**default_global)
 
     def cog_unload(self):
@@ -134,12 +135,14 @@ class AutoAvatar(commands.Cog):
             await ctx.send("I do not have any avatars saved.")
             return
 
-        paginator = discord.ext.commands.help.Paginator()
+        origin = ""
 
-        for obj in all_avatars:
-            paginator.add_line(obj)
+        for link in all_avatars:
+            origin.join(link + "\n")
+        
+        pages = [p for p in pagify(text=origin, delims='\n')]
 
-        for page in paginator.pages:
+        for page in pages:
             try:
                 await ctx.author.send(page)
             except:

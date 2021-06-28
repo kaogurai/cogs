@@ -152,6 +152,8 @@ class AiTools(commands.Cog):
             lolidk = ""
             for obj in channel_list:
                 lolidk = lolidk + "\n <#" + str(obj) + "> - " + str(obj)
+            if len(lolidk) > 4000:
+                return # no sane person has this many and it's not worth adding a paginator
             embed = discord.Embed(
                 title="AI Channels", color=await ctx.embed_colour(), description=lolidk
             )
