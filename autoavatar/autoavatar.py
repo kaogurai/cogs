@@ -138,7 +138,7 @@ class AutoAvatar(commands.Cog):
         origin = ""
 
         for link in all_avatars:
-            toappend = link + "\n"
+            toappend =  "<" + link + ">" + "\n"
             origin+=toappend
         
         pages = [p for p in pagify(text=origin, delims='\n')]
