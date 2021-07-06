@@ -1,6 +1,7 @@
 import re
 
 import aiohttp
+import random
 import discord
 from redbot.core import commands
 from redbot.core.utils.chat_formatting import humanize_list
@@ -191,12 +192,19 @@ class KaoTools(commands.Cog):
             await ctx.send(embed=embed)
 
     @commands.command()
+    @commands.guild_only()
     async def membercount(self, ctx):
         """Get the current amount of members in the server."""
         count = len(ctx.guild.members)
         await ctx.send(
             f"There are currently **{count}** members in this server."
         )
+
+    @commands.command(aliases=['someone', 'pickuser'])
+    @commands.guild_only()
+    async def randomuser(self, ctx):
+        """Pick a random user in the server."""
+        await ctx.send(f"<@{random.choice(ctx.guild.members).id}>")
 
 
 def setup(bot):
