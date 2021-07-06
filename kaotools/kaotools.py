@@ -190,6 +190,13 @@ class KaoTools(commands.Cog):
             )
             await ctx.send(embed=embed)
 
+    @commands.command()
+    async def membercount(self, ctx):
+        """Get the current amount of members in the server."""
+        await ctx.send(
+            f"There are currently {len(ctx.guild.members)} members in this server."
+        )
+
 
 def setup(bot):
     kaotools = KaoTools(bot)
