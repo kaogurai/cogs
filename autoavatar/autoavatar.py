@@ -199,4 +199,4 @@ class AutoAvatar(commands.Cog):
         """
         auto_color = await self.config.auto_color()
         await self.config.auto_color.set(not auto_color)
-        await ctx.send(f"The embed color is now {'auto' if not auto_color else 'manual'}.")
+        await ctx.send(f"The embed color is now {'automatic' if not auto_color else 'manual'}.")
