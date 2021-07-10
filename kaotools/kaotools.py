@@ -210,7 +210,7 @@ class KaoTools(commands.Cog):
                 await ctx.send("Something is wrong with the API I use, please try again later.")
                 return
 
-        embed = discord.Embed(color=color, title=data['name']['title'])
+        embed = discord.Embed(color=color, title=data['name']['value'])
         embed.image = data['image']['bare']
         await ctx.send(embed=embed)
 
