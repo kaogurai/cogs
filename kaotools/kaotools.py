@@ -211,7 +211,7 @@ class KaoTools(commands.Cog):
                 return
 
         embed = discord.Embed(color=color, title=data['name']['value'])
-        embed.image = data['image']['bare']
+        embed.set_image(url=data['image']['bare']
         await ctx.send(embed=embed)
 
 def setup(bot):
