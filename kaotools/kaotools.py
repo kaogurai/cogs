@@ -203,7 +203,7 @@ class KaoTools(commands.Cog):
     @commands.command(aliases=["colour"])
     @commands.bot_has_permissions(embed_links=True)
     async def color(self, ctx, color: discord.Colour):
-        async with self.session.get(f"https://www.thecolorapi.com/id?hex={color[1:]}") as r:
+        async with self.session.get(f"https://www.thecolorapi.com/id?hex={str(color)[1:]}") as r:
             if r.status == 200:
                 data = await r.json()
             else:
