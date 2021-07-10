@@ -211,7 +211,7 @@ class KaoTools(commands.Cog):
                 return
 
         embed = discord.Embed(color=color, title=data['name']['value'])
-        embed.set_thumbnail(url=data['image']['bare'])
+        embed.set_thumbnail(f"https://www.thecolorapi.com/id?format=svg&named=false&hex={str(color)[1:]}")
         await ctx.send(embed=embed)
 
 def setup(bot):
