@@ -219,12 +219,12 @@ class KaoTools(commands.Cog):
             url=f"https://singlecolorimage.com/get/{str(color)[1:]}/500x500"
         )
         embed.description = (
-            "```yaml"
+            "```yaml\n"
             f"Hex: {color}\n"
-            f"RGB: {data['rgb']['value']}"
-            f"HSL: {data['hsl']['value']}"
-            f"HSV: {data['hsv']['value']}"
-            f"CMYK: {data['cmyk']['value']}"
+            f"RGB: {data['rgb']['value']}\n"
+            f"HSL: {data['hsl']['value']}\n"
+            f"HSV: {data['hsv']['value']}\n"
+            f"CMYK: {data['cmyk']['value']}\n"
             f"XYZ: {data['XYZ']['value']}"
             "```"
         )
