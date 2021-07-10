@@ -140,8 +140,10 @@ class KaoTools(commands.Cog):
         if results is None:
             await ctx.send("Nothing found.")
             return
-        videos = [video["info"]["uri"] for result in results]
-        await dpymenu(ctx, videos, timeout=60)
+        urls = []
+        for result in results:
+            urls.append(result["info"]["uri"])
+        await dpymenu(ctx, urls, timeout=60)
 
     @commands.command()
     @commands.bot_has_permissions(add_reactions=True, use_external_emojis=True)
@@ -202,13 +204,11 @@ class KaoTools(commands.Cog):
         """Pick a random user in the server."""
         await ctx.send(f"<@{random.choice(ctx.guild.members).id}>")
 
-    async def do_color_stuff(ctx, color):
-        pass
-
     @commands.command(aliases=['colour'])
     @commands.bot_has_permissions(embed_links=True)
     async def color(self, ctx, color: discord.Colour):
-        await ctx.send(color)
+        embed = discord.Embed(color = color)
+        await ctx.send(embed=embed)
 
 
 def setup(bot):
