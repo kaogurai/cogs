@@ -218,6 +218,16 @@ class KaoTools(commands.Cog):
         embed.set_thumbnail(
             url=f"https://singlecolorimage.com/get/{str(color)[1:]}/500x500"
         )
+        embed.description = (
+            "```yaml"
+            f"Hex: {color}\n"
+            f"RGB: {data['rgb']['value']}"
+            f"HSL: {data['hsl']['value']}"
+            f"HSV: {data['hsv']['value']}"
+            f"CYMK: {data['cymk']['value']}"
+            f"XYZ: {data['xyz']['value']}"
+            "```"
+        )
         await ctx.send(embed=embed)
 
 
