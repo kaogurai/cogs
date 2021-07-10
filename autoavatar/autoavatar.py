@@ -3,6 +3,8 @@ import random
 
 import aiohttp
 import discord
+from io import BytesIO
+from PIL import Image
 from redbot.core import Config, commands
 from redbot.core.utils.chat_formatting import pagify
 
@@ -18,14 +20,23 @@ class AutoAvatar(commands.Cog):
             "avatars": [],
             "current_avatar": None,
             "current_channel": None,
+            "auto_color": False
         }
         self.config.register_global(**default_global)
 
     def cog_unload(self):
         self.bot.loop.create_task(self.session.close())
 
+    def get_color(self, avatar):
+        img = Image.open(BytesIO(avatar))
+        resized = img.resize((1, 1))
+        color = resized.getpixel((0, 0))
+        int = (color[0] << 16) + (color[1] << 8) + color[2]
+        return int
+
     async def change_avatar(self, ctx):
         all_avatars = await self.config.avatars()
+        auto_color = await self.config.auto_color()
 
         if not all_avatars:
             await ctx.send("You haven't added any avatars yet.")
@@ -44,6 +55,11 @@ class AutoAvatar(commands.Cog):
             all_avatars.remove(new_avatar)
             await self.config.avatars.set(all_avatars)
             return
+
+        if auto_color:
+            result = await self.bot.loop.run_in_executor(None, self.get_color, avatar)
+            ctx.bot._color = result
+            await ctx.bot._config.color.set(result)
 
         try:
             await self.bot.user.edit(avatar=avatar)
@@ -174,3 +190,13 @@ class AutoAvatar(commands.Cog):
         )
         embed.set_image(url=avatar)
         await ctx.send(embed=embed)
+
+    @commands.command()
+    @commands.is_owner()
+    async def avatarcolor(self, ctx):
+        """
+        Toggle if the embed color is based on the avatar's color.
+        """
+        auto_color = await self.config.auto_color()
+        await self.config.auto_color.set(not auto_color)
+        await ctx.send(f"The embed color is now {'auto' if not auto_color else 'manual'}.")

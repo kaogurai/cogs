@@ -1,7 +1,8 @@
 {
     "author": ["alec#8068 (749112024633704481)"],
     "name": "AutoAvatar",
-    "install_msg": "This cog is not recommended for general use. If you aren't careful, it may cause your bot to be ratelimited. I will not be supporting this cog.",
-    "short": "Automatically changes bot avatar.",
-    "description": "Automatically changes bot avatar every hour."
+    "install_msg": "**Thanks for installing!**\n\nDespite the same, keep in mind this cog does not automatically run the `newavatar` command, so you'll need to use a cog like FIFO (https://github.com/bobloy/Fox-V3/tree/master/fifo)",
+    "short": "Chooses a random bot avatar from a preset list.",
+    "description": "Chooses a random bot avatar from a preset list.",
+    "requirements": ["pillow"]
 }
