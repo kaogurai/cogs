@@ -225,7 +225,7 @@ class KaoTools(commands.Cog):
             f"HSL: {data['hsl']['value']}"
             f"HSV: {data['hsv']['value']}"
             f"CMYK: {data['cmyk']['value']}"
-            f"XYZ: {data['xyz']['value']}"
+            f"XYZ: {data['XYZ']['value']}"
             "```"
         )
         await ctx.send(embed=embed)
