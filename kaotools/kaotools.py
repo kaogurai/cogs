@@ -5,7 +5,7 @@ import random
 import discord
 from redbot.core import commands
 from redbot.core.utils.chat_formatting import humanize_list
-from redbot.core.utils.menus import DEFAULT_CONTROLS, menu
+from redbot.core.utils._dpy_menus_utils import dpymenu
 
 old_invite = None
 
@@ -79,8 +79,11 @@ class KaoTools(commands.Cog):
         async with self.session.get(
             f"https://haste.kaogurai.xyz/raw/{error_code}"
         ) as request:
+            txt = await request.text()
+            if len(txt) > 4000:
+                txt = txt[:4000]
             embed = discord.Embed(color=await ctx.embed_color())
-            embed.description = f"```yaml\n{await request.text()}```"
+            embed.description = f"```yaml\n{txt}```"
             embed.set_footer(text=f"Error Code: {error_code}")
             await ctx.send(embed=embed)
 
@@ -120,11 +123,12 @@ class KaoTools(commands.Cog):
         Search for a youtube video.
         Inspired by Aikaterna's YouTube cog
         """
-        videos = await self.search_youtube(video)
-        if videos:
-            await ctx.send(videos[0]["info"]["uri"])
-        else:
+        results = await self.search_youtube(video)
+        if results is None:
             await ctx.send("Nothing found.")
+            return
+
+        await ctx.send(results[0]["info"]["uri"])
 
     @commands.command(aliases=["yts", "ytsearch"])
     async def youtubesearch(self, ctx, *, video: str):
@@ -133,26 +137,18 @@ class KaoTools(commands.Cog):
         Inspired by Aikaterna's YouTube cog
         """
         results = await self.search_youtube(video)
-        if results:
-            videos = []
-            for obj in results:
-                videos.append(obj["info"]["uri"])
-            await menu(ctx, videos, DEFAULT_CONTROLS, timeout=60)
-        else:
+        if results is None:
             await ctx.send("Nothing found.")
+            return
+        videos = [video["info"]["uri"] for result in results]
+        await dpymenu(ctx, videos, timeout=60)
 
     @commands.command()
+    @commands.bot_has_permissions(add_reactions=True, use_external_emojis=True)
     async def poll(self, ctx, *, question: str):
         """Create a simple poll."""
         if len(question) > 2000:
-            return
-        if (
-            not ctx.channel.permissions_for(ctx.me).add_reactions
-            and not ctx.channel.permissions_for(ctx.me).use_external_emojis
-        ):
-            await ctx.send(
-                "Please give me permissions to react, and react with external emojis."
-            )
+            await ctx.send("That question is too long.")
             return
         message = await ctx.send(f"**{ctx.author} asks:** " + question)
         await message.add_reaction("👍")
@@ -183,13 +179,13 @@ class KaoTools(commands.Cog):
                 inline=True,
             )
             await ctx.send(embed=embed)
-        else:
-            embed = discord.Embed(
-                title="Click here to invite that bot!",
-                color=await ctx.embed_color(),
-                url=f"https://discord.com/oauth2/authorize?client_id={bot.id}&permissions=6441922047&scope=bot+applications.commands",
-            )
-            await ctx.send(embed=embed)
+            return
+        embed = discord.Embed(
+            title="Click here to invite that bot!",
+            color=await ctx.embed_color(),
+            url=f"https://discord.com/oauth2/authorize?client_id={bot.id}&permissions=6441922047&scope=bot+applications.commands",
+        )
+        await ctx.send(embed=embed)
 
     @commands.command()
     @commands.guild_only()
@@ -208,6 +204,11 @@ class KaoTools(commands.Cog):
 
     async def do_color_stuff(ctx, color):
         pass
+
+    @commands.command(aliases=['colour'])
+    @commands.bot_has_permissions(embed_links=True)
+    async def color(self, ctx, color: discord.Colour):
+        await ctx.send(color)
 
 
 def setup(bot):
