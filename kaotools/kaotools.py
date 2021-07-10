@@ -216,8 +216,9 @@ class KaoTools(commands.Cog):
 
         embed = discord.Embed(color=color, title=data["name"]["value"])
         embed.set_thumbnail(
-            url=f"https://singlecolorimage.com/get/{str(color)[1:]}/500x500"
+            url=f"https://api.alexflipnote.dev/color/image/{str(color)[1:]}"
         )
+        embed.set_image(url=f"https://api.alexflipnote.dev/color/image/gradient/{str(color)[1:]}")
         embed.description = (
             "```yaml\n"
             f"Hex: {color}\n"
