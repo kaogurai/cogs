@@ -218,7 +218,9 @@ class KaoTools(commands.Cog):
         embed.set_thumbnail(
             url=f"https://api.alexflipnote.dev/color/image/{str(color)[1:]}"
         )
-        embed.set_image(url=f"https://api.alexflipnote.dev/color/image/gradient/{str(color)[1:]}")
+        embed.set_image(
+            url=f"https://api.alexflipnote.dev/color/image/gradient/{str(color)[1:]}"
+        )
         embed.description = (
             "```yaml\n"
             f"Hex: {color}\n"
