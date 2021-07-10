@@ -203,16 +203,23 @@ class KaoTools(commands.Cog):
     @commands.command(aliases=["colour"])
     @commands.bot_has_permissions(embed_links=True)
     async def color(self, ctx, color: discord.Colour):
-        async with self.session.get(f"https://www.thecolorapi.com/id?hex={str(color)[1:]}") as r:
+        async with self.session.get(
+            f"https://www.thecolorapi.com/id?hex={str(color)[1:]}"
+        ) as r:
             if r.status == 200:
                 data = await r.json()
             else:
-                await ctx.send("Something is wrong with the API I use, please try again later.")
+                await ctx.send(
+                    "Something is wrong with the API I use, please try again later."
+                )
                 return
 
-        embed = discord.Embed(color=color, title=data['name']['value'])
-        embed.set_thumbnail(f"https://www.thecolorapi.com/id?format=svg&named=false&hex={str(color)[1:]}")
+        embed = discord.Embed(color=color, title=data["name"]["value"])
+        embed.set_thumbnail(
+            url=f"https://www.thecolorapi.com/id?format=svg&named=false&hex={str(color)[1:]}"
+        )
         await ctx.send(embed=embed)
+
 
 def setup(bot):
     kaotools = KaoTools(bot)
