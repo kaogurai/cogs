@@ -209,26 +209,6 @@ class KaoTools(commands.Cog):
     async def do_color_stuff(ctx, color):
         pass
 
-    @commands.command(aliases=['colour'])
-    @commands.bot_has_permissions(embed_links=True)
-    async def color(self, ctx, color= None):
-        if color is None:
-            await ctx.send_help()
-            return
-
-        try:
-            results = await commands.ColourConverter.convert(commands.ColourConverter, ctx, str(color))
-        except commands.errors.BadColourArgument:
-            color = f"#{color}"
-            try:
-                results = await commands.ColourConverter.convert(commands.ColourConverter, ctx, str(color))
-            except commands.errors.BadColourArgument:
-                if color < 2000:
-                    await ctx.send(f"Colour \"{color}\" is invalid.")
-                return
-
-        await ctx.send(results)
-
 
 def setup(bot):
     kaotools = KaoTools(bot)
