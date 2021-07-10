@@ -1,11 +1,11 @@
+import random
 import re
 
 import aiohttp
-import random
 import discord
 from redbot.core import commands
-from redbot.core.utils.chat_formatting import humanize_list
 from redbot.core.utils._dpy_menus_utils import dpymenu
+from redbot.core.utils.chat_formatting import humanize_list
 
 old_invite = None
 
@@ -40,9 +40,7 @@ class KaoTools(commands.Cog):
                 try:
                     return response["tracks"]
                 except:
-                    return
-            else:
-                return
+                    return None
 
     @commands.Cog.listener()
     async def on_message_without_command(self, message: discord.Message):
@@ -194,20 +192,18 @@ class KaoTools(commands.Cog):
     async def membercount(self, ctx):
         """Get the current amount of members in the server."""
         count = len(ctx.guild.members)
-        await ctx.send(
-            f"There are currently **{count}** members in this server."
-        )
+        await ctx.send(f"There are currently **{count}** members in this server.")
 
-    @commands.command(aliases=['someone', 'pickuser', 'randommember', 'picksomeone'])
+    @commands.command(aliases=["someone", "pickuser", "randommember", "picksomeone"])
     @commands.guild_only()
     async def randomuser(self, ctx):
         """Pick a random user in the server."""
         await ctx.send(f"<@{random.choice(ctx.guild.members).id}>")
 
-    @commands.command(aliases=['colour'])
+    @commands.command(aliases=["colour"])
     @commands.bot_has_permissions(embed_links=True)
     async def color(self, ctx, color: discord.Colour):
-        embed = discord.Embed(color = color)
+        embed = discord.Embed(color=color)
         await ctx.send(embed=embed)
 
 

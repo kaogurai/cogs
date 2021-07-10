@@ -1,9 +1,9 @@
 import datetime
 import random
+from io import BytesIO
 
 import aiohttp
 import discord
-from io import BytesIO
 from PIL import Image
 from redbot.core import Config, commands
 from redbot.core.utils.chat_formatting import pagify
@@ -20,7 +20,7 @@ class AutoAvatar(commands.Cog):
             "avatars": [],
             "current_avatar": None,
             "current_channel": None,
-            "auto_color": False
+            "auto_color": False,
         }
         self.config.register_global(**default_global)
 
@@ -199,4 +199,6 @@ class AutoAvatar(commands.Cog):
         """
         auto_color = await self.config.auto_color()
         await self.config.auto_color.set(not auto_color)
-        await ctx.send(f"The embed color is now {'automatic' if not auto_color else 'manual'}.")
+        await ctx.send(
+            f"The embed color is now {'automatic' if not auto_color else 'manual'}."
+        )
