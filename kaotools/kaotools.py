@@ -224,7 +224,7 @@ class KaoTools(commands.Cog):
             f"RGB: {data['rgb']['value']}"
             f"HSL: {data['hsl']['value']}"
             f"HSV: {data['hsv']['value']}"
-            f"CYMK: {data['cymk']['value']}"
+            f"CMYK: {data['cmyk']['value']}"
             f"XYZ: {data['xyz']['value']}"
             "```"
         )
