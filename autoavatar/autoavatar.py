@@ -3,6 +3,7 @@ import random
 from io import BytesIO
 
 import aiohttp
+from aiohttp.helpers import isasyncgenfunction
 import discord
 from PIL import Image
 from redbot.core import Config, commands
@@ -28,7 +29,10 @@ class AutoAvatar(commands.Cog):
         self.bot.loop.create_task(self.session.close())
 
     def get_color(self, avatar):
-        img = Image.open(BytesIO(avatar))
+        try:
+            img = Image.open(BytesIO(avatar))
+        except Exception:
+            return None
         resized = img.resize((1, 1))
         color = resized.getpixel((0, 0))
         int = (color[0] << 16) + (color[1] << 8) + color[2]
@@ -58,8 +62,9 @@ class AutoAvatar(commands.Cog):
 
         if auto_color:
             result = await self.bot.loop.run_in_executor(None, self.get_color, avatar)
-            ctx.bot._color = result
-            await ctx.bot._config.color.set(result)
+            if result:
+                ctx.bot._color = result
+                await ctx.bot._config.color.set(result)
 
         try:
             await self.bot.user.edit(avatar=avatar)
