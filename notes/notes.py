@@ -181,7 +181,7 @@ class Notes(commands.Cog):
     async def notes(self, ctx, user: discord.Member):
         """View a user's notes."""
         notes = await self.config.member(user).notes()
-        if notes is None:
+        if not notes:
             await ctx.send("That user has no notes.")
             return
         embeds = []
