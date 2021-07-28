@@ -182,7 +182,7 @@ class KaoTools(commands.Cog):
             embed.add_field(
                 name="Bot Invite",
                 value=(
-                    f"[Click Here]({await self.invite_url(self)})"
+                    f"[Click Here]({await self.invite_url()})"
                 ),
                 inline=True,
             )
@@ -196,7 +196,7 @@ class KaoTools(commands.Cog):
         embed = discord.Embed(
             title=f"Click here to invite {bot}!",
             color=await ctx.embed_color(),
-            url=await self.invite_url(self, bot.id),
+            url=await self.invite_url(bot.id),
         )
         embed.set_footer(text="Note: this link may not work for some bots.")
         await ctx.send(embed=embed)
@@ -322,7 +322,7 @@ class KaoTools(commands.Cog):
         links = (
             "If you're looking to invite me, [click here.]({})\n"
             "If you're looking for support or have any questions, [click here.]({})"
-        ).format(await self._invite_url(), SUPPORT_SERVER)
+        ).format(await self.invite_url(), SUPPORT_SERVER)
         embed = discord.Embed(color=(await ctx.embed_colour()))
         embed.add_field(
             name="<:python:817953344118063156> Python", value=python_version
