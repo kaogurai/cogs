@@ -251,7 +251,9 @@ class KaoTools(commands.Cog):
             f"Formats: [PNG]({png}) | [JPG]({jpg}) | [GIF]({gif})\n"
             f"Sizes: [512]({size_512}) | [1024]({size_1024}) | [2048]({size_2048}) | [4096]({size_4096})"
         )
-        embed = discord.Embed(color=await ctx.embed_color(), title=f"{user.name}'s avatar", description=m)
+        embed = discord.Embed(
+            color=await ctx.embed_color(), title=f"{user.name}'s avatar", description=m
+        )
         embed.set_image(url=user.avatar_url_as(size=4096))
         await ctx.send(embed=embed)
 
