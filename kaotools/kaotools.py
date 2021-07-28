@@ -37,6 +37,24 @@ class KaoTools(commands.Cog):
                 except:
                     return None
 
+    async def invite_url(self, snowflake: int= None) -> str:
+        """
+        Generates the invite URL for the bot.
+
+        Returns
+        -------
+        str
+            Invite URL.
+        """
+        scopes = ("bot", "applications.commands")
+        data = await self.bot._config.all()
+        perms_int = data["invite_perm"]
+        permissions = discord.Permissions(perms_int)
+        if snowflake:
+            return discord.utils.oauth_url(snowflake, permissions, scopes=scopes)
+        app_info = await self.bot.application_info()
+        return discord.utils.oauth_url(app_info.id, permissions, scopes=scopes)
+
     @commands.Cog.listener()
     async def on_message_without_command(self, message: discord.Message):
         if message.author.bot:
@@ -61,7 +79,7 @@ class KaoTools(commands.Cog):
                 My prefixes in this server are {humanize_list(prefixes)}
                 You can type `{sorted_prefixes[0]}help` to view all commands!
                 Need some help? Join my [support server!]({SUPPORT_SERVER})
-                Looking to invite me? [Click here!](https://discord.com/oauth2/authorize?client_id={message.guild.me.id}&permissions=6441922047&scope=bot+applications.commands)
+                Looking to invite me? [Click here!]({await self.invite_url()})
             """,
         )
         await message.channel.send(embed=embed)
@@ -154,8 +172,6 @@ class KaoTools(commands.Cog):
     @commands.command(aliases=["support", "inv"])
     async def invite(self, ctx, bot: discord.User = None):
         """Invite me or another bot!"""
-        app = await self.bot.application_info()
-        id = app.id
         if bot is None:
             embed = discord.Embed(
                 title="Thanks for using me!",
@@ -166,7 +182,7 @@ class KaoTools(commands.Cog):
             embed.add_field(
                 name="Bot Invite",
                 value=(
-                    f"[Click Here](https://discord.com/oauth2/authorize?client_id={id}&permissions=6441922047&scope=bot+applications.commands)"
+                    f"[Click Here]({await self.invite_url(self)})"
                 ),
                 inline=True,
             )
@@ -180,7 +196,7 @@ class KaoTools(commands.Cog):
         embed = discord.Embed(
             title=f"Click here to invite {bot}!",
             color=await ctx.embed_color(),
-            url=f"https://discord.com/oauth2/authorize?client_id={bot.id}&permissions=6441922047&scope=bot+applications.commands",
+            url=await self.invite_url(self, bot.id),
         )
         embed.set_footer(text="Note: this link may not work for some bots.")
         await ctx.send(embed=embed)
