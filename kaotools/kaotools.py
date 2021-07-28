@@ -37,7 +37,7 @@ class KaoTools(commands.Cog):
                 except:
                     return None
 
-    async def invite_url(self, snowflake: int= None) -> str:
+    async def invite_url(self, snowflake: int = None) -> str:
         """
         Generates the invite URL for the bot.
 
@@ -181,9 +181,7 @@ class KaoTools(commands.Cog):
             embed.set_thumbnail(url=ctx.me.avatar_url)
             embed.add_field(
                 name="Bot Invite",
-                value=(
-                    f"[Click Here]({await self.invite_url()})"
-                ),
+                value=(f"[Click Here]({await self.invite_url()})"),
                 inline=True,
             )
             embed.add_field(
