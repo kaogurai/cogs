@@ -173,7 +173,7 @@ class KaoTools(commands.Cog):
             await ctx.send(embed=embed)
             return
         embed = discord.Embed(
-            title="Click here to invite that bot!",
+            title=f"Click here to invite {bot}!",
             color=await ctx.embed_color(),
             url=f"https://discord.com/oauth2/authorize?client_id={bot.id}&permissions=6441922047&scope=bot+applications.commands",
         )
