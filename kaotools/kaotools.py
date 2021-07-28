@@ -1,12 +1,16 @@
 import random
 import re
+import sys
 import time
 
 import aiohttp
 import discord
+import redbot
 from redbot.core import commands
 from redbot.core.utils._dpy_menus_utils import dpymenu
 from redbot.core.utils.chat_formatting import humanize_list
+
+SUPPORT_SERVER = "https://discord.gg/p6ehU9qhg8"
 
 
 class KaoTools(commands.Cog):
@@ -56,7 +60,7 @@ class KaoTools(commands.Cog):
                 **Hey there!** <a:bounce:778449468717531166>
                 My prefixes in this server are {humanize_list(prefixes)}
                 You can type `{sorted_prefixes[0]}help` to view all commands!
-                Need some help? Join my [support server!](https://discord.gg/p6ehU9qhg8)
+                Need some help? Join my [support server!]({SUPPORT_SERVER})
                 Looking to invite me? [Click here!](https://discord.com/oauth2/authorize?client_id={message.guild.me.id}&permissions=6441922047&scope=bot+applications.commands)
             """,
         )
@@ -271,3 +275,46 @@ class KaoTools(commands.Cog):
             await msg.edit(content=None, embed=embed)
         except discord.NotFound:
             await ctx.send(embed=embed)
+
+    @commands.bot_has_permissions(external_emojis=True)
+    @commands.bot_has_permissions(embed_links=True)
+    @commands.command(aliases=["info"])
+    async def about(self, ctx: commands.Context):
+        """
+        Shows info about [botname].
+        """
+        author_repo = "https://github.com/Twentysix26"
+        org_repo = "https://github.com/Cog-Creators"
+        red_repo = org_repo + "/Red-DiscordBot"
+        red_pypi = "https://pypi.org/project/Red-DiscordBot"
+        red_server_url = "https://discord.gg/red"
+        dpy_repo = "https://github.com/Rapptz/discord.py"
+        python_url = "https://www.python.org/"
+
+        dpy_version = "[{}]({})".format(discord.__version__, dpy_repo)
+        python_version = "[{}.{}.{}]({})".format(*sys.version_info[:3], python_url)
+        red_version = "[{}]({})".format(redbot.__version__, red_pypi)
+
+        about = (
+            "This bot is a custom fork of [Red, an open source Discord bot]({}) "
+            "created by [Twentysix]({}) and [improved by many]({}).\n\n"
+            "Red is backed by a passionate community who contributes and "
+            "creates content for everyone to enjoy. [Join us today]({}) "
+            "and help us improve!\n\n"
+            "(c) Cog Creators"
+        ).format(red_repo, author_repo, org_repo, red_server_url)
+        links = (
+            "If you're looking to invite me, [click here.]({})\n"
+            "If you're looking for support or have any questions, [click here.]({})"
+        ).format(await self._invite_url(), SUPPORT_SERVER)
+        embed = discord.Embed(color=(await ctx.embed_colour()))
+        embed.add_field(
+            name="<:python:817953344118063156> Python", value=python_version
+        )
+        embed.add_field(
+            name="<:discordpy:817952974788624395> discord.py", value=dpy_version
+        )
+        embed.add_field(name="<:red:230319279424143360> Red", value=red_version)
+        embed.add_field(name="About Red", value=about, inline=False)
+        embed.add_field(name="Quick Links", value=links, inline=False)
+        await ctx.send(embed=embed)
