@@ -279,7 +279,7 @@ class KaoTools(commands.Cog):
     @commands.bot_has_permissions(external_emojis=True)
     @commands.bot_has_permissions(embed_links=True)
     @commands.command(aliases=["info"])
-    async def about(self, ctx: commands.Context):
+    async def botinfo(self, ctx: commands.Context):
         """
         Shows info about [botname].
         """
