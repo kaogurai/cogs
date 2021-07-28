@@ -1,9 +1,7 @@
-from redbot.core.bot import Red
-
 from .antinsfw import AntiNSFW
 
 
-async def setup(bot: Red) -> None:
+async def setup(bot) -> None:
     cog = AntiNSFW(bot)
     bot.add_cog(cog)
 

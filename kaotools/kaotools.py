@@ -7,8 +7,6 @@ from redbot.core import commands
 from redbot.core.utils._dpy_menus_utils import dpymenu
 from redbot.core.utils.chat_formatting import humanize_list
 
-old_invite = None
-
 
 class KaoTools(commands.Cog):
     """Random tools for kaogurai that fit nowhere else."""
@@ -19,14 +17,6 @@ class KaoTools(commands.Cog):
 
     def cog_unload(self):
         self.bot.loop.create_task(self.session.close())
-        # command remove logic - https://github.com/maxbooiii/maxcogs/blob/master/ping/ping.py#L28
-        global old_invite
-        if old_invite:
-            try:
-                self.bot.remove_command("invite")
-            except:
-                pass
-            self.bot.add_command(old_invite)
 
     async def search_youtube(self, query):
         """Make a Get call to FAKE youtube data api (HEHE)."""
@@ -62,12 +52,12 @@ class KaoTools(commands.Cog):
         embed = discord.Embed(
             colour=await self.bot.get_embed_colour(message.channel),
             description=f"""
-        **Hey there!** <a:bounce:778449468717531166>
-        My prefixes in this server are {humanize_list(prefixes)}
-        You can type `{sorted_prefixes[0]}help` to view all commands!
-        Need some help? Join my [support server!](https://discord.gg/p6ehU9qhg8)
-        Looking to invite me? [Click here!](https://discord.com/oauth2/authorize?client_id={message.guild.me.id}&permissions=6441922047&scope=bot+applications.commands)
-        """,
+                **Hey there!** <a:bounce:778449468717531166>
+                My prefixes in this server are {humanize_list(prefixes)}
+                You can type `{sorted_prefixes[0]}help` to view all commands!
+                Need some help? Join my [support server!](https://discord.gg/p6ehU9qhg8)
+                Looking to invite me? [Click here!](https://discord.com/oauth2/authorize?client_id={message.guild.me.id}&permissions=6441922047&scope=bot+applications.commands)
+            """,
         )
         await message.channel.send(embed=embed)
 
@@ -159,6 +149,8 @@ class KaoTools(commands.Cog):
     @commands.command(aliases=["support", "inv"])
     async def invite(self, ctx, bot: discord.User = None):
         """Invite me or another bot!"""
+        app = await self.bot.application_info()
+        id = app.id
         if bot is None:
             embed = discord.Embed(
                 title="Thanks for using me!",
@@ -169,7 +161,7 @@ class KaoTools(commands.Cog):
             embed.add_field(
                 name="Bot Invite",
                 value=(
-                    f"[Click Here](https://discord.com/oauth2/authorize?client_id={ctx.me.id}&permissions=6441922047&scope=bot+applications.commands)"
+                    f"[Click Here](https://discord.com/oauth2/authorize?client_id={id}&permissions=6441922047&scope=bot+applications.commands)"
                 ),
                 inline=True,
             )
@@ -185,6 +177,7 @@ class KaoTools(commands.Cog):
             color=await ctx.embed_color(),
             url=f"https://discord.com/oauth2/authorize?client_id={bot.id}&permissions=6441922047&scope=bot+applications.commands",
         )
+        embed.set_footer(text="Note: this link may not work for some bots.")
         await ctx.send(embed=embed)
 
     @commands.command()
@@ -256,12 +249,3 @@ class KaoTools(commands.Cog):
         )
         embed.set_image(url=user.avatar_url_as(size=4096))
         await ctx.send(embed=embed)
-
-
-def setup(bot):
-    kaotools = KaoTools(bot)
-    global old_invite
-    old_invite = bot.get_command("invite")
-    if old_invite:
-        bot.remove_command(old_invite.name)
-    bot.add_cog(kaotools)

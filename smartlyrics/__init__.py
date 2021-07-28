@@ -1,9 +1,7 @@
-from redbot.core.bot import Red
-
 from .smartlyrics import SmartLyrics
 
 
-async def setup(bot: Red) -> None:
+async def setup(bot):
     cog = SmartLyrics(bot)
     bot.add_cog(cog)
 

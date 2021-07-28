@@ -1,9 +1,7 @@
-from redbot.core.bot import Red
-
 from .notes import Notes
 
 
-async def setup(bot: Red) -> None:
+async def setup(bot):
     cog = Notes(bot)
     bot.add_cog(cog)
 

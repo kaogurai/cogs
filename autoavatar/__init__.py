@@ -1,9 +1,7 @@
-from redbot.core.bot import Red
-
 from .autoavatar import AutoAvatar
 
 
-async def setup(bot: Red) -> None:
+async def setup(bot) -> None:
     cog = AutoAvatar(bot)
     bot.add_cog(cog)
 
