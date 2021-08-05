@@ -30,13 +30,13 @@ class AiTools(commands.Cog):
         async with self.session.get(url) as response:
             if response.status == 200:
                 j = await response.json()
-                return j.get("response")
+                return j.get("cnt")
             elif response.status == 408:
                 # brainshop LOVES to time out
                 async with self.session.get(url) as response:
                     if response.status == 200:
                         j = await response.json()
-                        return j.get("response")
+                        return j.get("cnt")
 
     @commands.command(aliases=["ai", "robot"])
     async def talk(self, ctx, *, message: str):
