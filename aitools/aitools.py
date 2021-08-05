@@ -20,6 +20,24 @@ class AiTools(commands.Cog):
     def cog_unload(self):
         self.bot.loop.create_task(self.session.close())
 
+    async def request_brainshop(self, author, brain_info, message):
+        """Get a response from the Brainshop API"""
+        brain_id = brain_info.get("brain_id")
+        brain_key = brain_info.get("brain_key")
+        author_id = str(author.id)
+        message = urllib.parse.quote(message)
+        url = f"http://api.brainshop.ai/get?bid={brain_id}&key={brain_key}&uid={author_id}&msg={message}"
+        async with self.session.get(url) as response:
+            if response.status == 200:
+                j = await response.json()
+                return j.get("response")
+            elif response.status == 408:
+                # brainshop LOVES to time out
+                async with self.session.get(url) as response:
+                    if response.status == 200:
+                        j = await response.json()
+                        return j.get("response")
+
     @commands.command(aliases=["ai", "robot"])
     async def talk(self, ctx, *, message: str):
         """Talk to a robot!"""
@@ -28,21 +46,10 @@ class AiTools(commands.Cog):
             return await ctx.send("The brain id has not been set.")
         if brain_info.get("brain_key") is None:
             return await ctx.send("The brain key has not been set.")
-        try:
-            async with self.session.get(
-                "http://api.brainshop.ai/get?bid="
-                + brain_info.get("brain_id")
-                + "&key="
-                + brain_info.get("brain_key")
-                + "&uid="
-                + str(ctx.author.id)
-                + "&msg="
-                + urllib.parse.quote(message)
-            ) as request:
-                response = await request.json()
-                await ctx.send(response["cnt"])
-        except:
-            await ctx.send("Uh oh, an error occured!")
+        r = await self.request_brainshop(ctx.author, brain_info, message)
+        if r is None:
+            return await ctx.send("Something went wrong. Try again in a little bit.")
+        await ctx.send(r)
 
     @commands.Cog.listener()
     async def on_message_without_command(self, message: discord.Message):
@@ -68,21 +75,14 @@ class AiTools(commands.Cog):
         if brain_info.get("brain_key") is None:
             return await message.channel.send("The brain key has not been set.")
 
-        try:
-            async with self.session.get(
-                "http://api.brainshop.ai/get?bid="
-                + brain_info.get("brain_id")
-                + "&key="
-                + brain_info.get("brain_key")
-                + "&uid="
-                + str(message.author.id)
-                + "&msg="
-                + urllib.parse.quote(str(message.content))
-            ) as request:
-                response = await request.json()
-                await message.channel.send(response["cnt"])
-        except:
-            await message.channel.send("Uh oh, an error occured!")
+        r = await self.request_brainshop(
+            message.author, brain_info, message.clean_content
+        )
+        if r is None:
+            return await message.channel.send(
+                "Something went wrong. Try again in a little bit."
+            )
+        await message.channel.send(r)
 
     @commands.group()
     @commands.guild_only()
