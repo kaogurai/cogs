@@ -23,7 +23,9 @@ class KaoTools(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.session = aiohttp.ClientSession()
-        setattr(bot._connection, "parse_interaction_create", self.parse_interaction_create)
+        setattr(
+            bot._connection, "parse_interaction_create", self.parse_interaction_create
+        )
         bot._connection.parsers["INTERACTION_CREATE"] = self.parse_interaction_create
 
     def cog_unload(self):
@@ -65,7 +67,6 @@ class KaoTools(commands.Cog):
     # https://github.com/Kowlin/Sentinel/blob/master/slashinjector/core.py
     def parse_interaction_create(self, data):
         self.bot.dispatch("interaction_create", data)
-
 
     @commands.Cog.listener()
     async def on_message_without_command(self, message: discord.Message):
@@ -377,3 +378,19 @@ class KaoTools(commands.Cog):
         f = io.BytesIO(result)
         file = discord.File(f, filename="screenshot.png")
         await ctx.send(file=file)
+
+    @commands.command(aliases=["oldestmessage"])
+    @commands.bot_has_permissions(read_message_history=True, embed_links=True)
+    async def firstmessage(
+        self, ctx: commands.Context, channel: discord.TextChannel = None
+    ):
+        c = channel if channel else ctx.channel
+        first = await c.history(limit=1, oldest_first=True).flatten()
+        if first:
+            t = "Click here to jump to the first message in this channel."
+            e = discord.Embed(
+                color=await ctx.embed_color(), title=t, url=first[0].jump_url
+            )
+            await ctx.send(embed=e)
+        else:
+            await ctx.send("No messages found in this channel!")
