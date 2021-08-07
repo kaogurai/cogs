@@ -384,13 +384,14 @@ class KaoTools(commands.Cog):
     async def firstmessage(
         self, ctx: commands.Context, channel: discord.TextChannel = None
     ):
+        """Gets the first message in a channel."""
         c = channel if channel else ctx.channel
         first = await c.history(limit=1, oldest_first=True).flatten()
         if first:
-            t = "Click here to jump to the first message in this channel."
+            t = "Click here to jump to the first message."
             e = discord.Embed(
                 color=await ctx.embed_color(), title=t, url=first[0].jump_url
             )
             await ctx.send(embed=e)
         else:
-            await ctx.send("No messages found in this channel!")
+            await ctx.send("No messages found.")
