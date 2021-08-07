@@ -4,7 +4,7 @@ import io
 import discord
 import pyppeteer
 from pyppeteer import launch
-from redbot.core import Config, checks, commands
+from redbot.core import commands
 
 
 class Screenshot(commands.Cog):
