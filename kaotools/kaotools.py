@@ -24,7 +24,7 @@ class KaoTools(commands.Cog):
         self.bot = bot
         self.session = aiohttp.ClientSession()
         setattr(bot._connection, "parse_interaction_create", self.parse_interaction_create)
-        bot._connection.parsers["INTERACTION_CREATE"] = self.parse_interaction_create
+        bot._connection.parsers["INTERACTION_CREATE"] = self.
 
     def cog_unload(self):
         del self.bot._connection.parsers["INTERACTION_CREATE"]
@@ -63,7 +63,7 @@ class KaoTools(commands.Cog):
         return discord.utils.oauth_url(app_info.id, permissions, scopes=scopes)
 
     # https://github.com/Kowlin/Sentinel/blob/master/slashinjector/core.py
-    async def parse_interaction_create(self, data):
+    def parse_interaction_create(self, data):
         self.bot.dispatch("interaction_create", data)
 
 
