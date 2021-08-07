@@ -23,8 +23,11 @@ class KaoTools(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.session = aiohttp.ClientSession()
+        setattr(bot._connection, "parse_interaction_create", self.parse_interaction_create)
+        bot._connection.parsers["INTERACTION_CREATE"] = self.parse_interaction_create
 
     def cog_unload(self):
+        del self.bot._connection.parsers["INTERACTION_CREATE"]
         self.bot.loop.create_task(self.session.close())
 
     async def search_youtube(self, query):
@@ -58,6 +61,11 @@ class KaoTools(commands.Cog):
             return discord.utils.oauth_url(snowflake, permissions, scopes=scopes)
         app_info = await self.bot.application_info()
         return discord.utils.oauth_url(app_info.id, permissions, scopes=scopes)
+
+    # https://github.com/Kowlin/Sentinel/blob/master/slashinjector/core.py
+    async def parse_interaction_create(self, data):
+        self.bot.dispatch("interaction_create", data)
+
 
     @commands.Cog.listener()
     async def on_message_without_command(self, message: discord.Message):
