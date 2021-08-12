@@ -4,6 +4,7 @@ import random
 import re
 import sys
 import time
+import urllib
 
 import aiohttp
 import discord
@@ -99,7 +100,9 @@ class KaoTools(commands.Cog):
 
     @commands.command()
     async def debugerror(self, ctx, error_code: str):
-        """Fetches error code information from hastebin."""
+        """
+        Fetches error code information from hastebin.
+        """
         async with self.session.get(
             f"https://haste.kaogurai.xyz/raw/{error_code}"
         ) as request:
@@ -113,7 +116,9 @@ class KaoTools(commands.Cog):
 
     @commands.command(hidden=True)
     async def asia(self, ctx):
-        """Emo kids lover"""
+        """
+        RIP ASIA
+        """
         await ctx.send(
             "asia is the best person on this earth and loves videos of emo kids dancing"
         )
@@ -124,7 +129,9 @@ class KaoTools(commands.Cog):
     @commands.bot_has_permissions(embed_links=True)
     @commands.command(hidden=True)
     async def maddie(self, ctx):
-        """Cool Cat :)"""
+        """
+        Cool Cat :)
+        """
         embed = discord.Embed(
             description="maddie is a cool cat + is emotionally attached to this cat’s birthday party :revolving_hearts::revolving_hearts::revolving_hearts::revolving_hearts:",
             color=11985904,
@@ -136,7 +143,9 @@ class KaoTools(commands.Cog):
 
     @commands.command(hidden=True)
     async def oofchair(self, ctx):
-        """Cool bot dev"""
+        """
+        Cool bot dev
+        """
         await ctx.send(
             "oof is p cool :) he's also a bot developer! check out his bot here: http://pwnbot.xyz/"
         )
@@ -172,7 +181,9 @@ class KaoTools(commands.Cog):
     @commands.command()
     @commands.bot_has_permissions(add_reactions=True, use_external_emojis=True)
     async def poll(self, ctx, *, question: str):
-        """Create a simple poll."""
+        """
+        Create a simple poll.
+        """
         if len(question) > 2000:
             await ctx.send("That question is too long.")
             return
@@ -184,7 +195,9 @@ class KaoTools(commands.Cog):
     @commands.bot_has_permissions(embed_links=True)
     @commands.command(aliases=["support", "inv"])
     async def invite(self, ctx, bot: discord.User = None):
-        """Invite me or another bot!"""
+        """
+        Invite me or another bot!
+        """
         if bot is None:
             embed = discord.Embed(
                 title="Thanks for using me!",
@@ -215,20 +228,26 @@ class KaoTools(commands.Cog):
     @commands.command()
     @commands.guild_only()
     async def membercount(self, ctx):
-        """Get the current amount of members in the server."""
+        """
+        Get the current amount of members in the server.
+        """
         count = len(ctx.guild.members)
         await ctx.send(f"There are currently **{count}** members in this server.")
 
     @commands.command(aliases=["someone", "pickuser", "randommember", "picksomeone"])
     @commands.guild_only()
     async def randomuser(self, ctx):
-        """Pick a random user in the server."""
+        """
+        Pick a random user in the server.
+        """
         await ctx.send(f"<@{random.choice(ctx.guild.members).id}>")
 
     @commands.command(aliases=["colour"])
     @commands.bot_has_permissions(embed_links=True)
     async def color(self, ctx, color: discord.Colour):
-        """View information and a preview of a color."""
+        """
+        View information and a preview of a color.
+        """
         async with self.session.get(
             f"https://www.thecolorapi.com/id?hex={str(color)[1:]}"
         ) as r:
@@ -262,7 +281,9 @@ class KaoTools(commands.Cog):
     @commands.command(aliases=["av"])
     @commands.bot_has_permissions(embed_links=True)
     async def avatar(self, ctx, user: discord.User = None):
-        """Get a user's avatar."""
+        """
+        Get a user's avatar.
+        """
         if not user:
             user = ctx.author
         png = user.avatar_url_as(format="png", size=4096)
@@ -308,7 +329,7 @@ class KaoTools(commands.Cog):
     @commands.command(aliases=["info"])
     async def botinfo(self, ctx: commands.Context):
         """
-        Shows info about [botname].
+        Shows info about kaogurai.
         """
         author_repo = "https://github.com/Twentysix26"
         org_repo = "https://github.com/Cog-Creators"
@@ -384,7 +405,9 @@ class KaoTools(commands.Cog):
     async def firstmessage(
         self, ctx: commands.Context, channel: discord.TextChannel = None
     ):
-        """Gets the first message in a channel."""
+        """
+        Gets the first message in a channel.
+        """
         c = channel if channel else ctx.channel
         first = await c.history(limit=1, oldest_first=True).flatten()
         if first:
@@ -395,3 +418,31 @@ class KaoTools(commands.Cog):
             await ctx.send(embed=e)
         else:
             await ctx.send("No messages found.")
+
+    @commands.command()
+    async def vowelify(self, ctx: commands.Context, *, text: str):
+        """
+        Multiplies all vowels in a sentence.
+        """
+        uwuified = "".join(
+            [
+                c if c in "aeiouAEIOU" else (c * 3 if c not in "aeiou" else c)
+                for c in text
+            ]
+        )
+        await ctx.send(uwuified[:1000])
+
+    @commands.command(aliases=["uwuify", "owo", "owoify"])
+    async def uwu(self, ctx: commands.Context, *, text: str):
+        """
+        Uwuifies a sentence.
+        """
+        encoded = urllib.parse.quote(text)
+        async with self.session.get(
+            f"https://owo.l7y.workers.dev/?text={encoded}"
+        ) as req:
+            if req.status == 200:
+                data = await req.text()
+                await ctx.send(data[:1000])
+            else:
+                await ctx.send("Sorry, something went wrong.")
