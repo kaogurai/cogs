@@ -14,6 +14,7 @@ from pyppeteer import launch
 from redbot.core import commands
 from redbot.core.utils._dpy_menus_utils import dpymenu
 from redbot.core.utils.chat_formatting import humanize_list
+from zalgo_text import zalgo
 
 SUPPORT_SERVER = "https://discord.gg/p6ehU9qhg8"
 
@@ -446,3 +447,11 @@ class KaoTools(commands.Cog):
                 await ctx.send(data[:1000])
             else:
                 await ctx.send("Sorry, something went wrong.")
+
+    @commands.command(aliases=["zalgoify"])
+    async def zalgo(self, ctx: commands.Context, *, text: str):
+        """
+        Zalgoifies a sentence.
+        """
+        t = zalgo.zalgo().zalgofy(text)
+        await ctx.send(t[:2000])
