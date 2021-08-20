@@ -102,10 +102,10 @@ class KaoTools(commands.Cog):
     @commands.command()
     async def debugerror(self, ctx, error_code: str):
         """
-        Fetches error code information from hastebin.
+        Fetches error code information from paste.kaogurai.xyz.
         """
         async with self.session.get(
-            f"https://haste.kaogurai.xyz/raw/{error_code}"
+            f"https://paste.kaogurai.xyz/raw/{error_code}"
         ) as request:
             txt = await request.text()
             if len(txt) > 4000:
