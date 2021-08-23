@@ -1,3 +1,4 @@
+import contextlib
 import re
 
 import aiohttp
@@ -37,33 +38,30 @@ class SmartLyrics(commands.Cog):
         async with self.session.get(url, params=params, headers=headers) as request:
             if request.status == 200:
                 results = await request.json()
-                try:
-                    return [
+                with contextlib.suppress(IndexError):
+                    return (
                         results["data"][0]["lyrics"],
                         results["data"][0]["name"],
                         results["data"][0]["artist"],
                         results["data"][0]["album_art"],
-                    ]
-                except IndexError:
-                    return
-            return
+                    )
 
-    # adapted https://github.com/kaogurai/core/blob/V3/edge/redbot/cogs/mod/names.py#L71
-    def handle_listening(self, user):
-        l_acts = [
-            c for c in user.activities if c.type == discord.ActivityType.listening
+    # adapted https://github.com/Cog-Creators/Red-DiscordBot/blob/V3/develop/redbot/cogs/mod/names.py#L112-L126
+    def get_user_status_song(self, user):
+        listening_statuses = [
+            s for s in user.activities if s.type == discord.ActivityType.listening
         ]
-        if not l_acts:
-            return None, discord.ActivityType.listening
-        l_act = l_acts[0]
-        if isinstance(l_act, discord.Spotify):
-            act = ("{artist} {title}").format(
-                artist=discord.utils.escape_markdown(l_act.artist)
-                if l_act.artist
-                else "",
-                title=discord.utils.escape_markdown(l_act.title),
-            )
-        return act, discord.ActivityType.listening
+        if not listening_statuses:
+            return
+        for listening_status in listening_statuses:
+            if isinstance(listening_status, discord.Spotify):
+                text = ("{artist} {title}").format(
+                    artist=discord.utils.escape_markdown(listening_status.artist)
+                    if listening_status.artist
+                    else "",
+                    title=discord.utils.escape_markdown(listening_status.title),
+                )
+                return text
 
     async def create_menu(self, ctx, results, source=None):
         embeds = []
@@ -123,16 +121,12 @@ class SmartLyrics(commands.Cog):
         audiocog = self.bot.get_cog("Audio")
         lastfmcog = self.bot.get_cog("LastFM")
 
-        async def get_player(ctx):
-            try:
-                player = lavalink.get_player(ctx.guild.id)
-                return player
-            except:
-                return
-
         if ctx.author.voice and ctx.guild.me.voice:
             if ctx.author.voice.channel == ctx.guild.me.voice.channel:
-                player = await get_player(ctx)
+                try:
+                    player = lavalink.get_player(ctx.guild.id)
+                except KeyError:  # no player for that guild
+                    player = None
                 if audiocog and player and player.current:
                     title = player.current.title
                     regex_title = self.regex.sub("", title).strip()
@@ -145,7 +139,7 @@ class SmartLyrics(commands.Cog):
                         await ctx.send(f"Nothing was found for `{renamed_title}`")
                         return
 
-        statustext = self.handle_listening(ctx.author)[0]
+        statustext = self.get_user_status_song(ctx.author)
 
         if statustext:
             results = await self.get_lyrics(statustext)

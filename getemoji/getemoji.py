@@ -115,7 +115,7 @@ class GetEmoji(commands.Cog):
     @commands.bot_has_permissions(embed_links=True)
     async def mozilla(self, ctx, *, emoji: str):
         """get an image of a mozilla emoji"""
-        await self.get_emoji(ctx, "mozille", emoji)
+        await self.get_emoji(ctx, "mozilla", emoji)
 
     @getemoji.command()
     @commands.bot_has_permissions(embed_links=True)
@@ -137,7 +137,7 @@ class GetEmoji(commands.Cog):
                 embed = discord.Embed(color=await ctx.embed_colour())
                 embed.set_image(url=response["url"])
                 await ctx.send(embed=embed)
-        except:
+        except aiohttp.ClientConnectionError:
             await ctx.send(
                 "Uh oh, an error occured. Make sure the API is listening on the correct port."
             )

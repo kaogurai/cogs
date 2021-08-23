@@ -27,16 +27,19 @@ class AiTools(commands.Cog):
         author_id = str(author.id)
         message = urllib.parse.quote(message)
         url = f"http://api.brainshop.ai/get?bid={brain_id}&key={brain_key}&uid={author_id}&msg={message}"
-        async with self.session.get(url) as response:
-            if response.status == 200:
-                j = await response.json()
-                return j.get("cnt")
-            elif response.status == 408:
-                # brainshop LOVES to time out
-                async with self.session.get(url) as response:
-                    if response.status == 200:
-                        j = await response.json()
-                        return j.get("cnt")
+        try:
+            async with self.session.get(url) as response:
+                if response.status == 200:
+                    j = await response.json()
+                    return j.get("cnt")
+                elif response.status == 408:
+                    # brainshop LOVES to time out
+                    async with self.session.get(url) as response:
+                        if response.status == 200:
+                            j = await response.json()
+                            return j.get("cnt")
+        except aiohttp.ClientConnectorError:
+            return
 
     @commands.command(aliases=["ai", "robot"])
     async def talk(self, ctx, *, message: str):

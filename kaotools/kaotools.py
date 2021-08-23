@@ -35,7 +35,9 @@ class KaoTools(commands.Cog):
         self.bot.loop.create_task(self.session.close())
 
     async def search_youtube(self, query):
-        """Make a Get call to FAKE youtube data api (HEHE)."""
+        """
+        Query lavalink's /loadtracks endpoint for a list of tracks.
+        """
         params = {"identifier": "ytsearch:" + query}
         headers = {"Authorization": "youshallnotpass", "Accept": "application/json"}
         async with self.session.get(
