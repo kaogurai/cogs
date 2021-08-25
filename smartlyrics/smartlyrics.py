@@ -118,7 +118,6 @@ class SmartLyrics(commands.Cog):
                 await ctx.send(f"Nothing was found for `{query}`")
                 return
 
-        audiocog = self.bot.get_cog("Audio")
         lastfmcog = self.bot.get_cog("LastFM")
 
         if ctx.author.voice and ctx.guild.me.voice:
@@ -127,7 +126,7 @@ class SmartLyrics(commands.Cog):
                     player = lavalink.get_player(ctx.guild.id)
                 except KeyError:  # no player for that guild
                     player = None
-                if audiocog and player and player.current:
+                if player and player.current:
                     title = player.current.title
                     regex_title = self.regex.sub("", title).strip()
                     renamed_title = regex_title.replace("-", "")
