@@ -465,8 +465,8 @@ class KaoTools(commands.Cog):
         love = random.randint(0, 100)
         if user2 is None:
             user2 = ctx.author
-        ua = urllib.parse.quote(user.avatar_url)
-        u2a = urllib.parse.quote(user2.avatar_url)
+        ua = user.avatar_url_as(static_format="png")
+        u2a = user2.avatar_url_as(static_format="png")
         u = f"https://api.martinebot.com/v1/imagesgen/ship?percent={love}&first_user={ua}&second_user={u2a}&no_69_percent_emoji=false"
         t = f"Love between {user.name} and {user2.name} is {love}%"
         e = discord.Embed(color=await ctx.embed_color(), title=t)
