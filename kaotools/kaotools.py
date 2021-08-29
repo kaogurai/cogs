@@ -473,3 +473,35 @@ class KaoTools(commands.Cog):
         e.set_image(url=u)
         e.set_footer(text="Powered by api.martinebot.com")
         await ctx.send(embed=e)
+
+    @commands.bot_has_permissions(embed_links=True)
+    @commands.command()
+    async def country(self, ctx, *, country: str):
+        """
+        Get info about a specified country.
+        """
+        safe_country = urllib.parse.quote(country)
+        async with self.session.get(
+            f"https://restcountries.eu/rest/v2/name/{safe_country}"
+        ) as req:
+            if req.status == 200:
+                data = await req.json()
+                name = data[0]["name"]
+                capital = data[0]["capital"]
+                population = data[0]["population"]
+                flag = data[0]["flag"]
+                region = data[0]["region"]
+                languages = data[0]["languages"]
+                timezones = data[0]["timezones"]
+                continent = data[0]["continent"]
+                e = discord.Embed(color=await ctx.embed_color(), title=name, url=flag)
+                e.add_field(name="Capital", value=capital)
+                e.add_field(name="Population", value=f"{population:,}")
+                e.add_field(name="Region", value=region)
+                e.add_field(name="Languages", value=", ".join(languages))
+                e.add_field(name="Timezones", value=", ".join(timezones))
+                e.add_field(name="Continent", value=continent)
+                e.set_image(url=flag)
+                await ctx.send(embed=e)
+            else:
+                await ctx.send("Sorry, I couldn't find that country.")
