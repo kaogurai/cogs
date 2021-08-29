@@ -492,12 +492,16 @@ class KaoTools(commands.Cog):
                 flag = data[0]["flag"]
                 region = data[0]["region"]
                 languages = data[0]["languages"]
+                langs = []
+                for l in languages:
+                    langs.append(l["name"])
+                langs = ", ".join(langs)
                 timezones = data[0]["timezones"]
                 e = discord.Embed(color=await ctx.embed_color(), title=name, url=flag)
                 e.add_field(name="Capital", value=capital)
                 e.add_field(name="Population", value=f"{population:,}")
                 e.add_field(name="Region", value=region)
-                e.add_field(name="Languages", value=", ".join(languages)["name"])
+                e.add_field(name="Languages", value=langs)
                 e.add_field(name="Timezones", value=", ".join(timezones))
                 e.set_image(url=flag)
                 await ctx.send(embed=e)
