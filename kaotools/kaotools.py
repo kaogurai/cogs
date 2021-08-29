@@ -497,7 +497,7 @@ class KaoTools(commands.Cog):
                 e.add_field(name="Capital", value=capital)
                 e.add_field(name="Population", value=f"{population:,}")
                 e.add_field(name="Region", value=region)
-                e.add_field(name="Languages", value=", ".join(languages))
+                e.add_field(name="Languages", value=", ".join(languages["name"]))
                 e.add_field(name="Timezones", value=", ".join(timezones))
                 e.set_image(url=flag)
                 await ctx.send(embed=e)
