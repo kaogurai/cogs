@@ -490,6 +490,8 @@ class KaoTools(commands.Cog):
                 capital = data[0]["capital"]
                 population = data[0]["population"]
                 flag = data[0]["flag"]
+                flag_arr = flag.split("/")
+                flag_png = ("https://restcountries.com/data/png/" + flag_arr[-1]).replace(".svg", ".png")
                 region = data[0]["region"]
                 languages = data[0]["languages"]
                 langs = []
@@ -497,13 +499,13 @@ class KaoTools(commands.Cog):
                     langs.append(l["name"])
                 langs = ", ".join(langs)
                 timezones = data[0]["timezones"]
-                e = discord.Embed(color=await ctx.embed_color(), title=name, url=flag)
+                e = discord.Embed(color=await ctx.embed_color(), title=name)
                 e.add_field(name="Capital", value=capital)
                 e.add_field(name="Population", value=f"{population:,}")
                 e.add_field(name="Region", value=region)
                 e.add_field(name="Languages", value=langs)
                 e.add_field(name="Timezones", value=", ".join(timezones))
-                e.set_image(url=flag)
+                e.set_image(url=flag_png)
                 await ctx.send(embed=e)
             else:
                 await ctx.send("Sorry, I couldn't find that country.")
