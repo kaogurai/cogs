@@ -52,7 +52,6 @@ class AutoAvatar(commands.Cog):
             async with self.session.get(new_avatar) as request:
                 avatar = await request.read()
         except aiohttp.InvalidURL:
-            all_avatars.remove(new_avatar)
             await self.config.avatars.set(all_avatars)
             return
         except aiohttp.ClientError:
