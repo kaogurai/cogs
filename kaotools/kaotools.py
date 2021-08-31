@@ -41,7 +41,7 @@ class KaoTools(commands.Cog):
         params = {"identifier": "ytsearch:" + query}
         headers = {"Authorization": "youshallnotpass", "Accept": "application/json"}
         async with self.session.get(
-            "http://localhost:2333/loadtracks", params=params, headers=headers
+            "http://lava.link:80/loadtracks", params=params, headers=headers
         ) as request:
             if request.status == 200:
                 response = await request.json()
