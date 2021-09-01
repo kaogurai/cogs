@@ -491,7 +491,9 @@ class KaoTools(commands.Cog):
                 population = data[0]["population"]
                 flag = data[0]["flag"]
                 flag_arr = flag.split("/")
-                flag_png = ("https://restcountries.com/data/png/" + flag_arr[-1]).replace(".svg", ".png")
+                flag_png = (
+                    "https://restcountries.com/data/png/" + flag_arr[-1]
+                ).replace(".svg", ".png")
                 region = data[0]["region"]
                 languages = data[0]["languages"]
                 langs = []

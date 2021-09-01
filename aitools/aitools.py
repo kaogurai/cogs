@@ -4,7 +4,15 @@ import urllib.parse
 import aiohttp
 import discord
 from redbot.core import Config, commands
+from redbot.core.utils.chat_formatting import pagify
 from redbot.core.utils.predicates import MessagePredicate
+
+try:
+    from redbot.core.utils._dpy_menus_utils import dpymenu
+
+    DPY_MENUS = True
+except ImportError:
+    from redbot.core.utils.menus import DEFAULT_CONTROLS, menu
 
 
 class AiTools(commands.Cog):
@@ -16,9 +24,16 @@ class AiTools(commands.Cog):
         self.config = Config.get_conf(self, identifier=6574837465473)
         default_guild = {"channels": []}
         self.config.register_guild(**default_guild)
+        self.channel_cache = {}
+        self.bot.loop.create_task(self.fill_channel_cache())
 
     def cog_unload(self):
         self.bot.loop.create_task(self.session.close())
+
+    async def fill_channel_cache(self):
+        all_guilds = await self.config.all_guilds()
+        for guild in all_guilds:
+            self.channel_cache[guild] = all_guilds[guild]["channels"]
 
     async def request_brainshop(self, author, brain_info, message):
         """Get a response from the Brainshop API"""
@@ -66,7 +81,12 @@ class AiTools(commands.Cog):
             return
         if await self.bot.cog_disabled_in_guild(self, message.guild):
             return
-        channel_list = await self.config.guild(message.guild).channels()
+
+        try:
+            channel_list = self.channel_cache[message.guild.id]
+        except KeyError:
+            return
+
         if not channel_list:
             return
         if message.channel.id not in channel_list:
@@ -101,6 +121,7 @@ class AiTools(commands.Cog):
         if channel.id not in channel_list:
             channel_list.append(channel.id)
             await self.config.guild(ctx.guild).channels.set(channel_list)
+            self.channel_cache[ctx.guild.id] = channel_list
             await ctx.tick()
         else:
             await ctx.send(
@@ -114,6 +135,7 @@ class AiTools(commands.Cog):
         if channel.id in channel_list:
             channel_list.remove(channel.id)
             await self.config.guild(ctx.guild).channels.set(channel_list)
+            self.channel_cache[ctx.guild.id] = channel_list
             await ctx.tick()
         else:
             await ctx.send(
@@ -140,6 +162,7 @@ class AiTools(commands.Cog):
                 return
             if predictate.result:
                 await self.config.guild(ctx.guild).channels.clear()
+                del self.channel_cache[ctx.guild.id]
                 await ctx.tick()
             else:
                 await ctx.send("Ok, I won't clear any channels.")
@@ -147,16 +170,33 @@ class AiTools(commands.Cog):
     @aichannel.command()
     async def list(self, ctx):
         """List all the channels the AI will talk in."""
-        channel_list = await self.config.guild(ctx.guild).channels()
+        try:
+            channel_list = self.channel_cache[ctx.guild.id]
+        except KeyError:
+            channel_list = None
         if not channel_list:
             await ctx.send("There's no channels in the config.")
         else:
-            lolidk = ""
-            for obj in channel_list:
-                lolidk = lolidk + "\n <#" + str(obj) + "> - " + str(obj)
-            if len(lolidk) > 4000:
-                return  # no sane person has this many and it's not worth adding a paginator
-            embed = discord.Embed(
-                title="AI Channels", color=await ctx.embed_colour(), description=lolidk
+            text = "".join(
+                "<#" + str(channel) + "> - " + str(channel) + "\n"
+                for channel in channel_list
             )
-            await ctx.send(embed=embed)
+            pages = [p for p in pagify(text=text, delims="\n")]
+            embeds = []
+            for index, page in enumerate(pages):
+                embed = discord.Embed(
+                    title="Automatic AI Channels",
+                    color=await ctx.embed_colour(),
+                    description=page,
+                )
+                if len(embeds) > 1:
+                    embed.set_footer(text=f"Page {index+1}/{len(pages)}")
+                embeds.append(embed)
+
+            if DPY_MENUS:
+                await dpymenu(ctx, embeds, timeout=60)
+            else:
+                if len(pages) == 1:
+                    await ctx.send(embed=embeds[0])
+                else:
+                    await menu(ctx, embeds, DEFAULT_CONTROLS, timeout=60)
