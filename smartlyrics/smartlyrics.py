@@ -1,5 +1,6 @@
 import contextlib
 import re
+import urllib.parse
 
 import aiohttp
 import discord
@@ -30,6 +31,7 @@ class SmartLyrics(commands.Cog):
         self.bot.loop.create_task(self.session.close())
 
     async def get_lyrics(self, query):
+        query = urllib.parse.quote(query)
         url = f"https://some-random-api.ml/lyrics?title={query}"
         async with self.session.get(url) as request:
             if request.status == 200:
@@ -42,7 +44,7 @@ class SmartLyrics(commands.Cog):
                         results["title"],
                         results["author"],
                         results["thumbnail"]["genius"],
-                        results["links"]["genius"]
+                        results["links"]["genius"],
                     )
 
     # adapted https://github.com/Cog-Creators/Red-DiscordBot/blob/V3/develop/redbot/cogs/mod/names.py#L112-L126
@@ -79,11 +81,13 @@ class SmartLyrics(commands.Cog):
                     )
                 else:
                     embed.set_footer(
-                        text=f"Powered by some-random-api.ml| Page {index + 1}/{len(embed_content)}"
+                        text=f"Powered by some-random-api.ml | Page {index + 1}/{len(embed_content)}"
                     )
             else:
                 if source:
-                    embed.set_footer(text=f"Powered by some-random-api.ml | Source: {source}")
+                    embed.set_footer(
+                        text=f"Powered by some-random-api.ml | Source: {source}"
+                    )
                 else:
                     embed.set_footer(text=f"Powered by some-random-api.ml")
             embeds.append(embed)
