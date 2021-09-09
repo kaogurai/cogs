@@ -11,7 +11,7 @@ from redbot.core.utils.menus import DEFAULT_CONTROLS, menu
 
 class SmartLyrics(commands.Cog):
     """
-    Gets lyrics for your current song using the KSoft.SI API.
+    Gets lyrics for your current song using some-random-api.ml.
     """
 
     def __init__(self, bot):
@@ -30,20 +30,19 @@ class SmartLyrics(commands.Cog):
         self.bot.loop.create_task(self.session.close())
 
     async def get_lyrics(self, query):
-        ksoft_keys = await self.bot.get_shared_api_tokens("ksoftsi")
-        key = ksoft_keys.get("api_key")
-        url = "https://api.ksoft.si/lyrics/search"
-        headers = {"Authorization": "Bearer " + key}
-        params = {"q": query, "limit": 1}
-        async with self.session.get(url, params=params, headers=headers) as request:
+        url = f"https://some-random-api.ml/lyrics?title={query}"
+        async with self.session.get(url) as request:
             if request.status == 200:
                 results = await request.json()
+                if "error" in results.keys():
+                    return
                 with contextlib.suppress(IndexError):
                     return (
-                        results["data"][0]["lyrics"],
-                        results["data"][0]["name"],
-                        results["data"][0]["artist"],
-                        results["data"][0]["album_art"],
+                        results["lyrics"],
+                        results["title"],
+                        results["author"],
+                        results["thumbnail"]["genius"],
+                        results["links"]["genius"]
                     )
 
     # adapted https://github.com/Cog-Creators/Red-DiscordBot/blob/V3/develop/redbot/cogs/mod/names.py#L112-L126
@@ -76,17 +75,17 @@ class SmartLyrics(commands.Cog):
             if len(embed_content) != 1:
                 if source:
                     embed.set_footer(
-                        text=f"Powered by KSoft.SI | Source: {source} | Page {index + 1}/{len(embed_content)}"
+                        text=f"Powered by some-random-api.ml | Source: {source} | Page {index + 1}/{len(embed_content)}"
                     )
                 else:
                     embed.set_footer(
-                        text=f"Powered by KSoft.SI | Page {index + 1}/{len(embed_content)}"
+                        text=f"Powered by some-random-api.ml| Page {index + 1}/{len(embed_content)}"
                     )
             else:
                 if source:
-                    embed.set_footer(text=f"Powered by KSoft.SI | Source: {source}")
+                    embed.set_footer(text=f"Powered by some-random-api.ml | Source: {source}")
                 else:
-                    embed.set_footer(text=f"Powered by KSoft.SI")
+                    embed.set_footer(text=f"Powered by some-random-api.ml")
             embeds.append(embed)
         if len(embed_content) != 1:
             await menu(ctx, embeds, controls=DEFAULT_CONTROLS, timeout=120)
