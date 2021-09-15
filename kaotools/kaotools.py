@@ -1,5 +1,3 @@
-import asyncio
-import io
 import random
 import re
 import sys
@@ -8,12 +6,9 @@ import urllib
 
 import aiohttp
 import discord
-import pyppeteer
-import redbot
-from pyppeteer import launch
 from redbot.core import commands
 from redbot.core.utils._dpy_menus_utils import dpymenu
-from redbot.core.utils.chat_formatting import humanize_list
+from redbot.core.utils.chat_formatting import humanize_list, pagify
 from zalgo_text import zalgo
 
 SUPPORT_SERVER = "https://discord.gg/p6ehU9qhg8"
@@ -478,3 +473,31 @@ class KaoTools(commands.Cog):
                 await ctx.send(embed=e)
             else:
                 await ctx.send("Sorry, I couldn't find that country.")
+
+    @commands.command(aliases=["pp"])
+    async def penis(self, ctx, *users: discord.Member):
+        """
+        Get user's penis size!
+        """
+        if not users:
+            users = (ctx.author,)
+
+        penises = {}
+        msg = ""
+        state = random.getstate()
+
+        for user in users:
+            random.seed(user.id)
+
+            dong_size = random.randint(0, 30)
+
+            penises[user] = "8{}D".format("=" * dong_size)
+
+        random.setstate(state)
+        dongs = sorted(penises.items(), key=lambda x: x[1])
+
+        for user, dong in dongs:
+            msg += "**{}'s size:**\n{}\n".format(user.display_name, dong)
+
+        for page in pagify(msg):
+            await ctx.send(page)
