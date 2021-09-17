@@ -1,3 +1,4 @@
+import contextlib
 import random
 import re
 import sys
@@ -41,10 +42,8 @@ class KaoTools(commands.Cog):
         ) as request:
             if request.status == 200:
                 response = await request.json()
-                try:
+                with contextlib.suppress(KeyError):
                     return response["tracks"]
-                except:
-                    return None
 
     async def invite_url(self, snowflake: int = None) -> str:
         """
