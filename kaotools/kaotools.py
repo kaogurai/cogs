@@ -6,6 +6,7 @@ import urllib
 
 import aiohttp
 import discord
+import redbot
 from redbot.core import commands
 from redbot.core.utils._dpy_menus_utils import dpymenu
 from redbot.core.utils.chat_formatting import humanize_list, pagify
