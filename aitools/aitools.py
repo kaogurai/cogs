@@ -42,7 +42,7 @@ class AiTools(commands.Cog):
         author_id = str(author.id)
         message = urllib.parse.quote(message)
         url = f"http://api.brainshop.ai/get?bid={brain_id}&key={brain_key}&uid={author_id}&msg={message}"
-        try:
+        async def thing(url):
             async with self.session.get(url) as response:
                 if response.status == 200:
                     j = await response.json()
@@ -53,8 +53,15 @@ class AiTools(commands.Cog):
                         if response.status == 200:
                             j = await response.json()
                             return j.get("cnt")
+        try:
+            await thing(url)
+        except aiohttp.ServerDisconnectedError:
+            try:
+                await thing(url)
+            except:
+                pass
         except aiohttp.ClientConnectorError:
-            return
+            pass
 
     @commands.command(aliases=["ai", "robot"])
     async def talk(self, ctx, *, message: str):
