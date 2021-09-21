@@ -55,11 +55,6 @@ class AiTools(commands.Cog):
                             return j.get("cnt")
         try:
             await thing(self, url)
-        except aiohttp.ServerDisconnectedError:
-            try:
-                await thing(self, url)
-            except:
-                pass
         except aiohttp.ClientConnectorError:
             pass
 
