@@ -54,9 +54,15 @@ class AiTools(commands.Cog):
                             j = await response.json()
                             return j.get("cnt")
         try:
-            await thing(self, url)
+            results = await thing(self, url)
+        except aiohttp.ServerDisconnectedError:
+            try:
+                results = await thing(self, url)
+            except:
+                results = None
         except aiohttp.ClientConnectorError:
-            pass
+            results = None
+        return results
 
     @commands.command(aliases=["ai", "robot"])
     async def talk(self, ctx, *, message: str):
