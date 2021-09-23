@@ -3,6 +3,7 @@ import urllib.parse
 
 import aiohttp
 import discord
+import contextlib
 from redbot.core import Config, commands
 from redbot.core.utils.chat_formatting import pagify
 from redbot.core.utils.predicates import MessagePredicate
@@ -158,7 +159,7 @@ class AiTools(commands.Cog):
             await ctx.send("The AI is not set to talk in any channels.")
         else:
             try:
-                await ctx.send(
+                m = await ctx.send(
                     "Are you sure you want to clear all the channels that the ai talks in? Respond with yes or no."
                 )
                 predictate = MessagePredicate.yes_or_no(ctx, user=ctx.author)
@@ -170,8 +171,11 @@ class AiTools(commands.Cog):
                 return
             if predictate.result:
                 await self.config.guild(ctx.guild).channels.clear()
-                del self.channel_cache[ctx.guild.id]
+                self.channel_cache[ctx.guild.id] = []
                 await ctx.tick()
+                with contextlib.supress(discord.NotFound):
+                    await m.delete()
+
             else:
                 await ctx.send("Ok, I won't clear any channels.")
 
