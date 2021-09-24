@@ -39,9 +39,14 @@ class KaoTools(commands.Cog):
         if not cog:
             return
         config = await cog.config.all()
-        password = config["password"]
-        host = config["host"]
-        port = config["port"]
+        if not config["use_external_lavalink"]:
+            password = "youshallnotpass"
+            host = "localhost"
+            port = 2333
+        else:
+            password = config["password"]
+            host = config["host"]
+            port = config["port"]
         params = {"identifier": "ytsearch:" + query}
         headers = {"Authorization": password, "Accept": "application/json"}
         async with self.session.get(
