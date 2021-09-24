@@ -46,7 +46,7 @@ class KaoTools(commands.Cog):
         else:
             password = config["password"]
             host = config["host"]
-            port = config["port"]
+            port = config["ws_port"]
         params = {"identifier": "ytsearch:" + query}
         headers = {"Authorization": password, "Accept": "application/json"}
         async with self.session.get(
