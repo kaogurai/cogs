@@ -35,10 +35,17 @@ class KaoTools(commands.Cog):
         """
         Query lavalink's /loadtracks endpoint for a list of tracks.
         """
+        cog = self.bot.get_cog("Audio")
+        if not cog:
+            return
+        config = await cog.config.all()
+        password = config["password"]
+        host = config["host"]
+        port = config["port"]
         params = {"identifier": "ytsearch:" + query}
-        headers = {"Authorization": "youshallnotpass", "Accept": "application/json"}
+        headers = {"Authorization": password, "Accept": "application/json"}
         async with self.session.get(
-            "http://lava.link:80/loadtracks", params=params, headers=headers
+            f"http://{host}:{port}/loadtracks", params=params, headers=headers
         ) as request:
             if request.status == 200:
                 response = await request.json()
