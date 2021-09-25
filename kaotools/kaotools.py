@@ -346,19 +346,20 @@ class KaoTools(commands.Cog):
         red_server_url = "https://discord.gg/red"
         dpy_repo = "https://github.com/Rapptz/discord.py"
         python_url = "https://www.python.org/"
+        kao_repo = "https://github.com/kaogurai/bot"
 
         dpy_version = "[{}]({})".format(discord.__version__, dpy_repo)
         python_version = "[{}.{}.{}]({})".format(*sys.version_info[:3], python_url)
         red_version = "[{}]({})".format(redbot.__version__, red_pypi)
 
         about = (
-            "This bot is a custom fork of [Red, an open source Discord bot]({}) "
+            "This bot is a [custom fork]() of [Red, an open source Discord bot]({}) "
             "created by [Twentysix]({}) and [improved by many]({}).\n\n"
             "Red is backed by a passionate community who contributes and "
             "creates content for everyone to enjoy. [Join us today]({}) "
             "and help us improve!\n\n"
             "(c) Cog Creators"
-        ).format(red_repo, author_repo, org_repo, red_server_url)
+        ).format(kao_repo, red_repo, author_repo, org_repo, red_server_url)
         links = (
             "If you're looking to invite me, [click here.]({})\n"
             "If you're looking for support or have any questions, [click here.]({})"
