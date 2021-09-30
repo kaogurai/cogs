@@ -73,7 +73,10 @@ class AiTools(commands.Cog):
             return await ctx.send("The brain id has not been set.")
         if brain_info.get("brain_key") is None:
             return await ctx.send("The brain key has not been set.")
-        r = await self.request_brainshop(ctx.author, brain_info, message)
+        try:
+            r = await self.request_brainshop(ctx.author, brain_info, message)
+        except:
+           return await ctx.send("Something went wrong. Try again in a little bit")
         if r is None:
             return await ctx.send("Something went wrong. Try again in a little bit.")
         await ctx.send(r)
@@ -106,10 +109,12 @@ class AiTools(commands.Cog):
             return await message.channel.send("The brain id has not been set.")
         if brain_info.get("brain_key") is None:
             return await message.channel.send("The brain key has not been set.")
-
-        r = await self.request_brainshop(
-            message.author, brain_info, message.clean_content
-        )
+        try:
+            r = await self.request_brainshop(
+                message.author, brain_info, message.clean_content
+            )
+        except:
+            return await message.channel.send("Something went wrong. Try again in a little bit")
         if r is None:
             return await message.channel.send(
                 "Something went wrong. Try again in a little bit."
