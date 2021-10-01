@@ -107,46 +107,48 @@ class AutoAvatar(commands.Cog):
 
     @commands.command()
     @commands.is_owner()
-    async def addavatar(self, ctx, link: str):
+    async def addavatar(self, ctx, *links: str):
         """
-        Adds an avatar link.
+        Adds avatar links.
         """
         all_avatars = await self.config.avatars()
 
-        try:
-            await self.session.get(link)
-        except aiohttp.InvalidURL:
-            await ctx.send("That's not a valid link.")
-            return
-        except aiohttp.ClientError:
-            await ctx.send("That's not a valid link.")
-            return
+        for link in links:
+            try:
+                await self.session.get(link)
+            except aiohttp.InvalidURL:
+                await ctx.send(f"{link[:1000]} is not a valid link.")
+                continue
+            except aiohttp.ClientError:
+                await ctx.send(f"{link[:1000]} is not a valid link.")
+                continue
 
-        if link not in all_avatars:
-            all_avatars.append(link)
-            await self.config.avatars.set(all_avatars)
-            await ctx.tick()
-        else:
-            await ctx.send(
-                f"{link} was already in my list of avatars, did you mean to remove it?"
-            )
+            if link not in all_avatars:
+                all_avatars.append(link)
+            else:
+                await ctx.send(
+                    f"{link:1000} was already in my list of avatars, did you mean to remove it?"
+                )
+        await self.config.avatars.set(all_avatars)
+        await ctx.tick()
 
     @commands.command()
     @commands.is_owner()
-    async def removeavatar(self, ctx, link: str):
+    async def removeavatar(self, ctx, *links: str):
         """
         Removes an avatar link.
         """
         all_avatars = await self.config.avatars()
 
-        if link in all_avatars:
-            all_avatars.remove(link)
-            await self.config.avatars.set(all_avatars)
-            await ctx.tick()
-        else:
-            await ctx.send(
-                f"{link} wasn't in my list of avatars, did you mean to add it?"
-            )
+        for link in links:
+            if link in all_avatars:
+                all_avatars.remove(link)
+            else:
+                await ctx.send(
+                    f"{link} wasn't in my list of avatars, did you mean to add it?"
+                )
+        await self.config.avatars.set(all_avatars)
+        await ctx.tick()
 
     @commands.command()
     async def listavatars(self, ctx):
