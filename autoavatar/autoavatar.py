@@ -115,11 +115,11 @@ class AutoAvatar(commands.Cog):
 
         for link in links:
             try:
-                await self.session.get(link)
-            except aiohttp.InvalidURL:
-                await ctx.send(f"{link[:1000]} is not a valid link.")
-                continue
-            except aiohttp.ClientError:
+                async with self.session.get(link) as r:
+                    if r.status != 200:
+                        await ctx.send(f"{link[:1000]} is not a valid link.")
+                        continue
+            except Exception:
                 await ctx.send(f"{link[:1000]} is not a valid link.")
                 continue
 
