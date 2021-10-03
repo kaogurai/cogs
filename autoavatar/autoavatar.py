@@ -173,7 +173,9 @@ class AutoAvatar(commands.Cog):
                 await ctx.author.send(page)
             except:
                 await ctx.send("I can't DM you.")
-                break
+                return
+        await ctx.tick()
+
 
     @commands.command()
     @commands.is_owner()
