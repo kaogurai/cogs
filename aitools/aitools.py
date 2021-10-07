@@ -14,6 +14,7 @@ try:
     DPY_MENUS = True
 except ImportError:
     from redbot.core.utils.menus import DEFAULT_CONTROLS, menu
+    DPY_MENUS = False
 
 
 class AiTools(commands.Cog):

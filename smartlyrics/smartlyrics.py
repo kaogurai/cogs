@@ -8,6 +8,12 @@ import lavalink
 from redbot.core import commands
 from redbot.core.utils.chat_formatting import pagify
 from redbot.core.utils.menus import DEFAULT_CONTROLS, menu
+try:
+    from redbot.core.utils._dpy_menus_utils import dpymenu
+    DPY_MENUS = True
+except ImportError:
+    from redbot.core.utils.menus import DEFAULT_CONTROLS, menu
+    DPY_MENUS = False
 
 
 class SmartLyrics(commands.Cog):
@@ -91,10 +97,13 @@ class SmartLyrics(commands.Cog):
                 else:
                     embed.set_footer(text=f"Powered by some-random-api.ml")
             embeds.append(embed)
-        if len(embed_content) != 1:
-            await menu(ctx, embeds, controls=DEFAULT_CONTROLS, timeout=120)
+        if DPY_MENUS:
+            await dpymenu(ctx, embeds)
         else:
-            await ctx.send(embed=embeds[0])
+            if len(embed_content) != 1:
+                await menu(ctx, embeds, controls=DEFAULT_CONTROLS, timeout=120)
+            else:
+                await ctx.send(embed=embeds[0])
 
     @commands.bot_has_permissions(embed_links=True)
     @commands.guild_only()

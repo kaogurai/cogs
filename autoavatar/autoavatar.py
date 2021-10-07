@@ -4,7 +4,6 @@ from io import BytesIO
 
 import aiohttp
 import discord
-from aiohttp.helpers import isasyncgenfunction
 from PIL import Image
 from redbot.core import Config, commands
 from redbot.core.utils.chat_formatting import pagify
