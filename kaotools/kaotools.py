@@ -90,7 +90,8 @@ class KaoTools(commands.Cog):
         if not re.compile(rf"^<@!?{self.bot.user.id}>$").match(message.content):
             return
         prefixes = await self.bot.get_prefix(message.channel)
-        prefixes.remove(f"<@!{self.bot.user.id}> ")
+        if f"<@!{self.bot.user.id}> " in prefixes:
+            prefixes.remove(f"<@!{self.bot.user.id}> ")
         sorted_prefixes = sorted(prefixes, key=len)
         if len(sorted_prefixes) > 500:
             return

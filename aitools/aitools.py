@@ -1,9 +1,9 @@
 import asyncio
+import contextlib
 import urllib.parse
 
 import aiohttp
 import discord
-import contextlib
 from redbot.core import Config, commands
 from redbot.core.utils.chat_formatting import pagify
 from redbot.core.utils.predicates import MessagePredicate
@@ -14,6 +14,7 @@ try:
     DPY_MENUS = True
 except ImportError:
     from redbot.core.utils.menus import DEFAULT_CONTROLS, menu
+
     DPY_MENUS = False
 
 
@@ -44,6 +45,7 @@ class AiTools(commands.Cog):
         author_id = str(author.id)
         message = urllib.parse.quote(message)
         url = f"http://api.brainshop.ai/get?bid={brain_id}&key={brain_key}&uid={author_id}&msg={message}"
+
         async def thing(self, url):
             async with self.session.get(url) as response:
                 if response.status == 200:
@@ -55,6 +57,7 @@ class AiTools(commands.Cog):
                         if response.status == 200:
                             j = await response.json()
                             return j.get("cnt")
+
         try:
             results = await thing(self, url)
         except aiohttp.ServerDisconnectedError:
@@ -77,7 +80,7 @@ class AiTools(commands.Cog):
         try:
             r = await self.request_brainshop(ctx.author, brain_info, message)
         except:
-           return await ctx.send("Something went wrong. Try again in a little bit")
+            return await ctx.send("Something went wrong. Try again in a little bit")
         if r is None:
             return await ctx.send("Something went wrong. Try again in a little bit.")
         await ctx.send(r)
@@ -115,7 +118,9 @@ class AiTools(commands.Cog):
                 message.author, brain_info, message.clean_content
             )
         except:
-            return await message.channel.send("Something went wrong. Try again in a little bit")
+            return await message.channel.send(
+                "Something went wrong. Try again in a little bit"
+            )
         if r is None:
             return await message.channel.send(
                 "Something went wrong. Try again in a little bit."

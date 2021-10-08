@@ -8,11 +8,14 @@ import lavalink
 from redbot.core import commands
 from redbot.core.utils.chat_formatting import pagify
 from redbot.core.utils.menus import DEFAULT_CONTROLS, menu
+
 try:
     from redbot.core.utils._dpy_menus_utils import dpymenu
+
     DPY_MENUS = True
 except ImportError:
     from redbot.core.utils.menus import DEFAULT_CONTROLS, menu
+
     DPY_MENUS = False
 
 
