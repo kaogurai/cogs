@@ -82,9 +82,7 @@ class AutoAvatar(commands.Cog):
                     else:
                         link = links[0]
                     if link != current_avatar:
-                        c = self.bot.get_channel(await self.config.current_channel())
-                        await c.send(link)
-                        return None
+                        return link
                     maybe_bypass_random = False
 
     async def change_avatar(self, ctx):
