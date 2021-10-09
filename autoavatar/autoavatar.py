@@ -75,6 +75,7 @@ class AutoAvatar(commands.Cog):
                     link = div.select("img.entry-thumbnail")[0].attrs["src"]
                     better_quality_link = link.replace("superthumb", "original")
                     links.append(better_quality_link)
+                await c.send(links)
                 if not links:
                     return 404
                 link = None
