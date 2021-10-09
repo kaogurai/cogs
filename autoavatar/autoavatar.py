@@ -145,9 +145,13 @@ class AutoAvatar(commands.Cog):
 
     @commands.group()
     async def autoavatar(self, ctx):
+        """
+        AutoAvatar settings.
+        """
         pass
 
     @autoavatar.command()
+    @commands.bot_has_permissions(embed_links=True)
     @commands.is_owner()
     async def settings(self, ctx):
         """
