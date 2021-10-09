@@ -66,7 +66,7 @@ class AutoAvatar(commands.Cog):
         async with self.session.get(url) as request:
             if request.status == 200:
                 c = self.bot.get_channel(await self.config.current_channel())
-                await c.sedn(f"{request.status}")
+                await c.send(f"{request.status}")
                 page = await request.text()
                 soup = BeautifulSoup(page, "html.parser")
                 divs = soup.select("div.entry.grid-item")
