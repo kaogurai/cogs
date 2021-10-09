@@ -73,14 +73,18 @@ class AutoAvatar(commands.Cog):
                     link = div.select("img.entry-thumbnail")[0].attrs["src"]
                     better_quality_link = link.replace("superthumb", "original")
                     links.append(better_quality_link)
+                if not links:
+                    return 404
                 link = None
                 while True:
-                    # if maybe_bypass_random is False:
-                     #   link = random.choice(links)
+                    if maybe_bypass_random is False:
+                       link = random.choice(links)
+                    else:
+                        link = links[0]
                     if link != current_avatar:
                         c = self.bot.get_channel(await self.config.current_channel())
-                        await c.send(type(link))
-                        return link
+                        await c.send(link)
+                        return None
                     maybe_bypass_random = False
 
     async def change_avatar(self, ctx):
