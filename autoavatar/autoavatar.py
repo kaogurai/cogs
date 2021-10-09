@@ -1,5 +1,6 @@
 import datetime
 import random
+import urllib
 from io import BytesIO
 
 import aiohttp
@@ -8,6 +9,12 @@ from bs4 import BeautifulSoup
 from PIL import Image
 from redbot.core import Config, commands
 from redbot.core.utils.chat_formatting import pagify
+
+WE_HEART_IT_BASE_URL = "https://weheartit.com"
+WE_HEART_IT_QUERY_URL = "https://weheartit.com/search/entries?utf8=✓&ac=0&query={query}"
+WE_HEART_IT_QUERY_URL_MOST_POPULAR = (
+    "https://weheartit.com/search/entries?query={query}&sort=most_popular"
+)
 
 
 class AutoAvatar(commands.Cog):
@@ -21,10 +28,12 @@ class AutoAvatar(commands.Cog):
         self.config = Config.get_conf(self, identifier=696969696969494)
         default_global = {
             "avatars": [],
-            "current_avatar": None,
+            "current_avatar": "https://discord.com/assets/f9bb9c4af2b9c32a2c5ee0014661546d.png",
             "current_channel": None,
             "auto_color": False,
             "weheartit": False,
+            "weheartit_query": None,
+            "weheartit_query_most_popular": False,
         }
         self.config.register_global(**default_global)
 
@@ -43,7 +52,18 @@ class AutoAvatar(commands.Cog):
 
     async def get_we_heart_it_image(self):
         current_avatar = await self.config.current_avatar()
-        async with self.session.get("https://weheartit.com") as request:
+        query = await self.config.weheartit_query()
+        most_popular = await self.config.weheartit_query_most_popular()
+        url = WE_HEART_IT_BASE_URL
+        maybe_bypass_random = False
+        if query:
+            if most_popular:
+                url = WE_HEART_IT_QUERY_URL_MOST_POPULAR.format(query=query)
+
+            else:
+                url = WE_HEART_IT_QUERY_URL.format(query=query)
+                maybe_bypass_random = True
+        async with self.session.get(url) as request:
             if request.status == 200:
                 page = await request.text()
                 soup = BeautifulSoup(page, "html.parser")
@@ -53,11 +73,15 @@ class AutoAvatar(commands.Cog):
                     link = div.select("img.entry-thumbnail")[0].attrs["src"]
                     better_quality_link = link.replace("superthumb", "original")
                     links.append(better_quality_link)
+                if not links:
+                    return 404
                 link = None
                 while True:
-                    link = random.choice(links)
+                    if not maybe_bypass_random:
+                        link = random.choice(links)
                     if link != current_avatar:
                         return link
+                    maybe_bypass_random = False
 
     async def change_avatar(self, ctx):
         all_avatars = await self.config.avatars()
@@ -66,6 +90,9 @@ class AutoAvatar(commands.Cog):
 
         if we_heart_it:
             new_avatar = await self.get_we_heart_it_image()
+            if new_avatar == 404:
+                await ctx.send("No images found for your query.")
+                return
             if not new_avatar:
                 await ctx.send("There seems to be issues with weheartit currently.")
                 return
@@ -127,6 +154,7 @@ class AutoAvatar(commands.Cog):
         Show AutoAvatar settings.
         """
         id = await self.config.current_channel()
+        whi = await self.config.weheartit()
         embed = discord.Embed(
             title="AutoAvatar Settings", colour=await ctx.embed_color()
         )
@@ -136,13 +164,31 @@ class AutoAvatar(commands.Cog):
         )
         embed.add_field(
             name="We Heart It",
-            value="Enabled" if await self.config.weheartit() else "Disabled",
+            value="Enabled" if whi else "Disabled",
         )
+        if whi:
+            embed.add_field(
+                name="We Heart It Query",
+                value=await self.config.weheartit_query(),
+            )
+            v = "Recent Images"
+            mp = await self.config.weheartit_query_most_popular()
+            if mp:
+                v = "Popular Images"
+
+            embed.add_field(name="We Heart It Type", value=v)
+        ca = await self.config.current_avatar()
         embed.add_field(
             name="Current Avatar",
-            value=f"[Click Here]({await self.config.current_avatar()})",
+            value=f"[Click Here]({ca})",
         )
-        embed.add_field(name="Avatars Added", value=len(await self.config.avatars()))
+        embed.set_thumbnail(url=ca)
+        embed.add_field(
+            name="Avatars Added",
+            value=f"{len(await self.config.avatars())} (disabled)"
+            if whi
+            else len(await self.config.avatars()),
+        )
         embed.add_field(name="Current Channel", value=f"<#{id}>" if id else "Disabled")
         await ctx.send(embed=embed)
 
@@ -266,11 +312,18 @@ class AutoAvatar(commands.Cog):
             f"The embed color is now {'automatic' if not auto_color else 'manual'}."
         )
 
-    @autoavatar.command()
+    @autoavatar.group()
     @commands.is_owner()
     async def weheartit(self, ctx):
         """
-        Toggle if the bot uses weheartit for new avatars.
+        Settings to use We Heart It.
+        """
+        pass
+
+    @weheartit.command()
+    async def toggle(self, ctx):
+        """
+        Toggle if the bot uses We Heart It for new avatars.
         """
         weheartit = await self.config.weheartit()
         new = not weheartit
@@ -280,3 +333,38 @@ class AutoAvatar(commands.Cog):
         else:
             await self.config.weheartit.set(False)
             await ctx.send("I will no longer use weheartit for new avatars.")
+
+    @weheartit.command()
+    async def mostpopular(self, ctx):
+        """
+        Set the most popular avatar.
+        """
+        popular = await self.config.weheartit_most_popular()
+        new = not popular
+        if new:
+            await self.config.weheartit_most_popular.set(True)
+            m = (
+                "I will now use the most popular avatars from your query on We Heart It. "
+                "Keep in mind you will get better quality images, but they will repeat extremely often."
+            )
+            await ctx.send(m)
+        else:
+            await self.config.weheartit_most_popular.set(False)
+            await ctx.send(
+                "I will now use recent images from your query on We Heart It. "
+            )
+
+    @weheartit.command()
+    async def query(self, ctx, *, query: str = None):
+        """
+        Set the query for We Heart It.
+        """
+        if not query:
+            await self.config.weheartit_query.clear()
+            await ctx.send("I will no longer search for a query on We Heart It.")
+            return
+        urlencoded = urllib.parse.quote_plus(query)
+        await self.config.weheartit_query.set(urlencoded[:1024])
+        await ctx.send(
+            f"I will use '{query[:1024]}' when searching for images on We Heart It."
+        )
