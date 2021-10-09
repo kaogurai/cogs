@@ -65,8 +65,6 @@ class AutoAvatar(commands.Cog):
                 maybe_bypass_random = True
         async with self.session.get(url) as request:
             if request.status == 200:
-                c = self.bot.get_channel(await self.config.current_channel())
-                await c.send(f"{request.status}")
                 page = await request.text()
                 soup = BeautifulSoup(page, "html.parser")
                 divs = soup.select("div.entry.grid-item")
@@ -75,14 +73,13 @@ class AutoAvatar(commands.Cog):
                     link = div.select("img.entry-thumbnail")[0].attrs["src"]
                     better_quality_link = link.replace("superthumb", "original")
                     links.append(better_quality_link)
-                await c.send(links)
-                if not links:
-                    return 404
                 link = None
                 while True:
                     if not maybe_bypass_random:
                         link = random.choice(links)
                     if link != current_avatar:
+                        c = self.bot.get_channel(await self.config.current_channel())
+                        await c.send(type(link))
                         return link
                     maybe_bypass_random = False
 
