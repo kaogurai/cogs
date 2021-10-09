@@ -75,7 +75,7 @@ class AutoAvatar(commands.Cog):
                     links.append(better_quality_link)
                 link = None
                 while True:
-                    if not maybe_bypass_random:
+                    if maybe_bypass_random is False:
                         link = random.choice(links)
                     if link != current_avatar:
                         c = self.bot.get_channel(await self.config.current_channel())
