@@ -173,9 +173,14 @@ class AutoAvatar(commands.Cog):
             value="Enabled" if whi else "Disabled",
         )
         if whi:
+            q = await self.config.weheartit_query()
+            if not q:
+                q = "Not Set"
+            else:
+                q = urllib.parse.unquite(q)
             embed.add_field(
                 name="We Heart It Query",
-                value=await self.config.weheartit_query(),
+                value=q
             )
             v = "Recent Images"
             mp = await self.config.weheartit_query_most_popular()
