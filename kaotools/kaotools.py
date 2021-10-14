@@ -107,22 +107,6 @@ class KaoTools(commands.Cog):
         )
         await message.channel.send(embed=embed)
 
-    @commands.command()
-    async def debugerror(self, ctx, error_code: str):
-        """
-        Fetches error code information from paste.kaogurai.xyz.
-        """
-        async with self.session.get(
-            f"https://paste.kaogurai.xyz/raw/{error_code}"
-        ) as request:
-            txt = await request.text()
-            if len(txt) > 4000:
-                txt = txt[:4000]
-            embed = discord.Embed(color=await ctx.embed_color())
-            embed.description = f"```yaml\n{txt}```"
-            embed.set_footer(text=f"Error Code: {error_code}")
-            await ctx.send(embed=embed)
-
     @commands.command(hidden=True)
     async def asia(self, ctx):
         """
@@ -444,7 +428,7 @@ class KaoTools(commands.Cog):
         ua = user.avatar_url_as(static_format="png")
         u2a = user2.avatar_url_as(static_format="png")
         u = f"https://api.martinebot.com/v1/imagesgen/ship?percent={love}&first_user={ua}&second_user={u2a}&no_69_percent_emoji=false"
-        t = f"{user.name} and {user2.name} are {love}% in love."
+        t = f"{user.name} and {user2.name} have {love}% compatibility."
         e = discord.Embed(color=await ctx.embed_color(), title=t)
         e.set_image(url=u)
         e.set_footer(text="Powered by api.martinebot.com")
