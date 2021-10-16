@@ -193,8 +193,7 @@ class KaoTools(commands.Cog):
         """
         if bot is None:
             m = (
-                "kaogurai is now a semi-private bot.\n\n"
-                "Join the [support server](https://discord.gg/p6ehU9qhg8) for instructions on how to apply"
+                "Join the [support server](https://discord.gg/p6ehU9qhg8) for instructions on how to apply to invite kaogurai."
             )
             embed = discord.Embed(color=await ctx.embed_color(), description=m)
             await ctx.send(embed=embed)
