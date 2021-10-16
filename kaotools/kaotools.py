@@ -192,22 +192,11 @@ class KaoTools(commands.Cog):
         Invite me or another bot!
         """
         if bot is None:
-            embed = discord.Embed(
-                title="Thanks for using me!",
-                color=await ctx.embed_color(),
-                url="https://kaogurai.xyz",
+            m = (
+                "kaogurai is now a semi-private bot.\n\n"
+                "Join the [support server](https://discord.gg/p6ehU9qhg8) for instructions on how to apply"
             )
-            embed.set_thumbnail(url=ctx.me.avatar_url)
-            embed.add_field(
-                name="Bot Invite",
-                value=(f"[Click Here]({await self.invite_url()})"),
-                inline=True,
-            )
-            embed.add_field(
-                name="Support Server",
-                value="[Click Here](https://discord.gg/p6ehU9qhg8)",
-                inline=True,
-            )
+            embed = discord.Embed(color=await ctx.embed_color(), description=m)
             await ctx.send(embed=embed)
             return
         embed = discord.Embed(
