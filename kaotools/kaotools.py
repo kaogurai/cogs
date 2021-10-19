@@ -326,7 +326,7 @@ class KaoTools(commands.Cog):
         red_version = "[{}]({})".format(redbot.__version__, red_pypi)
 
         about = (
-            "This bot is a [custom fork]() of [Red, an open source Discord bot]({}) "
+            "This bot is a [custom fork]({}) of [Red, an open source Discord bot]({}) "
             "created by [Twentysix]({}) and [improved by many]({}).\n\n"
             "Red is backed by a passionate community who contributes and "
             "creates content for everyone to enjoy. [Join us today]({}) "
@@ -334,8 +334,8 @@ class KaoTools(commands.Cog):
             "(c) Cog Creators"
         ).format(kao_repo, red_repo, author_repo, org_repo, red_server_url)
         links = (
-            "If you're looking to invite me, [click here.]({})\n"
-            "If you're looking for support or have any questions, [click here.]({})"
+            "I'm a semi-private bot, so you'll need to join my [support server]({}) "
+            "and apply to invite me."
         ).format(await self.invite_url(), SUPPORT_SERVER)
         embed = discord.Embed(color=(await ctx.embed_colour()))
         embed.add_field(
@@ -346,7 +346,7 @@ class KaoTools(commands.Cog):
         )
         embed.add_field(name="<:red:230319279424143360> Red", value=red_version)
         embed.add_field(name="About Red", value=about, inline=False)
-        embed.add_field(name="Quick Links", value=links, inline=False)
+        embed.add_field(name="Inviting kaogurai", value=links, inline=False)
         await ctx.send(embed=embed)
 
     @commands.command(aliases=["oldestmessage"])

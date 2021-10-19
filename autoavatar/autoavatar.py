@@ -82,7 +82,9 @@ class AutoAvatar(commands.Cog):
                     else:
                         link = links[0]
                     if link != current_avatar:
-                        return link
+                        async with self.session.get(link) as request:
+                            if request.status == 200:
+                                return link
                     maybe_bypass_random = False
 
     async def change_avatar(self, ctx):
@@ -109,7 +111,7 @@ class AutoAvatar(commands.Cog):
             if request.status == 200:
                 avatar = await request.read()
             else:
-                if we_heart_it:
+                if not we_heart_it:
                     all_avatars.remove(new_avatar)
                     await self.config.avatars.set(all_avatars)
                 return
