@@ -78,7 +78,7 @@ class AutoAvatar(commands.Cog):
                 link = None
                 while True:
                     if maybe_bypass_random is False:
-                       link = random.choice(links)
+                        link = random.choice(links)
                     else:
                         link = links[0]
                     if link != current_avatar:
@@ -180,10 +180,7 @@ class AutoAvatar(commands.Cog):
                 q = "Not Set"
             else:
                 q = urllib.parse.unquite(q)
-            embed.add_field(
-                name="We Heart It Query",
-                value=q
-            )
+            embed.add_field(name="We Heart It Query", value=q)
             v = "Recent Images"
             mp = await self.config.weheartit_query_most_popular()
             if mp:

@@ -1,5 +1,4 @@
 import asyncio
-import contextlib
 import urllib.parse
 
 import aiohttp
@@ -184,9 +183,6 @@ class AiTools(commands.Cog):
                 await self.config.guild(ctx.guild).channels.clear()
                 self.channel_cache[ctx.guild.id] = []
                 await ctx.tick()
-                with contextlib.supress(discord.NotFound):
-                    await m.delete()
-
             else:
                 await ctx.send("Ok, I won't clear any channels.")
 

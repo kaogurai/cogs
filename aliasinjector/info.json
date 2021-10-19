@@ -5,5 +5,4 @@
     "short": "Injects aliases into the discord.py command objects.",
     "description": "Injects aliases into the discord.py command objects.",
     "tags": ["aliases", "alias"],
-    "disabled": true
 }
