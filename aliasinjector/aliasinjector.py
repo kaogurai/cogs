@@ -29,6 +29,8 @@ class AliasInjector(commands.Cog):
         aliases = await self.config.aliases()
         for command in aliases.keys():
             command_obj = self.bot.get_command(command)
+            if not command_obj:
+                continue
             new = aliases[command]
             for alias in new:
                 if alias not in command_obj.aliases:
