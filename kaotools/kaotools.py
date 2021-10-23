@@ -447,3 +447,32 @@ class KaoTools(commands.Cog):
 
         for page in pagify(msg):
             await ctx.send(page)
+
+    @commands.command(aliases=["listemojis", "emojilist"])
+    @commands.guild_only()
+    @commands.admin_or_permissions(manage_emojis=True)
+    async def listemoji(self, ctx: commands.Context, list_urls: bool = False):
+        """
+        Lists all custom emojis on the server.
+
+        If `list_urls` is True, the URLs of the emojis will be returned instead of ids.
+        """
+        guild = ctx.guild
+        emojis = guild.emojis
+        if not emojis:
+            return await ctx.send("This server has no custom emojis.")
+
+        msg = f"Custom emojis in {guild.name}:\n"
+
+        for emoji in emojis:
+            if list_urls:
+                msg += f"{emoji} - `:{emoji.name}:` (<{emoji.url}>)\n"
+            else:
+                if emoji.animated:
+                    msg += f"{emoji} - `:{emoji.name}:` (`<a:{emoji.name}:{emoji.id}>`)\n"
+                else:
+                    msg += f"{emoji} - `:{emoji.name}:` (`<:{emoji.name}:{emoji.id}>`)\n"
+
+        for page in pagify(msg):
+            await ctx.send(page)
+
