@@ -38,6 +38,16 @@ class AliasInjector(commands.Cog):
                     self.bot.remove_command(command_obj.qualified_name)
                     self.bot.add_command(command_obj)
 
+    async def remove_aliases(self):
+        aliases = await self.config.aliases()
+        for command in aliases.keys():
+            a = aliases[command]
+            for alias in a:
+                self.bot.remove_command(alias)
+
+    def cog_unload(self):
+        self.bot.loop.create_task(self.remove_aliases())
+
     @commands.Cog.listener()
     async def on_cog_add(self, cog):
         await self.reload_aliases()
