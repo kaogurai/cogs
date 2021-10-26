@@ -49,6 +49,8 @@ class AiTools(commands.Cog):
             async with self.session.get(url) as response:
                 if response.status == 200:
                     j = await response.json()
+                    if "status" in j: # it only seems to be returned when it's a bad status code
+                        return
                     return j.get("cnt")
                 elif response.status == 408:
                     # brainshop LOVES to time out
