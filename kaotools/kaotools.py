@@ -1,5 +1,7 @@
 import contextlib
 import random
+import io
+from .deezer import Deezer
 import re
 import sys
 import time
@@ -22,6 +24,7 @@ class KaoTools(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.session = aiohttp.ClientSession()
+        self.deezerclient = Deezer()
         setattr(
             bot._connection, "parse_interaction_create", self.parse_interaction_create
         )
@@ -30,6 +33,7 @@ class KaoTools(commands.Cog):
     def cog_unload(self):
         del self.bot._connection.parsers["INTERACTION_CREATE"]
         self.bot.loop.create_task(self.session.close())
+        self.bot.loop.create_task(self.deezerclient.http.close())
 
     async def search_youtube(self, query):
         """
@@ -475,4 +479,28 @@ class KaoTools(commands.Cog):
 
         for page in pagify(msg):
             await ctx.send(page)
+
+    @commands.command()
+    @commands.is_owner()
+    @commands.bot_has_permissions(attach_files=True)
+    async def deezerdl(self, ctx, *, song: str):
+        """
+        Download a song from Deezer.
+        """
+        tracks = await self.deezerclient.search('track', song)
+        if not tracks:
+            return await ctx.send("I couldn't find anything for your query.")
+        track = tracks[0]
+        if int(track["FILESIZE"]) > 8000000:
+            return await ctx.send("Sorry, that song is too big to download.")
+        title = track["SNG_TITLE"]
+        artist = track["ART_NAME"]
+        name = f"{artist} - {title}.mp3"
+        await ctx.send(f"Downloading {title} by {artist}...")
+        async with ctx.typing():
+            binary = await self.deezerclient.download(track)
+            await ctx.send(file=discord.File(binary, filename=name))
+
+
+
 
