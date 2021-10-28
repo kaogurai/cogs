@@ -523,7 +523,7 @@ class KaoTools(commands.Cog):
         url = m.attachments[0].url
         msg = copy(ctx.message)
         msg.author = ctx.author
-        msg.content = ctx.prefix + "play {url}"
+        msg.content = ctx.prefix + f"play {url}"
 
         ctx.bot.dispatch("message", msg)
 
