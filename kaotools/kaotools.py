@@ -1,6 +1,5 @@
 import contextlib
 import random
-import io
 from .deezer import Deezer
 import re
 import sys
@@ -13,6 +12,7 @@ import redbot
 from redbot.core import commands
 from redbot.core.utils._dpy_menus_utils import dpymenu
 from redbot.core.utils.chat_formatting import humanize_list, pagify
+from copy import copy
 from zalgo_text import zalgo
 
 SUPPORT_SERVER = "https://discord.gg/p6ehU9qhg8"
@@ -500,6 +500,35 @@ class KaoTools(commands.Cog):
         async with ctx.typing():
             binary = await self.deezerclient.download(track)
             await ctx.send(file=discord.File(binary, filename=name))
+
+    @commands.command()
+    @commands.is_owner()
+    @commands.bot_has_permissions(attach_files=True)
+    async def deezerplay(self, ctx, *, song: str):
+        """
+        Play a song from Deezer.
+        """
+        tracks = await self.deezerclient.search('track', song)
+        if not tracks:
+            return await ctx.send("I couldn't find anything for your query.")
+        track = tracks[0]
+        if int(track["FILESIZE"]) > 8000000:
+            return await ctx.send("Sorry, that song is too big to download.")
+        title = track["SNG_TITLE"]
+        artist = track["ART_NAME"]
+        await ctx.send(f"Playing {title} by {artist}...")
+        async with ctx.typing():
+            binary = await self.deezerclient.download(track)
+            m = await ctx.send(file=discord.File(binary, filename=f"{title}.mp3"))
+        url = m.attachments[0].url
+        msg = copy(ctx.message)
+        msg.author = ctx.author
+        msg.content = ctx.prefix + "play {url}"
+
+        ctx.bot.dispatch("message", msg)
+
+        
+
 
 
 
