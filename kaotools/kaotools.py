@@ -338,7 +338,7 @@ class KaoTools(commands.Cog):
         links = (
             "I'm a semi-private bot, so you'll need to join my [support server]({}) "
             "and apply to invite me."
-        ).format(await self.invite_url(), SUPPORT_SERVER)
+        ).format(SUPPORT_SERVER)
         embed = discord.Embed(color=(await ctx.embed_colour()))
         embed.add_field(
             name="<:python:817953344118063156> Python", value=python_version
