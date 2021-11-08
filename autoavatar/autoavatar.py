@@ -179,7 +179,7 @@ class AutoAvatar(commands.Cog):
             if not q:
                 q = "Not Set"
             else:
-                q = urllib.parse.unquite(q)
+                q = urllib.parse.unquote(q)
             embed.add_field(name="We Heart It Query", value=q)
             v = "Recent Images"
             mp = await self.config.weheartit_query_most_popular()
