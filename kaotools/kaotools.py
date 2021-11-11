@@ -204,7 +204,7 @@ class KaoTools(commands.Cog):
         if not bot.bot:
             await ctx.send("Dumbass")
             return
-            
+
         embed = discord.Embed(
             title=f"Click here to invite {bot}!",
             color=await ctx.embed_color(),
@@ -429,7 +429,7 @@ class KaoTools(commands.Cog):
         e.set_footer(text="Powered by api.martinebot.com")
         await ctx.send(embed=e)
 
-    @commands.command(aliases=["pp"])
+    @commands.command(aliases=["pp", "dingdong"])
     async def penis(self, ctx, *users: discord.Member):
         """
         Get user's penis size!
