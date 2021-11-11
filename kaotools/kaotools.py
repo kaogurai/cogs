@@ -200,6 +200,11 @@ class KaoTools(commands.Cog):
             embed = discord.Embed(color=await ctx.embed_color(), description=m)
             await ctx.send(embed=embed)
             return
+
+        if not bot.bot:
+            await ctx.send("Dumbass")
+            return
+            
         embed = discord.Embed(
             title=f"Click here to invite {bot}!",
             color=await ctx.embed_color(),
