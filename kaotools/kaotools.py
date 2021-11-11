@@ -196,7 +196,7 @@ class KaoTools(commands.Cog):
         Invite me or another bot!
         """
         if bot is None:
-            m = "Join the [support server](https://discord.gg/p6ehU9qhg8) for instructions on how to apply to invite kaogurai."
+            m = f"Click [here]({await self.invite_url()}) to invite me.\n\nNote: You need 75 members and 50% of your member count must be human."
             embed = discord.Embed(color=await ctx.embed_color(), description=m)
             await ctx.send(embed=embed)
             return
