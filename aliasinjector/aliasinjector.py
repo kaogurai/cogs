@@ -42,8 +42,11 @@ class AliasInjector(commands.Cog):
         aliases = await self.config.aliases()
         for command in aliases.keys():
             a = aliases[command]
-            for alias in a:
-                self.bot.remove_command(alias)
+            command_obj = self.bot.get_command(command)
+            if command_obj:
+                for alias in a:
+                    command_obj.aliases.remove(alias)
+                self.bot.add_command(command_obj)
 
     def cog_unload(self):
         self.bot.loop.create_task(self.remove_aliases())
@@ -99,6 +102,7 @@ class AliasInjector(commands.Cog):
             return
         command.aliases.remove(alias)
         self.bot.remove_command(alias)
+        self.bot.add_command(command)
         a[command.name] = command.aliases
         await self.config.aliases.set(a)
         await ctx.send(f"Removed alias `{alias}` from `{command.qualified_name}`.")
@@ -126,8 +130,10 @@ class AliasInjector(commands.Cog):
         if predictate.result:
             for command in a.keys():
                 monkeypatched_ones = a[command]
+                command_obj = self.bot.get_command(command)
                 for alias in monkeypatched_ones:
-                    self.bot.remove_command(alias)
+                    command_obj.aliases.remove(alias)
+                self.bot.add_command(command_obj)
             await self.config.aliases.clear()
             await ctx.send("Cleared all aliases.")
         else:
