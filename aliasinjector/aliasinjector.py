@@ -46,6 +46,7 @@ class AliasInjector(commands.Cog):
             if command_obj:
                 for alias in a:
                     command_obj.aliases.remove(alias)
+                self.bot.remove_command(command_obj.qualified_name)
                 self.bot.add_command(command_obj)
 
     def cog_unload(self):
