@@ -191,13 +191,14 @@ class KaoTools(commands.Cog):
 
     @commands.bot_has_permissions(embed_links=True)
     @commands.command(aliases=["support", "inv"])
-    async def invite(self, ctx, bot: discord.User = None):
+    async def invite(self, ctx, *, bot: discord.User = None):
         """
         Invite me or another bot!
         """
         if bot is None:
-            m = f"Click here to invite me."
-            embed = discord.Embed(color=await ctx.embed_color(), title=m, url = await self.invite_url())
+            t = "Click here to invite me."
+            d = f"If you need help with the bot, click [here]({SUPPORT_SERVER})"
+            embed = discord.Embed(color=await ctx.embed_color(), title=t, url = await self.invite_url(), description=d)
             embed.set_footer(text="Note: You need 75 members and 50% of your member count must be human.")
             await ctx.send(embed=embed)
             return
