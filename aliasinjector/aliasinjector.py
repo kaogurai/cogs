@@ -44,9 +44,9 @@ class AliasInjector(commands.Cog):
             a = aliases[command]
             command_obj = self.bot.get_command(command)
             if command_obj:
+                self.bot.remove_command(command_obj.qualified_name)
                 for alias in a:
                     command_obj.aliases.remove(alias)
-                self.bot.remove_command(command_obj.qualified_name)
                 self.bot.add_command(command_obj)
 
     def cog_unload(self):
@@ -54,7 +54,8 @@ class AliasInjector(commands.Cog):
 
     @commands.Cog.listener()
     async def on_cog_add(self, cog):
-        await self.reload_aliases()
+        if cog.__class__.__name__ != self.__class__.__name__:
+            await self.reload_aliases()
 
     @commands.group()
     @commands.is_owner()
@@ -101,8 +102,8 @@ class AliasInjector(commands.Cog):
         if alias not in aliases:
             await ctx.send("That alias doesn't exist.")
             return
-        command.aliases.remove(alias)
         self.bot.remove_command(alias)
+        command.aliases.remove(alias)
         self.bot.add_command(command)
         a[command.name] = command.aliases
         await self.config.aliases.set(a)
@@ -118,7 +119,7 @@ class AliasInjector(commands.Cog):
             await ctx.send("There are no aliases to clear.")
             return
         try:
-            m = await ctx.send(
+            await ctx.send(
                 "Are you sure you want to clear all the monkeypatched aliases? Respond with yes or no."
             )
             predictate = MessagePredicate.yes_or_no(ctx, user=ctx.author)
@@ -132,9 +133,11 @@ class AliasInjector(commands.Cog):
             for command in a.keys():
                 monkeypatched_ones = a[command]
                 command_obj = self.bot.get_command(command)
-                for alias in monkeypatched_ones:
-                    command_obj.aliases.remove(alias)
-                self.bot.add_command(command_obj)
+                if command_obj:
+                    self.bot.remove_command(command_obj.qualified_name)
+                    for alias in monkeypatched_ones:
+                        command_obj.aliases.remove(alias)
+                    self.bot.add_command(command_obj)
             await self.config.aliases.clear()
             await ctx.send("Cleared all aliases.")
         else:

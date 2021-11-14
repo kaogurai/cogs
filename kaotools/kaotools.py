@@ -343,9 +343,9 @@ class KaoTools(commands.Cog):
             "(c) Cog Creators"
         ).format(kao_repo, red_repo, author_repo, org_repo, red_server_url)
         links = (
-            "I'm a semi-private bot, so you'll need to join my [support server]({}) "
-            "and apply to invite me."
-        ).format(SUPPORT_SERVER)
+            "Click [here]({}) to invite me. You'll need at least 75 members, and 50% of your members must be human.\n\n"
+            "If you have any questions, join my [support server]({})"
+        ).format(await self.invite_url(), SUPPORT_SERVER)
         embed = discord.Embed(color=(await ctx.embed_colour()))
         embed.add_field(
             name="<:python:817953344118063156> Python", value=python_version
