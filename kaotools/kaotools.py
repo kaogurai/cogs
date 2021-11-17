@@ -71,7 +71,7 @@ class KaoTools(commands.Cog):
             Invite URL.
         """
         scopes = ("bot", "applications.commands")
-        permissions = discord.Permissions(6408367871)
+        permissions = discord.Permissions(397283945463)
         if snowflake:
             return discord.utils.oauth_url(snowflake, permissions, scopes=scopes)
         app_info = await self.bot.application_info()
