@@ -154,7 +154,7 @@ class KaoTools(commands.Cog):
         Inspired by Aikaterna's YouTube cog
         """
         results = await self.search_youtube(video)
-        if results is None:
+        if not results:
             await ctx.send("Nothing found.")
             return
 
@@ -167,7 +167,7 @@ class KaoTools(commands.Cog):
         Inspired by Aikaterna's YouTube cog
         """
         results = await self.search_youtube(video)
-        if results is None:
+        if not results:
             await ctx.send("Nothing found.")
             return
         urls = []
