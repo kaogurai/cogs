@@ -215,13 +215,14 @@ class AutoAvatar(commands.Cog):
         if whi:
             qs = await self.config.weheartit_queries()
             if not qs:
-                qs = "None"
+                thing = "None"
             else:
                 for q in qs:
                     qs.remove(q)
                     nqs = urllib.parse.unquote(q)
                     qs.append(nqs)
-            embed.add_field(name="We Heart It Queries", value=humanize_list(qs)[:500])
+                    thing = humanize_list(qs)[:500]
+            embed.add_field(name="We Heart It Queries", value=thing)
             v = "Recent Images"
             mp = await self.config.weheartit_query_most_popular()
             if mp:
