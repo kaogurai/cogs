@@ -55,7 +55,7 @@ class AutoAvatar(commands.Cog):
         query = await self.config.weheartit_query()
         if not query:
             return
-        await self.config.weheartit_query.set([query])
+        await self.config.weheartit_queries.set([query])
         await self.config.migrated_to_multi_query.set(True)
 
     def get_color(self, avatar):
@@ -408,7 +408,7 @@ class AutoAvatar(commands.Cog):
     @weheartit.group()
     async def query(self, ctx):
         """
-        Set the querys for We Heart It.
+        Set the queries for We Heart It.
         """
         pass
 
