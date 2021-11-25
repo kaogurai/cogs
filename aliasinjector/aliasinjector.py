@@ -16,7 +16,11 @@ except ImportError:
 
 
 class AliasInjector(commands.Cog):
-    """Injects aliases into the discord.py command objects."""
+    """
+    Injects aliases into the discord.py command objects.
+    """
+
+    __version__ = "1.0.0"
 
     def __init__(self, bot):
         self.bot = bot
@@ -24,6 +28,10 @@ class AliasInjector(commands.Cog):
         # Key: command name (str) | Value: alias list((str))
         self.config.register_global(aliases={})
         self.bot.loop.create_task(self.reload_aliases())
+
+    def format_help_for_context(self, ctx):
+        pre_processed = super().format_help_for_context(ctx)
+        return f"{pre_processed}\n\nCog Version: {self.__version__}"
 
     async def reload_aliases(self):
         aliases = await self.config.aliases()

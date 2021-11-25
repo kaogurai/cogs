@@ -1,5 +1,5 @@
 {
-    "author": ["alec#8068 (749112024633704481)"],
+    "author": ["alec"],
     "name": "AiTools",
     "install_msg": "**Thanks for installing!**\n To use this cog, you will need to get a brain from https://brainshop.ai and `[p]set api brainshopai brain_id <id> brain_key <key>` More information is available here: https://github.com/kaogurai/cogs/tree/master/aitools",
     "short": "Talk to a free robot!",

@@ -1,10 +1,10 @@
 import contextlib
 import random
-from .deezer import Deezer
 import re
 import sys
 import time
 import urllib
+from copy import copy
 
 import aiohttp
 import discord
@@ -12,20 +12,28 @@ import redbot
 from redbot.core import commands
 from redbot.core.utils._dpy_menus_utils import dpymenu
 from redbot.core.utils.chat_formatting import humanize_list, pagify
-from copy import copy
 from zalgo_text import zalgo
+
+from .deezer import Deezer
+
 SUPPORT_SERVER = "https://discord.gg/p6ehU9qhg8"
 
 
 class KaoTools(commands.Cog):
-    """Random tools for kaogurai that fit nowhere else."""
+    """
+    Random things that make kaogurai kaogurai.
+    """
+
+    __version__ = "1.0.0"
 
     def __init__(self, bot):
         self.bot = bot
         self.session = aiohttp.ClientSession()
         self.deezerclient = Deezer()
         setattr(
-            bot._connection, "parse_interaction_create", self.parse_interaction_create
+            bot._connection,
+            "parse_interaction_create",
+            self.parse_interaction_create,
         )
         bot._connection.parsers["INTERACTION_CREATE"] = self.parse_interaction_create
 
@@ -33,6 +41,10 @@ class KaoTools(commands.Cog):
         del self.bot._connection.parsers["INTERACTION_CREATE"]
         self.bot.loop.create_task(self.session.close())
         self.bot.loop.create_task(self.deezerclient.http.close())
+
+    def format_help_for_context(self, ctx):
+        pre_processed = super().format_help_for_context(ctx)
+        return f"{pre_processed}\n\nCog Version: {self.__version__}"
 
     async def search_youtube(self, query):
         """
@@ -53,7 +65,9 @@ class KaoTools(commands.Cog):
         params = {"identifier": "ytsearch:" + query}
         headers = {"Authorization": password, "Accept": "application/json"}
         async with self.session.get(
-            f"http://{host}:{port}/loadtracks", params=params, headers=headers
+            f"http://{host}:{port}/loadtracks",
+            params=params,
+            headers=headers,
         ) as request:
             if request.status == 200:
                 response = await request.json()
@@ -197,8 +211,15 @@ class KaoTools(commands.Cog):
         if bot is None:
             t = "Click here to invite me."
             d = f"If you need help with the bot, click [here]({SUPPORT_SERVER})"
-            embed = discord.Embed(color=await ctx.embed_color(), title=t, url = await self.invite_url(), description=d)
-            embed.set_footer(text="Note: You need 75 members and 50% of your member count must be human.")
+            embed = discord.Embed(
+                color=await ctx.embed_color(),
+                title=t,
+                url=await self.invite_url(),
+                description=d,
+            )
+            embed.set_footer(
+                text="Note: You need 75 members and 50% of your member count must be human."
+            )
             await ctx.send(embed=embed)
             return
 
@@ -287,7 +308,9 @@ class KaoTools(commands.Cog):
             f"Sizes: [512]({size_512}) | [1024]({size_1024}) | [2048]({size_2048}) | [4096]({size_4096})"
         )
         embed = discord.Embed(
-            color=await ctx.embed_color(), title=f"{user.name}'s avatar", description=m
+            color=await ctx.embed_color(),
+            title=f"{user.name}'s avatar",
+            description=m,
         )
         embed.set_image(url=user.avatar_url_as(size=4096))
         await ctx.send(embed=embed)
@@ -347,10 +370,12 @@ class KaoTools(commands.Cog):
         ).format(await self.invite_url(), SUPPORT_SERVER)
         embed = discord.Embed(color=(await ctx.embed_colour()))
         embed.add_field(
-            name="<:python:817953344118063156> Python", value=python_version
+            name="<:python:817953344118063156> Python",
+            value=python_version,
         )
         embed.add_field(
-            name="<:discordpy:817952974788624395> discord.py", value=dpy_version
+            name="<:discordpy:817952974788624395> discord.py",
+            value=dpy_version,
         )
         embed.add_field(name="<:red:230319279424143360> Red", value=red_version)
         embed.add_field(name="About Red", value=about, inline=False)
@@ -370,7 +395,9 @@ class KaoTools(commands.Cog):
         if first:
             t = "Click here to jump to the first message."
             e = discord.Embed(
-                color=await ctx.embed_color(), title=t, url=first[0].jump_url
+                color=await ctx.embed_color(),
+                title=t,
+                url=first[0].jump_url,
             )
             await ctx.send(embed=e)
         else:
@@ -479,9 +506,13 @@ class KaoTools(commands.Cog):
                 msg += f"{emoji} - `:{emoji.name}:` (<{emoji.url}>)\n"
             else:
                 if emoji.animated:
-                    msg += f"{emoji} - `:{emoji.name}:` (`<a:{emoji.name}:{emoji.id}>`)\n"
+                    msg += (
+                        f"{emoji} - `:{emoji.name}:` (`<a:{emoji.name}:{emoji.id}>`)\n"
+                    )
                 else:
-                    msg += f"{emoji} - `:{emoji.name}:` (`<:{emoji.name}:{emoji.id}>`)\n"
+                    msg += (
+                        f"{emoji} - `:{emoji.name}:` (`<:{emoji.name}:{emoji.id}>`)\n"
+                    )
 
         for page in pagify(msg):
             await ctx.send(page)
@@ -493,7 +524,7 @@ class KaoTools(commands.Cog):
         """
         Download a song from Deezer.
         """
-        tracks = await self.deezerclient.search('track', song)
+        tracks = await self.deezerclient.search("track", song)
         if not tracks:
             return await ctx.send("I couldn't find anything for your query.")
         track = tracks[0]
@@ -514,7 +545,7 @@ class KaoTools(commands.Cog):
         """
         Play a song from Deezer.
         """
-        tracks = await self.deezerclient.search('track', song)
+        tracks = await self.deezerclient.search("track", song)
         if not tracks:
             return await ctx.send("I couldn't find anything for your query.")
         track = tracks[0]
@@ -532,10 +563,3 @@ class KaoTools(commands.Cog):
         msg.content = ctx.prefix + f"play {url}"
 
         ctx.bot.dispatch("message", msg)
-
-        
-
-
-
-
-

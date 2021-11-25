@@ -24,6 +24,8 @@ class SmartLyrics(commands.Cog):
     Gets lyrics for your current song using some-random-api.ml.
     """
 
+    __version__ = "1.0.0"
+
     def __init__(self, bot):
         self.bot = bot
         self.session = aiohttp.ClientSession()
@@ -38,6 +40,10 @@ class SmartLyrics(commands.Cog):
 
     def cog_unload(self):
         self.bot.loop.create_task(self.session.close())
+
+    def format_help_for_context(self, ctx):
+        pre_processed = super().format_help_for_context(ctx)
+        return f"{pre_processed}\n\nCog Version: {self.__version__}"
 
     async def get_lyrics(self, query):
         query = urllib.parse.quote(query)

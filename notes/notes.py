@@ -8,7 +8,11 @@ from redbot.core.utils.predicates import MessagePredicate
 
 
 class Notes(commands.Cog):
-    """Write notes on users for moderators to share."""
+    """
+    Write notes on users for moderators to share.
+    """
+
+    __version__ = "1.0.0"
 
     def __init__(self, bot):
         self.bot = bot
@@ -16,6 +20,10 @@ class Notes(commands.Cog):
         default_member = {"notes": []}
         self.config.register_member(**default_member)
         self.register_casetypes = self.bot.loop.create_task(self.register_casetypes())
+
+    def format_help_for_context(self, ctx):
+        pre_processed = super().format_help_for_context(ctx)
+        return f"{pre_processed}\n\nCog Version: {self.__version__}"
 
     async def register_casetypes(self):
         try:
@@ -59,7 +67,11 @@ class Notes(commands.Cog):
         )
         user_notes = await self.config.member(user).notes()
         user_notes.append(
-            {"note": reason, "author": moderator.id, "message": ctx.message.id}
+            {
+                "note": reason,
+                "author": moderator.id,
+                "message": ctx.message.id,
+            }
         )
         await self.config.member(user).notes.set(user_notes)
 

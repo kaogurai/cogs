@@ -18,7 +18,11 @@ except ImportError:
 
 
 class AiTools(commands.Cog):
-    """https://brainshop.ai cog"""
+    """
+    Cog that uses brainshop.ai for a chatbot.
+    """
+
+    __version__ = "1.0.0"
 
     def __init__(self, bot):
         self.bot = bot
@@ -31,6 +35,10 @@ class AiTools(commands.Cog):
 
     def cog_unload(self):
         self.bot.loop.create_task(self.session.close())
+
+    def format_help_for_context(self, ctx):
+        pre_processed = super().format_help_for_context(ctx)
+        return f"{pre_processed}\n\nCog Version: {self.__version__}"
 
     async def fill_channel_cache(self):
         all_guilds = await self.config.all_guilds()
@@ -49,7 +57,9 @@ class AiTools(commands.Cog):
             async with self.session.get(url) as response:
                 if response.status == 200:
                     j = await response.json()
-                    if "status" in j: # it only seems to be returned when it's a bad status code
+                    if (
+                        "status" in j
+                    ):  # it only seems to be returned when it's a bad status code
                         return
                     return j.get("cnt")
                 elif response.status == 408:

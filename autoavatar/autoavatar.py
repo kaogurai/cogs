@@ -22,6 +22,8 @@ class AutoAvatar(commands.Cog):
     Chooses a random avatar to set from a preset list or can scrape we heart it.
     """
 
+    __version__ = "1.0.0"
+
     def __init__(self, bot):
         self.bot = bot
         self.session = aiohttp.ClientSession()
@@ -39,6 +41,10 @@ class AutoAvatar(commands.Cog):
 
     def cog_unload(self):
         self.bot.loop.create_task(self.session.close())
+
+    def format_help_for_context(self, ctx):
+        pre_processed = super().format_help_for_context(ctx)
+        return f"{pre_processed}\n\nCog Version: {self.__version__}"
 
     def get_color(self, avatar):
         try:

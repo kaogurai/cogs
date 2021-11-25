@@ -1,7 +1,7 @@
 {
-    "author": ["alec#8068 (749112024633704481)"],
+    "author": ["alec"],
     "name": "Notes",
-    "install_msg": "**Thanks for installing!**",
+    "install_msg": "Thanks for installing!",
     "short": "Write notes on users for moderators to share.",
     "description": "Write notes on users for moderators to share.",
     "tags": ["notes", "note", "mod", "moderators"],

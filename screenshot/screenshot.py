@@ -8,7 +8,15 @@ from redbot.core import commands
 
 
 class Screenshot(commands.Cog):
-    """Screenshots a given link."""
+    """
+    Screenshots a given link using pyppeteer.
+    """
+
+    __version__ = "1.0.0"
+
+    def format_help_for_context(self, ctx):
+        pre_processed = super().format_help_for_context(ctx)
+        return f"{pre_processed}\n\nCog Version: {self.__version__}"
 
     @commands.bot_has_permissions(attach_files=True)
     @commands.command(aliases=["ss"])
