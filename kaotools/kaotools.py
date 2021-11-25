@@ -512,7 +512,7 @@ class KaoTools(commands.Cog):
             file['title'] = track['SNG_TITLE']
             file['artist'] = track['ART_NAME']
             file.save(fileobj=binary)
-            await ctx.send(file=discord.File(binary, filename=name))
+            await ctx.send(file=discord.File(fp=binary.getbuffer(), filename=name))
 
     @commands.command()
     @commands.is_owner()
@@ -536,7 +536,7 @@ class KaoTools(commands.Cog):
             file['title'] = track['SNG_TITLE']
             file['artist'] = track['ART_NAME']
             file.save(fileobj=binary)
-            m = await ctx.send(file=discord.File(binary, filename=f"{title}.mp3"))
+            m = await ctx.send(file=discord.File(fp=binary.getbuffer(), filename=f"{title}.mp3"))
         url = m.attachments[0].url
         msg = copy(ctx.message)
         msg.author = ctx.author
