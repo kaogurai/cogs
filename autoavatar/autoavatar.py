@@ -160,8 +160,7 @@ class AutoAvatar(commands.Cog):
                 await ctx.bot._config.color.set(result)
 
         try:
-            # await self.bot.user.edit(avatar=avatar)
-            pass
+            await self.bot.user.edit(avatar=avatar)
         except discord.HTTPException:
             return
         except discord.InvalidArgument:
