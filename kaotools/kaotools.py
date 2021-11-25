@@ -14,6 +14,8 @@ from redbot.core.utils._dpy_menus_utils import dpymenu
 from redbot.core.utils.chat_formatting import humanize_list, pagify
 from copy import copy
 from zalgo_text import zalgo
+from mutagen.mp3 import MP3
+from mutagen.easyid3 import EasyID3
 
 SUPPORT_SERVER = "https://discord.gg/p6ehU9qhg8"
 
@@ -506,6 +508,10 @@ class KaoTools(commands.Cog):
         await ctx.send(f"Downloading {title} by {artist}...")
         async with ctx.typing():
             binary = await self.deezerclient.download(track)
+            file = MP3(fileobj=binary, ID3=EasyID3)
+            file['title'] = track['SNG_TITLE']
+            file['artist'] = track['ART_NAME']
+            file.save(fileobj=binary)
             await ctx.send(file=discord.File(binary, filename=name))
 
     @commands.command()
@@ -526,6 +532,10 @@ class KaoTools(commands.Cog):
         await ctx.send(f"Playing {title} by {artist}...")
         async with ctx.typing():
             binary = await self.deezerclient.download(track)
+            file = MP3(fileobj=binary, ID3=EasyID3)
+            file['title'] = track['SNG_TITLE']
+            file['artist'] = track['ART_NAME']
+            file.save(fileobj=binary)
             m = await ctx.send(file=discord.File(binary, filename=f"{title}.mp3"))
         url = m.attachments[0].url
         msg = copy(ctx.message)
