@@ -8,7 +8,7 @@ import discord
 from bs4 import BeautifulSoup
 from PIL import Image
 from redbot.core import Config, commands
-from redbot.core.utils.chat_formatting import pagify
+from redbot.core.utils.chat_formatting import humanize_list, pagify
 
 WE_HEART_IT_BASE_URL = "https://weheartit.com"
 WE_HEART_IT_QUERY_URL = "https://weheartit.com/search/entries?utf8=✓&ac=0&query={query}"
@@ -22,7 +22,7 @@ class AutoAvatar(commands.Cog):
     Chooses a random avatar to set from a preset list or can scrape we heart it.
     """
 
-    __version__ = "1.0.0"
+    __version__ = "1.1.0"
 
     def __init__(self, bot):
         self.bot = bot
@@ -34,10 +34,13 @@ class AutoAvatar(commands.Cog):
             "current_channel": None,
             "auto_color": False,
             "weheartit": False,
-            "weheartit_query": None,
+            "weheartit_query": None,  # deprecated
+            "weheartit_queries": [],
             "weheartit_query_most_popular": False,
+            "migrated_to_multi_query": False,
         }
         self.config.register_global(**default_global)
+        self.bot.loop.create_task(self.migrate_to_multi_query())
 
     def cog_unload(self):
         self.bot.loop.create_task(self.session.close())
@@ -45,6 +48,15 @@ class AutoAvatar(commands.Cog):
     def format_help_for_context(self, ctx):
         pre_processed = super().format_help_for_context(ctx)
         return f"{pre_processed}\n\nCog Version: {self.__version__}"
+
+    async def migrate_to_multi_query(self):
+        if await self.config.migrated_to_multi_query():
+            return
+        query = await self.config.weheartit_query()
+        if not query:
+            return
+        await self.config.weheartit_query.set([query])
+        await self.config.migrated_to_multi_query.set(True)
 
     def get_color(self, avatar):
         try:
@@ -58,40 +70,59 @@ class AutoAvatar(commands.Cog):
 
     async def get_we_heart_it_image(self):
         current_avatar = await self.config.current_avatar()
-        query = await self.config.weheartit_query()
+        queries = await self.config.weheartit_queries()
         most_popular = await self.config.weheartit_query_most_popular()
         url = WE_HEART_IT_BASE_URL
         maybe_bypass_random = False
-        if query:
-            if most_popular:
-                url = WE_HEART_IT_QUERY_URL_MOST_POPULAR.format(query=query)
+        urls = []
+        if queries:
+            for query in queries:
+                if most_popular:
+                    url = WE_HEART_IT_QUERY_URL_MOST_POPULAR.format(query=query)
+                    urls.append(url)
 
+                else:
+                    url = WE_HEART_IT_QUERY_URL.format(query=query)
+                    urls.append(url)
+                    maybe_bypass_random = True
+        links = []
+        before_interlaced = []
+        for num, url in enumerate(urls):
+            print(num, url)
+            async with self.session.get(url) as request:
+                if request.status == 200:
+                    page = await request.text()
+                    soup = BeautifulSoup(page, "html.parser")
+                    divs = soup.select("div.entry.grid-item")
+                    before_interlaced.append([])
+                    for div in divs:
+                        link = div.select("img.entry-thumbnail")[0].attrs["src"]
+                        better_quality_link = link.replace("superthumb", "original")
+                        before_interlaced[num].append(better_quality_link)
+
+        random.shuffle(before_interlaced)
+        length_list = []
+        for x in before_interlaced:
+            length_list.append(len(x))
+        length_list.sort(reverse=True)
+        if not length_list:
+            return 404
+        length = length_list[0]
+        for x in range(length):
+            for y in before_interlaced:
+                links.append(y[x])
+
+        link = None
+        while True:
+            if maybe_bypass_random is False:
+                link = random.choice(links)
             else:
-                url = WE_HEART_IT_QUERY_URL.format(query=query)
-                maybe_bypass_random = True
-        async with self.session.get(url) as request:
-            if request.status == 200:
-                page = await request.text()
-                soup = BeautifulSoup(page, "html.parser")
-                divs = soup.select("div.entry.grid-item")
-                links = []
-                for div in divs:
-                    link = div.select("img.entry-thumbnail")[0].attrs["src"]
-                    better_quality_link = link.replace("superthumb", "original")
-                    links.append(better_quality_link)
-                if not links:
-                    return 404
-                link = None
-                while True:
-                    if maybe_bypass_random is False:
-                        link = random.choice(links)
-                    else:
-                        link = links[0]
-                    if link != current_avatar:
-                        async with self.session.get(link) as request:
-                            if request.status == 200:
-                                return link
-                    maybe_bypass_random = False
+                link = links[0]
+            if link != current_avatar:
+                async with self.session.get(link) as request:
+                    if request.status == 200:
+                        return link
+            maybe_bypass_random = False
 
     async def change_avatar(self, ctx):
         all_avatars = await self.config.avatars()
@@ -101,7 +132,7 @@ class AutoAvatar(commands.Cog):
         if we_heart_it:
             new_avatar = await self.get_we_heart_it_image()
             if new_avatar == 404:
-                await ctx.send("No images found for your query.")
+                await ctx.send("No images found for your queries.")
                 return
             if not new_avatar:
                 await ctx.send("There seems to be issues with weheartit currently.")
@@ -129,7 +160,8 @@ class AutoAvatar(commands.Cog):
                 await ctx.bot._config.color.set(result)
 
         try:
-            await self.bot.user.edit(avatar=avatar)
+            # await self.bot.user.edit(avatar=avatar)
+            pass
         except discord.HTTPException:
             return
         except discord.InvalidArgument:
@@ -181,12 +213,15 @@ class AutoAvatar(commands.Cog):
             value="Enabled" if whi else "Disabled",
         )
         if whi:
-            q = await self.config.weheartit_query()
-            if not q:
-                q = "Not Set"
+            qs = await self.config.weheartit_queries()
+            if not qs:
+                qs = "None"
             else:
-                q = urllib.parse.unquote(q)
-            embed.add_field(name="We Heart It Query", value=q)
+                for q in qs:
+                    qs.remove(q)
+                    nqs = urllib.parse.unquote(q)
+                    qs.append(nqs)
+            embed.add_field(name="We Heart It Queries", value=humanize_list(qs)[:500])
             v = "Recent Images"
             mp = await self.config.weheartit_query_most_popular()
             if mp:
@@ -360,7 +395,7 @@ class AutoAvatar(commands.Cog):
         if new:
             await self.config.weheartit_most_popular.set(True)
             m = (
-                "I will now use the most popular avatars from your query on We Heart It. "
+                "I will now use the most popular avatars from your queries on We Heart It. "
                 "Keep in mind you will get better quality images, but they will repeat extremely often."
             )
             await ctx.send(m)
@@ -370,17 +405,39 @@ class AutoAvatar(commands.Cog):
                 "I will now use recent images from your query on We Heart It. "
             )
 
-    @weheartit.command()
-    async def query(self, ctx, *, query: str = None):
+    @weheartit.group()
+    async def query(self, ctx):
         """
-        Set the query for We Heart It.
+        Set the querys for We Heart It.
         """
-        if not query:
-            await self.config.weheartit_query.clear()
-            await ctx.send("I will no longer search for a query on We Heart It.")
+        pass
+
+    @query.command()
+    async def add(self, ctx, *, query: str):
+        """
+        Add a query to the list of queries.
+        """
+        all_queries = await self.config.weheartit_queries()
+        nquery = urllib.parse.quote_plus(query)
+        if nquery in all_queries:
+            await ctx.send(f"{query} is already in my list of queries.")
             return
-        urlencoded = urllib.parse.quote_plus(query)
-        await self.config.weheartit_query.set(urlencoded[:1024])
-        await ctx.send(
-            f"I will use '{query[:1024]}' when searching for images on We Heart It."
-        )
+
+        all_queries.append(nquery[:1024])
+        await self.config.weheartit_queries.set(all_queries)
+        await ctx.tick()
+
+    @query.command()
+    async def remove(self, ctx, *, query: str):
+        """
+        Remove a query from the list of queries.
+        """
+        all_queries = await self.config.weheartit_queries()
+        nquery = urllib.parse.quote_plus(query)
+        if nquery not in all_queries:
+            await ctx.send(f"{query} isn't in my list of queries.")
+            return
+
+        all_queries.remove(nquery)
+        await self.config.weheartit_queries.set(all_queries)
+        await ctx.tick()
