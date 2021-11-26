@@ -9,7 +9,8 @@ from copy import copy
 import aiohttp
 import discord
 import redbot
-from redbot.core import commands
+from redbot.core import commands, Config
+from redbot.core.utils import AsyncIter
 from redbot.core.utils._dpy_menus_utils import dpymenu
 from redbot.core.utils.chat_formatting import humanize_list, pagify
 from zalgo_text import zalgo
@@ -28,6 +29,12 @@ class KaoTools(commands.Cog):
 
     def __init__(self, bot):
         self.bot = bot
+        self.config = Config.get_conf(self, identifier=10023)
+        default_global = {
+            "blacklist": [],
+            "whitelist": [],
+        }
+        self.config.register_global(**default_global)
         self.session = aiohttp.ClientSession()
         self.deezerclient = Deezer()
         setattr(
@@ -123,6 +130,34 @@ class KaoTools(commands.Cog):
             """,
         )
         await message.channel.send(embed=embed)
+
+    @commands.Cog.listener()
+    async def on_guild_join(self, guild: discord.Guild):
+        """
+        Leave guilds in the blacklist
+        Leave guilds with less than 75 members
+        Leave guilds with more than 50% bots
+        Don't leave guilds in the whitelist
+        """
+        if not guild:
+            return
+        if guild.id in await self.config.whitelist():
+            return
+        if guild.id in await self.config.blacklist():
+            await guild.leave()
+            return
+        botcount = len([x async for x in AsyncIter(guild.members) if x.bot]) 
+        if guild.member_count < 75 or botcount / guild.member_count > 0.5:
+            if guild.system_channel:
+                with contextlib.suppress(discord.Forbidden):
+                    await guild.system_channel.send(
+                        "Hey there!\n",
+                        "I'm leaving this server because it doesn't meet my requirements.\n",
+                        "Remember: your server needs more at least 75 members, and you can't ",
+                        "have more than 50% of your members be bots."
+                    )
+            await guild.leave()
+            return
 
     @commands.command(hidden=True)
     async def asia(self, ctx):
@@ -563,3 +598,63 @@ class KaoTools(commands.Cog):
         msg.content = ctx.prefix + f"play {url}"
 
         ctx.bot.dispatch("message", msg)
+
+    @commands.is_owner()
+    @commands.group(aliases=["guildmgr"])
+    async def guildmanager(self, ctx):
+        """
+        Manage bot guilds.
+        """
+
+    @guildmanager.command()
+    async def whitelist(self, ctx, id:int=None):
+        """
+        Whitelist a guild or remove a guild from the whitelist.
+
+        The whitelist will be listed if no guild is provided
+        """
+        list = await self.config.whitelist()
+        if not id and not list:
+            return await ctx.send("There are no guilds on the whitelist.")
+        if not id:
+            string = "Whitelisted Guilds:\n"
+            for guild in list:
+                string += f"{guild}\n"
+            for page in pagify(string, delims=['\n']):
+                await ctx.send(page)
+            return
+        if id in list:
+            list.remove(id)
+            await self.config.whitelist.set(list)
+            await ctx.send(f"Removed {id} from the whitelist.")
+            return
+        list.append(id)
+        await self.config.whitelist.set(list)
+        await ctx.send(f"Added {id} to the whitelist.")
+
+    @guildmanager.command()
+    async def blacklist(self, ctx, id:int=None):
+        """
+        Blacklist a guild or remove a guild from the whitelist.
+
+        The blacklist will be listed if no guild is provided
+        """
+        list = await self.config.blacklist()
+        if not id and not list:
+            return await ctx.send("There are no guilds on the blacklist.")
+        if not id:
+            string = "Blacklisted Guilds:\n"
+            for guild in list:
+                string += f"{guild}\n"
+            for page in pagify(string, delims=['\n']):
+                await ctx.send(page)
+            return
+        if id in list:
+            list.remove(id)
+            await self.config.whitelist.set(list)
+            await ctx.send(f"Removed {id} from the blacklist.")
+            return
+        list.append(id)
+        await self.config.whitelist.set(list)
+        await ctx.send(f"Added {id} to the blacklist.")
+
