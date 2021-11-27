@@ -148,14 +148,16 @@ class KaoTools(commands.Cog):
             return
         botcount = len([x async for x in AsyncIter(guild.members) if x.bot]) 
         if guild.member_count < 75 or botcount / guild.member_count > 0.5:
-            if guild.system_channel:
+            if hasattr(guild, 'system_channel') and guild.system_channel:
                 with contextlib.suppress(discord.Forbidden):
-                    await guild.system_channel.send(
-                        "Hey there!\n",
-                        "I'm leaving this server because it doesn't meet my requirements.\n",
-                        "Remember: your server needs more at least 75 members, and you can't ",
-                        "have more than 50% of your members be bots."
+                    m = (
+                        "I'm leaving this server because it doesn't meet my requirements.\n\n"
+                        "Remember:\n"
+                        "1. Your server needs more at least 75 members\n"
+                        "2. You can't have more than 50% of your members be bots."
                     )
+                    embed = discord.Embed(title="Hey there!", color=await self.bot.get_embed_colour(guild.system_channel), description=m)
+                    await guild.system_channel.send(embed=embed)
             await guild.leave()
             return
 
