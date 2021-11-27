@@ -25,7 +25,7 @@ class KaoTools(commands.Cog):
     Random things that make kaogurai kaogurai.
     """
 
-    __version__ = "1.0.0"
+    __version__ = "1.1.0"
 
     def __init__(self, bot):
         self.bot = bot
@@ -154,7 +154,7 @@ class KaoTools(commands.Cog):
                         "I'm leaving this server because it doesn't meet my requirements.\n\n"
                         "Remember:\n"
                         "1. Your server needs more at least 75 members\n"
-                        "2. You can't have more than 50% of your members be bots."
+                        "2. You can't have more than 50% of your members be bots"
                     )
                     embed = discord.Embed(title="Hey there!", color=await self.bot.get_embed_colour(guild.system_channel), description=m)
                     await guild.system_channel.send(embed=embed)
