@@ -12,7 +12,8 @@ import redbot
 from redbot.core import commands, Config
 from redbot.core.utils import AsyncIter
 from redbot.core.utils._dpy_menus_utils import dpymenu
-from redbot.core.utils.chat_formatting import humanize_list, pagify
+from redbot.core.utils.chat_formatting import humanize_list, pagify, box
+from redbot.cogs.downloader.converters import InstalledCog
 from zalgo_text import zalgo
 
 from .deezer import Deezer
@@ -659,4 +660,34 @@ class KaoTools(commands.Cog):
         list.append(id)
         await self.config.whitelist.set(list)
         await ctx.send(f"Added {id} to the blacklist.")
+
+    @commands.is_owner()
+    @commands.command()
+    async def updr(self, ctx, *cogs: InstalledCog):
+        """Update cogs without questioning about reload."""
+        ctx.assume_yes = True
+        cog_update_command = ctx.bot.get_command("cog update")
+        if not cog_update_command:
+            await ctx.send(f"I can't find `{ctx.prefix}cog update` command")
+            return
+        await ctx.invoke(cog_update_command, *cogs)
+
+    @commands.command()
+    @commands.is_owner()
+    async def unusedrepos(self, ctx):
+        """View unused downloader repos."""
+        repo_cog = self.bot.get_cog("Downloader")
+        if not repo_cog:
+            return await ctx.send("Downloader cog not found.")
+        repos = [r.name for r in repo_cog._repo_manager.repos]
+        active_repos = {c.repo_name for c in await repo_cog.installed_cogs()}
+        for r in active_repos:
+            try:
+                repos.remove(r)
+            except:
+                pass
+        if not repos:
+            await ctx.send("All repos are currently being used!")
+            return
+        await ctx.send(f"Unused: \n"+box(repos, lang="py"))
 
