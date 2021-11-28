@@ -135,7 +135,7 @@ class KaoTools(commands.Cog):
     async def on_guild_join(self, guild: discord.Guild):
         """
         Leave guilds in the blacklist
-        Leave guilds with less than 75 members
+        Leave guilds with less than 50 members
         Leave guilds with more than 50% bots
         Don't leave guilds in the whitelist
         """
@@ -147,13 +147,13 @@ class KaoTools(commands.Cog):
             await guild.leave()
             return
         botcount = len([x async for x in AsyncIter(guild.members) if x.bot]) 
-        if guild.member_count < 75 or botcount / guild.member_count > 0.5:
+        if guild.member_count < 50 or botcount / guild.member_count > 0.5:
             if hasattr(guild, 'system_channel') and guild.system_channel:
                 with contextlib.suppress(discord.Forbidden):
                     m = (
                         "I'm leaving this server because it doesn't meet my requirements.\n\n"
                         "Remember:\n"
-                        "1. Your server needs more at least 75 members\n"
+                        "1. Your server needs more at least 50 members\n"
                         "2. You can't have more than 50% of your members be bots"
                     )
                     embed = discord.Embed(title="Hey there!", color=await self.bot.get_embed_colour(guild.system_channel), description=m)
@@ -255,7 +255,7 @@ class KaoTools(commands.Cog):
                 description=d,
             )
             embed.set_footer(
-                text="Note: You need 75 members and 50% of your member count must be human."
+                text="Note: You need 50 members and 50% of your member count must be human."
             )
             await ctx.send(embed=embed)
             return
@@ -402,7 +402,7 @@ class KaoTools(commands.Cog):
             "(c) Cog Creators"
         ).format(kao_repo, red_repo, author_repo, org_repo, red_server_url)
         links = (
-            "Click [here]({}) to invite me. You'll need at least 75 members, and 50% of your members must be human.\n\n"
+            "Click [here]({}) to invite me. You'll need at least 50 members, and 50% of your members must be human.\n\n"
             "If you have any questions, join my [support server]({})"
         ).format(await self.invite_url(), SUPPORT_SERVER)
         embed = discord.Embed(color=(await ctx.embed_colour()))
