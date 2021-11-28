@@ -9,11 +9,11 @@ from copy import copy
 import aiohttp
 import discord
 import redbot
-from redbot.core import commands, Config
+from redbot.cogs.downloader.converters import InstalledCog
+from redbot.core import Config, commands
 from redbot.core.utils import AsyncIter
 from redbot.core.utils._dpy_menus_utils import dpymenu
-from redbot.core.utils.chat_formatting import humanize_list, pagify, box
-from redbot.cogs.downloader.converters import InstalledCog
+from redbot.core.utils.chat_formatting import box, humanize_list, pagify
 from zalgo_text import zalgo
 
 from .deezer import Deezer
@@ -147,9 +147,9 @@ class KaoTools(commands.Cog):
         if guild.id in await self.config.blacklist():
             await guild.leave()
             return
-        botcount = len([x async for x in AsyncIter(guild.members) if x.bot]) 
+        botcount = len([x async for x in AsyncIter(guild.members) if x.bot])
         if guild.member_count < 50 or botcount / guild.member_count > 0.5:
-            if hasattr(guild, 'system_channel') and guild.system_channel:
+            if hasattr(guild, "system_channel") and guild.system_channel:
                 with contextlib.suppress(discord.Forbidden):
                     m = (
                         "I'm leaving this server because it doesn't meet my requirements.\n\n"
@@ -157,7 +157,11 @@ class KaoTools(commands.Cog):
                         "1. Your server needs more at least 50 members\n"
                         "2. You can't have more than 50% of your members be bots"
                     )
-                    embed = discord.Embed(title="Hey there!", color=await self.bot.get_embed_colour(guild.system_channel), description=m)
+                    embed = discord.Embed(
+                        title="Hey there!",
+                        color=await self.bot.get_embed_colour(guild.system_channel),
+                        description=m,
+                    )
                     await guild.system_channel.send(embed=embed)
             await guild.leave()
             return
@@ -610,7 +614,7 @@ class KaoTools(commands.Cog):
         """
 
     @guildmanager.command()
-    async def whitelist(self, ctx, id:int=None):
+    async def whitelist(self, ctx, id: int = None):
         """
         Whitelist a guild or remove a guild from the whitelist.
 
@@ -623,7 +627,7 @@ class KaoTools(commands.Cog):
             string = "Whitelisted Guilds:\n"
             for guild in list:
                 string += f"{guild}\n"
-            for page in pagify(string, delims=['\n']):
+            for page in pagify(string, delims=["\n"]):
                 await ctx.send(page)
             return
         if id in list:
@@ -636,7 +640,7 @@ class KaoTools(commands.Cog):
         await ctx.send(f"Added {id} to the whitelist.")
 
     @guildmanager.command()
-    async def blacklist(self, ctx, id:int=None):
+    async def blacklist(self, ctx, id: int = None):
         """
         Blacklist a guild or remove a guild from the whitelist.
 
@@ -649,7 +653,7 @@ class KaoTools(commands.Cog):
             string = "Blacklisted Guilds:\n"
             for guild in list:
                 string += f"{guild}\n"
-            for page in pagify(string, delims=['\n']):
+            for page in pagify(string, delims=["\n"]):
                 await ctx.send(page)
             return
         if id in list:
@@ -689,5 +693,4 @@ class KaoTools(commands.Cog):
         if not repos:
             await ctx.send("All repos are currently being used!")
             return
-        await ctx.send(f"Unused: \n"+box(repos, lang="py"))
-
+        await ctx.send(f"Unused: \n" + box(repos, lang="py"))
