@@ -1,3 +1,4 @@
+import contextlib
 import datetime
 import random
 import urllib
@@ -110,7 +111,7 @@ class AutoAvatar(commands.Cog):
         length = length_list[0]
         for x in range(length):
             for y in before_interlaced:
-                if x in y:
+                with contextlib.supress(IndexError):
                     links.append(y[x])
 
         link = None
