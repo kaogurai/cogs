@@ -110,7 +110,8 @@ class AutoAvatar(commands.Cog):
         length = length_list[0]
         for x in range(length):
             for y in before_interlaced:
-                links.append(y[x])
+                if x in y:
+                    links.append(y[x])
 
         link = None
         while True:
