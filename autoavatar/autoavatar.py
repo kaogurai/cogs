@@ -111,7 +111,7 @@ class AutoAvatar(commands.Cog):
         length = length_list[0]
         for x in range(length):
             for y in before_interlaced:
-                with contextlib.supress(IndexError):
+                with contextlib.suppress(IndexError):
                     links.append(y[x])
 
         link = None
