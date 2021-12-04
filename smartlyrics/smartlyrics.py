@@ -9,6 +9,8 @@ from redbot.core import commands
 from redbot.core.utils.chat_formatting import pagify
 from redbot.core.utils.menus import DEFAULT_CONTROLS, menu
 
+from .deezer import Deezer
+
 try:
     from redbot.core.utils._dpy_menus_utils import dpymenu
 
@@ -36,31 +38,35 @@ class SmartLyrics(commands.Cog):
             ),
             flags=re.I,
         )
+        self.deezerclient = Deezer()
         # thanks wyn - https://github.com/TheWyn/Wyn-RedV3Cogs/blob/master/lyrics/lyrics.py#L12-13
 
     def cog_unload(self):
         self.bot.loop.create_task(self.session.close())
+        self.bot.loop.create_task(self.deezerclient.http.close())
 
     def format_help_for_context(self, ctx):
         pre_processed = super().format_help_for_context(ctx)
         return f"{pre_processed}\n\nCog Version: {self.__version__}"
 
     async def get_lyrics(self, query):
-        query = urllib.parse.quote(query)
-        url = f"https://some-random-api.ml/lyrics?title={query}"
-        async with self.session.get(url) as request:
-            if request.status == 200:
-                results = await request.json()
-                if "error" in results.keys():
-                    return
-                with contextlib.suppress(IndexError):
-                    return (
-                        results["lyrics"],
-                        results["title"],
-                        results["author"],
-                        results["thumbnail"]["genius"],
-                        results["links"]["genius"],
-                    )
+        tracks = await self.deezerclient.search("track", query)
+        if not tracks:
+            return
+        track = tracks[0]
+        lyrics = await self.deezerclient.api(
+            "song.getLyrics", {"sng_id": track["SNG_ID"]}
+        )
+        if not lyrics["results"]:
+            return
+        artid = track["ALB_PICTURE"]
+        artwork = f"https://e-cdn-images.dzcdn.net/images/cover/{artid}/264x264-000000-80-0-0.jpg"
+        return (
+            lyrics["results"]["LYRICS_TEXT"],
+            track["SNG_TITLE"],
+            track["ART_NAME"],
+            artwork,
+        )
 
     # adapted https://github.com/Cog-Creators/Red-DiscordBot/blob/V3/develop/redbot/cogs/mod/names.py#L112-L126
     def get_user_status_song(self, user):
@@ -92,19 +98,13 @@ class SmartLyrics(commands.Cog):
             if len(embed_content) != 1:
                 if source:
                     embed.set_footer(
-                        text=f"Powered by some-random-api.ml | Source: {source} | Page {index + 1}/{len(embed_content)}"
+                        text=f"Source: {source} | Page {index + 1}/{len(embed_content)}"
                     )
                 else:
-                    embed.set_footer(
-                        text=f"Powered by some-random-api.ml | Page {index + 1}/{len(embed_content)}"
-                    )
+                    embed.set_footer(text=f"Page {index + 1}/{len(embed_content)}")
             else:
                 if source:
-                    embed.set_footer(
-                        text=f"Powered by some-random-api.ml | Source: {source}"
-                    )
-                else:
-                    embed.set_footer(text=f"Powered by some-random-api.ml")
+                    embed.set_footer(text=f"Source: {source}")
             embeds.append(embed)
         if DPY_MENUS:
             await dpymenu(ctx, embeds)
