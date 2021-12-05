@@ -11,7 +11,7 @@ class Radio(commands.Cog):
     Saves radio stations for easy access.
     """
 
-    __version__ = "1.0.1"
+    __version__ = "1.0.2"
 
     def __init__(self, bot):
         self.bot = bot
@@ -50,6 +50,7 @@ class Radio(commands.Cog):
 
         names = [name for name in stations]
         if station:
+            station = station.lower()
             if station not in names:
                 await ctx.send("That station doesn't exist.")
                 return
@@ -77,6 +78,7 @@ class Radio(commands.Cog):
             "message", check=lambda m: m.author == ctx.author
         )
         station = response.content.split()[0]
+        station = station.lower()
         if station not in names:
             await ctx.send("That station doesn't exist.")
             return
@@ -99,6 +101,7 @@ class Radio(commands.Cog):
         - `[p]radioset country http://ais-edge23-dal02.cdnstream.com/1976_64.aac`
         """
         stations = await self.config.stations()
+        name = name.lower()
         if name in stations:
             await ctx.send("That station already exists.")
             return
@@ -115,6 +118,7 @@ class Radio(commands.Cog):
         - `[p]radioset remove pop`
         """
         stations = await self.config.stations()
+        name = name.lower()
         if name not in stations:
             await ctx.send("That station doesn't exist.")
             return
