@@ -1,0 +1,7 @@
+{
+    "author": ["alec"],
+    "name": "Radio",
+    "install_msg": "**Thanks for installing.**\n\nThe Audio cog must be loaded for the radio command to work. Use the `[p]radioset` command to add radio stations.",
+    "short": "Saves radio URLs for easy access.",
+    "description": "Saves radio URLs for easy access."
+}
