@@ -16,6 +16,7 @@
 | AliasInjector  | Monkeypatches aliases into commands |
 | AutoAvatar | Picks random bot avatar |
 | Notes    | Write notes on users for moderators to share |
+| Radio | Save radio stations to be easily played |
 | Screenshot | Takes a screenshot of the given link |
 | SmartLyrics | Get lyrics of your current song from 4 different sources |
 
