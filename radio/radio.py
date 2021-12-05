@@ -11,7 +11,7 @@ class Radio(commands.Cog):
     Saves radio stations for easy access.
     """
 
-    __version__ = "1.0.0"
+    __version__ = "1.0.1"
 
     def __init__(self, bot):
         self.bot = bot
@@ -27,7 +27,7 @@ class Radio(commands.Cog):
         Plays a radio station.
         """
         msg = copy(ctx.message)
-        msg.content = f"{ctx.prefix}play {name}"
+        msg.content = f"{ctx.prefix}bumpplay true {name}"
         self.bot.dispatch("message", msg)
 
     @commands.command()
