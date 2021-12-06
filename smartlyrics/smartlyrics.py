@@ -23,7 +23,7 @@ except ImportError:
 
 class SmartLyrics(commands.Cog):
     """
-    Gets lyrics for your current song using some-random-api.ml.
+    Gets lyrics for your current song.
     """
 
     __version__ = "1.0.0"
