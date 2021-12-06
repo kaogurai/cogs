@@ -38,7 +38,6 @@ class SmartLyrics(commands.Cog):
             ),
             flags=re.I,
         )
-        self.deezerclient = Deezer()
         # thanks wyn - https://github.com/TheWyn/Wyn-RedV3Cogs/blob/master/lyrics/lyrics.py#L12-13
 
     def cog_unload(self):
@@ -50,13 +49,16 @@ class SmartLyrics(commands.Cog):
         return f"{pre_processed}\n\nCog Version: {self.__version__}"
 
     async def get_lyrics(self, query):
-        tracks = await self.deezerclient.search("track", query)
+        c = Deezer()
+        tracks = await c.search("track", query)
         if not tracks:
+            await c.http.close()
             return
         track = tracks[0]
-        lyrics = await self.deezerclient.api(
+        lyrics = await c.api(
             "song.getLyrics", {"sng_id": track["SNG_ID"]}
         )
+        await c.http.close()
         if not lyrics["results"]:
             return
         artid = track["ALB_PICTURE"]
