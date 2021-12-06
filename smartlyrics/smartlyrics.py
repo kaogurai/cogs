@@ -42,7 +42,6 @@ class SmartLyrics(commands.Cog):
 
     def cog_unload(self):
         self.bot.loop.create_task(self.session.close())
-        self.bot.loop.create_task(self.deezerclient.http.close())
 
     def format_help_for_context(self, ctx):
         pre_processed = super().format_help_for_context(ctx)
