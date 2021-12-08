@@ -105,7 +105,9 @@ class SFX(commands.Cog):
             await ctx.send("That's not a valid message, sorry.")
             return
 
-        urls = await generate_urls(self, author_voice, text, author_speed, author_volume)
+        urls = await generate_urls(
+            self, author_voice, text, author_speed, author_volume
+        )
         await self.play_sfx(
             ctx.author.voice.channel, ctx.channel, True, author_data, text, urls
         )
@@ -323,7 +325,6 @@ class SFX(commands.Cog):
         """
         pass
 
-
     @mytts.command()
     async def voice(self, ctx, voice: str = None):
         """
@@ -366,9 +367,7 @@ class SFX(commands.Cog):
             return
 
         await self.config.user(ctx.author).speed.set(speed)
-        await ctx.send(
-            f"Your new speed is **{speed}**. "
-        )
+        await ctx.send(f"Your new speed is **{speed}**. ")
 
     @mytts.command()
     async def volume(self, ctx, volume: int = None):
@@ -390,9 +389,7 @@ class SFX(commands.Cog):
             return
 
         await self.config.user(ctx.author).volume.set(volume)
-        await ctx.send(
-            f"Your new volume is **{volume}**. "
-        )
+        await ctx.send(f"Your new volume is **{volume}**. ")
 
     @commands.command()
     async def listvoices(self, ctx):
@@ -419,7 +416,7 @@ class SFX(commands.Cog):
                     f"Gender: {voices[voice]['gender']}\n"
                     f"Language: {voices[voice]['languageName']}\n"
                     "```"
-                ) 
+                )
             pages.append(embed)
 
         for index, embed in enumerate(pages):
@@ -585,7 +582,9 @@ class SFX(commands.Cog):
             )
             return
 
-        urls = await generate_urls(self, author_voice, text, author_speed, author_volume)
+        urls = await generate_urls(
+            self, author_voice, text, author_speed, author_volume
+        )
 
         await self.play_sfx(
             message.author.voice.channel,
