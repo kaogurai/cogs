@@ -411,7 +411,7 @@ class SFX(commands.Cog):
             await self.config.user(ctx.author).translate.set(True)
             await ctx.send("Your TTS translation is now on.")
 
-    @commands.command()
+    @commands.command(aliases=["voicelist", "voicelists"])
     async def listvoices(self, ctx):
         """
         Lists all the TTS voices in the selected language.
