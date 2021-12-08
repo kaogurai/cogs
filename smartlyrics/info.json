@@ -4,5 +4,6 @@
     "install_msg": "Thanks for installing!",
     "short": "Gets lyrics for your current song.",
     "description": "Gets lyrics for your current song through four different sources.",
-    "tags": ["lyrics", "music"]
+    "tags": ["lyrics", "music"],
+    "requirements": ["cryptography"]
 }

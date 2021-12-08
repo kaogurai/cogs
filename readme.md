@@ -18,5 +18,6 @@
 | Notes    | Write notes on users for moderators to share |
 | Radio | Save radio stations to be easily played |
 | Screenshot | Takes a screenshot of the given link |
+| SFX | Plays SFX & TTS in voice channels (originally made by baiumbg) |
 | SmartLyrics | Get lyrics of your current song from 4 different sources |
 

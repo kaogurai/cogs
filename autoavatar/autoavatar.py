@@ -89,7 +89,6 @@ class AutoAvatar(commands.Cog):
         links = []
         before_interlaced = []
         for num, url in enumerate(urls):
-            print(num, url)
             async with self.session.get(url) as request:
                 if request.status == 200:
                     page = await request.text()

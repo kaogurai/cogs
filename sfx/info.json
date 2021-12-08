@@ -1,0 +1,8 @@
+{
+    "author" : ["baiumbg", "alec"],
+    "short" : "Allow users to play TTS and SFX.",
+    "description" : "Allow users to play TTS and SFX.",
+    "install_msg": "Thanks for installing!",
+    "requirements" : ["unicodedata2"],
+    "tags" : ["tts", "audio"]
+}

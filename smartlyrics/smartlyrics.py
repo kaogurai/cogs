@@ -54,9 +54,7 @@ class SmartLyrics(commands.Cog):
             await c.http.close()
             return
         track = tracks[0]
-        lyrics = await c.api(
-            "song.getLyrics", {"sng_id": track["SNG_ID"]}
-        )
+        lyrics = await c.api("song.getLyrics", {"sng_id": track["SNG_ID"]})
         await c.http.close()
         if not lyrics["results"]:
             return
