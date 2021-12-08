@@ -25,7 +25,13 @@ class SFX(commands.Cog):
         self.bot = bot
         self.config = Config.get_conf(self, identifier=134621854878007296)
         self.session = aiohttp.ClientSession()
-        user_config = {"voice": "Anna", "speed": 5, "pitch": 5, "volume": 5}
+        user_config = {
+            "voice": "Anna",
+            "speed": 5,
+            "pitch": 5,
+            "volume": 5,
+            "translate": False,
+        }
         guild_config = {"sounds": {}, "channels": []}
         global_config = {"sounds": {}, "schema_version": 0}
         self.config.register_user(**user_config)
@@ -92,8 +98,8 @@ class SFX(commands.Cog):
         author_data = await self.config.user(ctx.author).all()
         author_voice = author_data["voice"]
         author_speed = author_data["speed"]
-        author_pitch = author_data["pitch"]
         author_volume = author_data["volume"]
+        author_translate = author_data["translate"]
 
         if author_voice not in voices.keys():
             await self.config.user(ctx.author).voice.clear()
@@ -106,7 +112,7 @@ class SFX(commands.Cog):
             return
 
         urls = await generate_urls(
-            self, author_voice, text, author_speed, author_volume
+            self, author_voice, text, author_speed, author_volume, author_translate
         )
         await self.play_sfx(
             ctx.author.voice.channel, ctx.channel, True, author_data, text, urls
@@ -391,6 +397,20 @@ class SFX(commands.Cog):
         await self.config.user(ctx.author).volume.set(volume)
         await ctx.send(f"Your new volume is **{volume}**. ")
 
+    @mytts.command()
+    async def translate(self, ctx):
+        """
+        Toggles your TTS translation.
+        """
+        current_translate = await self.config.user(ctx.author).translate()
+
+        if current_translate:
+            await self.config.user(ctx.author).translate.set(False)
+            await ctx.send("Your TTS translation is now off.")
+        else:
+            await self.config.user(ctx.author).translate.set(True)
+            await ctx.send("Your TTS translation is now on.")
+
     @commands.command()
     async def listvoices(self, ctx):
         """
@@ -561,8 +581,8 @@ class SFX(commands.Cog):
         author_data = await self.config.user(message.author).all()
         author_voice = author_data["voice"]
         author_speed = author_data["speed"]
-        author_pitch = author_data["pitch"]
         author_volume = author_data["volume"]
+        author_translate = author_data["translate"]
 
         if author_voice not in voices.keys():
             await self.config.user(message.author).voice.clear()
@@ -583,7 +603,7 @@ class SFX(commands.Cog):
             return
 
         urls = await generate_urls(
-            self, author_voice, text, author_speed, author_volume
+            self, author_voice, text, author_speed, author_volume, author_translate
         )
 
         await self.play_sfx(

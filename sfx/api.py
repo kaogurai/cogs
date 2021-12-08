@@ -35,15 +35,18 @@ def _convert_stuff_reversed(num: int):
     return int(reversed_ramp[num])
 
 
-async def generate_urls(self, voice: str, text: str, speed: int, volume: int):
+async def generate_urls(
+    self, voice: str, text: str, speed: int, volume: int, translate: bool
+):
     """
     Input: voice: str, text: str, speed: int
     Output: list of str (urls)
     """
     lang = voices[voice]["languageCode"]
-    maybe_text = await _translate_text(self, lang, text)
-    if maybe_text:
-        text = maybe_text
+    if translate:
+        maybe_text = await _translate_text(self, lang, text)
+        if maybe_text:
+            text = maybe_text
     texts = _split_text(voice, text)
     url = "https://en.dict.naver.com/api/nvoice?speaker={voice}&service=dictionary&speech_fmt=mp3&text={text}&speed={speed}&volume={volume}"
     urls = []
