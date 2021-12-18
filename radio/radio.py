@@ -41,7 +41,7 @@ class Radio(commands.Cog):
         Examples:
         - `[p]radio` - Shows a list of stations and asks for one to play.
         - `[p]radio pop` - Plays the station 'pop'
-        - `[p]radio country` - Plays the station - 'country'
+        - `[p]radio country` - Plays the station 'country'
         """
         stations = await self.config.stations()
         if not stations:
