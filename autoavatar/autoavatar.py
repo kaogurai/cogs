@@ -258,9 +258,9 @@ class AutoAvatar(commands.Cog):
             await self.config.current_channel.set(channel.id)
             await ctx.tick()
 
-    @autoavatar.command()
+    @autoavatar.command(name="add")
     @commands.is_owner()
-    async def add(self, ctx, *links: str):
+    async def avatar_add(self, ctx, *links: str):
         """
         Adds avatar links.
         """
@@ -285,9 +285,9 @@ class AutoAvatar(commands.Cog):
         await self.config.avatars.set(all_avatars)
         await ctx.tick()
 
-    @autoavatar.command()
+    @autoavatar.command(name="remove")
     @commands.is_owner()
-    async def remove(self, ctx, *links: str):
+    async def avatar_remove(self, ctx, *links: str):
         """
         Removes an avatar link.
         """
@@ -303,8 +303,8 @@ class AutoAvatar(commands.Cog):
         await self.config.avatars.set(all_avatars)
         await ctx.tick()
 
-    @autoavatar.command()
-    async def list(self, ctx):
+    @autoavatar.command(name="list")
+    async def avatar_list(self, ctx):
         """
         Lists all bot avatars.
         """
@@ -413,8 +413,8 @@ class AutoAvatar(commands.Cog):
         """
         pass
 
-    @query.command()
-    async def add(self, ctx, *, query: str):
+    @query.command(name="add")
+    async def query_add(self, ctx, *, query: str):
         """
         Add a query to the list of queries.
         """
@@ -428,8 +428,8 @@ class AutoAvatar(commands.Cog):
         await self.config.weheartit_queries.set(all_queries)
         await ctx.tick()
 
-    @query.command()
-    async def remove(self, ctx, *, query: str):
+    @query.command(name="remove")
+    async def query_remove(self, ctx, *, query: str):
         """
         Remove a query from the list of queries.
         """
