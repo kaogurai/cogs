@@ -1,6 +1,4 @@
-import contextlib
 import re
-import urllib.parse
 
 import aiohttp
 import discord
@@ -10,15 +8,6 @@ from redbot.core.utils.chat_formatting import pagify
 from redbot.core.utils.menus import DEFAULT_CONTROLS, menu
 
 from .deezer import Deezer
-
-try:
-    from redbot.core.utils._dpy_menus_utils import dpymenu
-
-    DPY_MENUS = True
-except ImportError:
-    from redbot.core.utils.menus import DEFAULT_CONTROLS, menu
-
-    DPY_MENUS = False
 
 
 class SmartLyrics(commands.Cog):
@@ -105,13 +94,11 @@ class SmartLyrics(commands.Cog):
                 if source:
                     embed.set_footer(text=f"Source: {source}")
             embeds.append(embed)
-        if DPY_MENUS:
-            await dpymenu(ctx, embeds)
+    
+        if len(embed_content) != 1:
+            await menu(ctx, embeds, controls=DEFAULT_CONTROLS, timeout=120)
         else:
-            if len(embed_content) != 1:
-                await menu(ctx, embeds, controls=DEFAULT_CONTROLS, timeout=120)
-            else:
-                await ctx.send(embed=embeds[0])
+            await ctx.send(embed=embeds[0])
 
     @commands.bot_has_permissions(embed_links=True)
     @commands.guild_only()

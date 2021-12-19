@@ -12,7 +12,7 @@ import redbot
 from redbot.cogs.downloader.converters import InstalledCog
 from redbot.core import Config, commands
 from redbot.core.utils import AsyncIter
-from redbot.core.utils._dpy_menus_utils import dpymenu
+from redbot.core.utils.menus import DEFAULT_CONTROLS, menu
 from redbot.core.utils.chat_formatting import box, humanize_list, pagify
 from zalgo_text import zalgo
 
@@ -228,7 +228,7 @@ class KaoTools(commands.Cog):
         urls = []
         for result in results:
             urls.append(result["info"]["uri"])
-        await dpymenu(ctx, urls, timeout=60)
+        await menu(ctx, urls, DEFAULT_CONTROLS, timeout=60)
 
     @commands.command()
     @commands.bot_has_permissions(add_reactions=True, use_external_emojis=True)
