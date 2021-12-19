@@ -241,7 +241,7 @@ class KaoTools(commands.Cog):
             return
         message = await ctx.send(f"**{ctx.author} asks:** " + question)
         await message.add_reaction("👍")
-        await message.add_reaction("<:idk:838887174345588796")
+        await message.add_reaction("<:idk:838887174345588796>")
         await message.add_reaction("👎")
 
     @commands.bot_has_permissions(embed_links=True)
