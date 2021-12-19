@@ -5,8 +5,8 @@ import aiohttp
 import discord
 from redbot.core import Config, commands
 from redbot.core.utils.chat_formatting import pagify
-from redbot.core.utils.predicates import MessagePredicate
 from redbot.core.utils.menus import DEFAULT_CONTROLS, menu
+from redbot.core.utils.predicates import MessagePredicate
 
 
 class AiTools(commands.Cog):

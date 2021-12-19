@@ -3,8 +3,8 @@ import asyncio
 import discord
 from redbot.core import Config, commands
 from redbot.core.utils.chat_formatting import humanize_list, pagify
-from redbot.core.utils.predicates import MessagePredicate
 from redbot.core.utils.menus import DEFAULT_CONTROLS, menu
+from redbot.core.utils.predicates import MessagePredicate
 
 
 class AliasInjector(commands.Cog):
@@ -170,7 +170,7 @@ class AliasInjector(commands.Cog):
             if len(embeds) > 1:
                 embed.set_footer(text=f"Page {index+1}/{len(pages)}")
             embeds.append(embed)
-        
+
         if len(pages) == 1:
             await ctx.send(embed=embeds[0])
         else:

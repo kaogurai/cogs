@@ -7,7 +7,6 @@ from .abc import MixinMeta
 
 
 class SFXConfigMixin(MixinMeta):
-
     @commands.command()
     @commands.admin_or_permissions(manage_guild=True)
     @commands.guild_only()

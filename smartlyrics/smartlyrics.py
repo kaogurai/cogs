@@ -94,7 +94,7 @@ class SmartLyrics(commands.Cog):
                 if source:
                     embed.set_footer(text=f"Source: {source}")
             embeds.append(embed)
-    
+
         if len(embed_content) != 1:
             await menu(ctx, embeds, controls=DEFAULT_CONTROLS, timeout=120)
         else:
