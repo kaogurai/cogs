@@ -61,7 +61,7 @@ class AutoAvatar(commands.Cog):
 
     def get_color(self, avatar):
         try:
-            img = Image.open(BytesIO(avatar))
+            img = Image.open(BytesIO(avatar)).convert('RGB')
         except Exception:
             return
         resized = img.resize((1, 1))
