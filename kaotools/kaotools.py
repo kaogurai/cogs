@@ -122,10 +122,10 @@ class KaoTools(commands.Cog):
             return
         d = (
             "**Hey there!** <a:bounce:778449468717531166>\n"
-            "My prefixes in this server are {humanize_list(prefixes)}\n"
-            "You can type `{sorted_prefixes[0]}help` to view all commands!\n"
-            "Need some help? Join my [support server!]({SUPPORT_SERVER})\n"
-            "Looking to invite me? [Click here!]({await self.invite_url()})"
+            f"My prefixes in this server are {humanize_list(prefixes)}\n"
+            f"You can type `{sorted_prefixes[0]}help` to view all commands!\n"
+            f"Need some help? Join my [support server!]({SUPPORT_SERVER})\n"
+            f"Looking to invite me? [Click here!]({await self.invite_url()})"
         )
         embed = discord.Embed(
             colour=await self.bot.get_embed_colour(message.channel),
