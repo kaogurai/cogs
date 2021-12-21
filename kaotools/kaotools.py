@@ -120,15 +120,16 @@ class KaoTools(commands.Cog):
         sorted_prefixes = sorted(prefixes, key=len)
         if len(sorted_prefixes) > 500:
             return
+        d = (
+            "**Hey there!** <a:bounce:778449468717531166>\n"
+            "My prefixes in this server are {humanize_list(prefixes)}\n"
+            "You can type `{sorted_prefixes[0]}help` to view all commands!\n"
+            "Need some help? Join my [support server!]({SUPPORT_SERVER})\n"
+            "Looking to invite me? [Click here!]({await self.invite_url()})"
+        )
         embed = discord.Embed(
             colour=await self.bot.get_embed_colour(message.channel),
-            description=f"""
-                **Hey there!** <a:bounce:778449468717531166>
-                My prefixes in this server are {humanize_list(prefixes)}
-                You can type `{sorted_prefixes[0]}help` to view all commands!
-                Need some help? Join my [support server!]({SUPPORT_SERVER})
-                Looking to invite me? [Click here!]({await self.invite_url()})
-            """,
+            description=d
         )
         await message.channel.send(embed=embed)
 
@@ -392,7 +393,7 @@ class KaoTools(commands.Cog):
         red_server_url = "https://discord.gg/red"
         dpy_repo = "https://github.com/Rapptz/discord.py"
         python_url = "https://www.python.org/"
-        kao_repo = "https://github.com/kaogurai/bot"
+        kao_repo = "https://github.com/kaogurai/red"
 
         dpy_version = "[{}]({})".format(discord.__version__, dpy_repo)
         python_version = "[{}.{}.{}]({})".format(*sys.version_info[:3], python_url)
