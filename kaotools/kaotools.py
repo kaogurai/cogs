@@ -50,6 +50,9 @@ class KaoTools(commands.Cog):
         self.bot.loop.create_task(self.session.close())
         self.bot.loop.create_task(self.deezerclient.http.close())
 
+    async def red_delete_data_for_user(self, **kwargs):
+        return
+
     def format_help_for_context(self, ctx):
         pre_processed = super().format_help_for_context(ctx)
         return f"{pre_processed}\n\nCog Version: {self.__version__}"
@@ -128,8 +131,7 @@ class KaoTools(commands.Cog):
             f"Looking to invite me? [Click here!]({await self.invite_url()})"
         )
         embed = discord.Embed(
-            colour=await self.bot.get_embed_colour(message.channel),
-            description=d
+            colour=await self.bot.get_embed_colour(message.channel), description=d
         )
         await message.channel.send(embed=embed)
 

@@ -18,6 +18,9 @@ class Radio(commands.Cog):
         self.config = Config.get_conf(self, identifier=69420)
         self.config.register_global(stations={})
 
+    async def red_delete_data_for_user(self, **kwargs):
+        return
+
     def format_help_for_context(self, ctx):
         pre_processed = super().format_help_for_context(ctx)
         return f"{pre_processed}\n\nCog Version: {self.__version__}"

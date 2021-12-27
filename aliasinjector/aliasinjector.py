@@ -21,6 +21,9 @@ class AliasInjector(commands.Cog):
         self.config.register_global(aliases={})
         self.bot.loop.create_task(self.reload_aliases())
 
+    async def red_delete_data_for_user(self, **kwargs):
+        return
+
     def format_help_for_context(self, ctx):
         pre_processed = super().format_help_for_context(ctx)
         return f"{pre_processed}\n\nCog Version: {self.__version__}"
