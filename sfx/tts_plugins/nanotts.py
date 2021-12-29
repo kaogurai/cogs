@@ -15,6 +15,8 @@ class NanoTTSPlugin(TTSPlugin):
             "text": text,
             "voice": self.voices[voice]["apiName"],
             "response_type": "audio_address",
+            "speed": "",
+            "pitch": "",
         }
         async with self.session.post(f"{self.NANOTTS_API_URL}", data=data) as request:
             if request.status == 200:

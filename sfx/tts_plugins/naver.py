@@ -16,7 +16,6 @@ class NaverPlugin(TTSPlugin):
             "service": "dictionary",
             "speech_fmt": "mp3",
             "text": text,
-            "speed": 5,
             "volume": 5,
         }
 

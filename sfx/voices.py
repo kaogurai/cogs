@@ -471,7 +471,7 @@ voices = {
     "Sophia": {
         "api": "NanoTTS",
         "apiName": "en-GB",
-        "languageName": "English",
+        "languageName": "English (British)",
         "gender": "Female",
         "languageCode": "en-GB",
     },
