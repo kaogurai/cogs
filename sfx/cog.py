@@ -25,9 +25,9 @@ class SFX(
     TTSChannelMixin,
     metaclass=CompositeMetaClass,
 ):
-    """Plays uploaded sounds or text-to-speech."""
+    """Plays sound effects or text-to-speech."""
 
-    __version__ = "4.0.1"
+    __version__ = "4.0.2"
 
     def __init__(self, bot):
         self.bot = bot
