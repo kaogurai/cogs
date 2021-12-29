@@ -29,12 +29,7 @@ class Deezer:
         id_md5 = m.hexdigest()
 
         blowfish_key = bytes(
-            (
-                [
-                    (ord(id_md5[i]) ^ ord(id_md5[i + 16]) ^ ord(secret[i]))
-                    for i in range(16)
-                ]
-            )
+            ([(ord(id_md5[i]) ^ ord(id_md5[i + 16]) ^ ord(secret[i])) for i in range(16)])
         )
 
         return blowfish_key

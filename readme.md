@@ -10,14 +10,14 @@
 [p]load <cog>
 ```
 
-| Name     | Description                 |
-|----------|-----------------------------|
-| AiTools  | Brainshop.ai cog |
-| AliasInjector  | Monkeypatches aliases into commands |
-| AutoAvatar | Picks random bot avatar |
-| Notes    | Write notes on users for moderators to share |
-| Radio | Save radio stations to be easily played |
-| Screenshot | Takes a screenshot of the given link |
-| SFX | Plays SFX & TTS in voice channels (originally made by baiumbg) |
-| SmartLyrics | Get lyrics of your current song from 4 different sources |
+| Name | Version | Description |
+|----------|--------|---------------------|
+| AiTools  | v1.0.0 | Brainshop.ai cog |
+| AliasInjector  | v1.0.0 | Monkeypatches aliases into commands |
+| AutoAvatar | v1.1.0 | Picks random bot avatar |
+| Notes    | v1.0.0 | Write notes on users for moderators to share |
+| Radio | v1.0.2 | Save radio stations to be easily played |
+| Screenshot | v1.0.0 | Takes a screenshot of the given link |
+| SFX | v4.0.0 | Plays SFX & TTS in voice channels (originally made by baiumbg) |
+| SmartLyrics | v1.0.0 | Get lyrics of your current song from 4 different sources |
 

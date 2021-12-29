@@ -2,7 +2,7 @@
     "author" : ["baiumbg", "alec"],
     "short" : "Allow users to play TTS and SFX.",
     "description" : "Allow users to play TTS and SFX.",
-    "install_msg": "Thanks for installing!",
+    "install_msg": "Thanks for installing!\n\nIf you want to use the `[p]sfx` command, you'll need to make a FreeSound API application.\n\nGo to https://freesound.org/apiv2/apply and make an account, and then submit a application.\n\nAfter you've submitted the application, the credentials should have appeared onscreen. Run `[p]set api freesound id <client_id> key <api_key>` and you'll be all set.",
     "requirements" : ["unicodedata2"],
     "tags" : ["tts", "audio"]
 }

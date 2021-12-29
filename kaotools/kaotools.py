@@ -26,8 +26,6 @@ class KaoTools(commands.Cog):
     Random things that make kaogurai kaogurai.
     """
 
-    __version__ = "1.1.0"
-
     def __init__(self, bot):
         self.bot = bot
         self.config = Config.get_conf(self, identifier=10023)
@@ -52,10 +50,6 @@ class KaoTools(commands.Cog):
 
     async def red_delete_data_for_user(self, **kwargs):
         return
-
-    def format_help_for_context(self, ctx):
-        pre_processed = super().format_help_for_context(ctx)
-        return f"{pre_processed}\n\nCog Version: {self.__version__}"
 
     async def search_youtube(self, query):
         """
@@ -454,10 +448,7 @@ class KaoTools(commands.Cog):
         Multiplies all vowels in a sentence.
         """
         uwuified = "".join(
-            [
-                c if c in "aeiouAEIOU" else (c * 3 if c not in "aeiou" else c)
-                for c in text
-            ]
+            [c if c in "aeiouAEIOU" else (c * 3 if c not in "aeiou" else c) for c in text]
         )
         await ctx.send(uwuified[:1000])
 
@@ -551,13 +542,9 @@ class KaoTools(commands.Cog):
                 msg += f"{emoji} - `:{emoji.name}:` (<{emoji.url}>)\n"
             else:
                 if emoji.animated:
-                    msg += (
-                        f"{emoji} - `:{emoji.name}:` (`<a:{emoji.name}:{emoji.id}>`)\n"
-                    )
+                    msg += f"{emoji} - `:{emoji.name}:` (`<a:{emoji.name}:{emoji.id}>`)\n"
                 else:
-                    msg += (
-                        f"{emoji} - `:{emoji.name}:` (`<:{emoji.name}:{emoji.id}>`)\n"
-                    )
+                    msg += f"{emoji} - `:{emoji.name}:` (`<:{emoji.name}:{emoji.id}>`)\n"
 
         for page in pagify(msg):
             await ctx.send(page)

@@ -1,16 +1,17 @@
+import asyncio
+
 import discord
 from redbot.core import commands
 from redbot.core.utils.chat_formatting import pagify
 from redbot.core.utils.menus import DEFAULT_CONTROLS, menu
 from redbot.core.utils.predicates import MessagePredicate
 
-from sfx.api import generate_urls
-
 from .abc import MixinMeta
+from .tts_api import generate_url
 from .voices import voices
 
 
-class ChannelConfigMixin(MixinMeta):
+class TTSChannelMixin(MixinMeta):
     @commands.group()
     @commands.guild_only()
     @commands.admin_or_permissions(manage_guild=True)
@@ -31,9 +32,7 @@ class ChannelConfigMixin(MixinMeta):
             await self.config.guild(ctx.guild).channels.set(channel_list)
             self.channel_cache[ctx.guild.id] = channel_list
 
-            await ctx.send(
-                f"Okay, {channel.mention} will now be used as a TTS channel."
-            )
+            await ctx.send(f"Okay, {channel.mention} will now be used as a TTS channel.")
         else:
             await ctx.send(
                 f"{channel.mention} is already a TTS channel, did you mean use the `{ctx.clean_prefix}ttschannel remove` command?"
@@ -143,13 +142,11 @@ class ChannelConfigMixin(MixinMeta):
 
         author_data = await self.config.user(message.author).all()
         author_voice = author_data["voice"]
-        author_speed = author_data["speed"]
-        author_volume = author_data["volume"]
         author_translate = author_data["translate"]
 
         if author_voice not in voices.keys():
             await self.config.user(message.author).voice.clear()
-            author_voice = "Anna"
+            author_voice = await self.config.user(message.author).voice()
 
         text = self.decancer_text(message.clean_content)
 
@@ -165,9 +162,7 @@ class ChannelConfigMixin(MixinMeta):
             )
             return
 
-        urls = await generate_urls(
-            self, author_voice, text, author_speed, author_volume, author_translate
-        )
+        url = await generate_url(self, author_voice, text, author_translate)
 
         await self.play_sfx(
             message.author.voice.channel,
@@ -175,5 +170,5 @@ class ChannelConfigMixin(MixinMeta):
             True,
             author_data,
             text,
-            urls,
+            url,
         )

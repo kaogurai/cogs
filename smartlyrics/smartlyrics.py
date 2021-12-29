@@ -164,9 +164,7 @@ class SmartLyrics(commands.Cog):
                 data = await lastfmcog.api_request(
                     ctx,
                     {
-                        "user": await lastfmcog.config.user(
-                            ctx.author
-                        ).lastfm_username(),
+                        "user": await lastfmcog.config.user(ctx.author).lastfm_username(),
                         "method": "user.getrecenttracks",
                         "limit": 1,
                     },

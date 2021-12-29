@@ -204,9 +204,7 @@ class AutoAvatar(commands.Cog):
         """
         id = await self.config.current_channel()
         whi = await self.config.weheartit()
-        embed = discord.Embed(
-            title="AutoAvatar Settings", colour=await ctx.embed_color()
-        )
+        embed = discord.Embed(title="AutoAvatar Settings", colour=await ctx.embed_color())
         embed.add_field(
             name="Auto Color",
             value="Enabled" if await self.config.auto_color() else "Disabled",
