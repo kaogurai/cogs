@@ -1,16 +1,16 @@
 import urllib
 
-from .base import TTSPlugin
 
-
-class NaverPlugin(TTSPlugin):
+class NaverPlugin:
 
     NAVER_BASE_URL = "https://en.dict.naver.com/api/nvoice"
 
-    async def generate_url(self, voice: str, translate: bool, text: str):
-        if translate:
-            langcode = self.voices[voice]["languageCode"]
-            text = await self.translate_text(self, langcode, text)
+    def __init__(self, voices, session):
+        self.session = session
+        self.voices = voices
+        self.name = "Naver"
+
+    async def generate_url(self, voice: str, text: str):
         params = {
             "speaker": self.voices[voice]["apiName"],
             "service": "dictionary",

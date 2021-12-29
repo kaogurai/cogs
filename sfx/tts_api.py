@@ -1,6 +1,3 @@
-from .tts_plugins.marytts import MaryTTSPlugin
-from .tts_plugins.nanotts import NanoTTSPlugin
-from .tts_plugins.naver import NaverPlugin
 from .voices import voices
 
 
@@ -10,21 +7,10 @@ async def generate_url(self, voice: str, text: str, translate: bool):
     Output: url:str
     """
     text = text[:1000]
-    lang = voices[voice]["languageCode"]
     if translate:
-        maybe_text = await _translate_text(self, lang, text)
-        if maybe_text:
-            text = maybe_text
-    if voices[voice]["api"] == "Naver":
-        url = await NaverPlugin(voices, self.session).generate_url(voice, translate, text)
-    elif voices[voice]["api"] == "MaryTTS":
-        url = await MaryTTSPlugin(voices, self.session).generate_url(
-            voice, translate, text
-        )
-    elif voices[voice]["api"] == "NanoTTS":
-        url = await NanoTTSPlugin(voices, self.session).generate_url(
-            voice, translate, text
-        )
+        text = await _translate_text(self, voices[voice]["languageCode"], text)
+    plugin = voices[voice]["api"](voices, self.session)
+    url = await plugin.generate_url(voice, text)
     return url
 
 
@@ -48,3 +34,4 @@ async def _translate_text(self, lang, text):
                 if "trans" in response.keys():
                     results += response["trans"]
             return results
+        return text

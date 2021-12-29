@@ -1,17 +1,16 @@
 import urllib
 
-from .base import TTSPlugin
 
-
-class MaryTTSPlugin(TTSPlugin):
+class MaryTTSPlugin:
 
     MARYTTS_BASE_URL = "http://fiware.tts.mivoq.it/process"
 
-    async def generate_url(self, voice: str, translate: bool, text: str):
-        if translate:
-            langcode = self.voices[voice]["languageCode"]
-            text = await self.translate_text(self, langcode, text)
+    def __init__(self, voices, session):
+        self.session = session
+        self.voices = voices
+        self.name = "MaryTTS"
 
+    async def generate_url(self, voice: str, text: str):
         params = {
             "INPUT_TEXT": text,
             "INPUT_TYPE": "TEXT",

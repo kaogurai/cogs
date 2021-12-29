@@ -30,18 +30,23 @@ class UserConfigMixin(MixinMeta):
                     f"Hi, I'm {voice}, nice to meet you.",
                     False,
                 )
+                plugin = voices[voice]["api"](voices, self.session)
                 m = ""
                 if url:
                     m += f"Example: [Click Here]({url})\n"
                 m += f"• Gender: {voices[voice]['gender']}\n"
                 m += f"• Language: {voices[voice]['languageName']}\n"
+                m += f"• Source: {plugin.name}"
+                if "apiExtra" in voices[voice].keys():
+                    m += f" ({voices[voice]['apiExtra']})"
 
                 embed.add_field(name=voice, value=m)
             pages.append(embed)
 
         for index, embed in enumerate(pages):
-            if len(pages) > 1:
-                embed.set_footer(text=f"Page {index + 1}/{len(pages)}")
+            embed.set_footer(
+                text=f"Page {index + 1}/{len(pages)} | {len(voices_list)} voices"
+            )
 
         if len(pages) == 1:
             await ctx.send(embed=pages[0])

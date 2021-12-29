@@ -1,16 +1,14 @@
-from .base import TTSPlugin
-
-
-class NanoTTSPlugin(TTSPlugin):
+class NanoTTSPlugin:
 
     NANOTTS_DOMAIN = "https://nanottsaas.herokuapp.com"
     NANOTTS_API_URL = f"{NANOTTS_DOMAIN}/api"
 
-    async def generate_url(self, voice: str, translate: bool, text: str):
-        if translate:
-            langcode = self.voices[voice]["languageCode"]
-            text = await self.translate_text(self, langcode, text)
+    def __init__(self, voices, session):
+        self.session = session
+        self.voices = voices
+        self.name = "NanoTTS"
 
+    async def generate_url(self, voice: str, text: str):
         data = {
             "text": text,
             "voice": self.voices[voice]["apiName"],
