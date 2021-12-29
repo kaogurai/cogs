@@ -30,11 +30,12 @@ class UserConfigMixin(MixinMeta):
                     f"Hi, I'm {voice}, nice to meet you.",
                     False,
                 )
-                m = (
-                    f"Example: [Click Here]({url})\n"
-                    f"• Gender: {voices[voice]['gender']}\n"
-                    f"• Language: {voices[voice]['languageName']}\n"
-                )
+                m = ""
+                if url:
+                    m += f"Example: [Click Here]({url})\n"
+                m += f"• Gender: {voices[voice]['gender']}\n"
+                m += f"• Language: {voices[voice]['languageName']}\n"
+
                 embed.add_field(name=voice, value=m)
             pages.append(embed)
 
