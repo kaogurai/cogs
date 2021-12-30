@@ -36,6 +36,7 @@ class UserConfigMixin(MixinMeta):
                     m += f"Example: [Click Here]({url})\n"
                 m += f"• Gender: {voices[voice]['gender']}\n"
                 m += f"• Language: {voices[voice]['languageName']}\n"
+                m += f"• Limit: {plugin.limit}\n"
                 m += f"• Source: {plugin.name}"
                 if "apiExtra" in voices[voice].keys():
                     m += f" ({voices[voice]['apiExtra']})"

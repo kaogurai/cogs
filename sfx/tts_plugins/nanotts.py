@@ -7,10 +7,11 @@ class NanoTTSPlugin:
         self.session = session
         self.voices = voices
         self.name = "NanoTTS"
+        self.limit = 200
 
     async def generate_url(self, voice: str, text: str):
         data = {
-            "text": text,
+            "text": text[: self.limit],
             "voice": self.voices[voice]["apiName"],
             "response_type": "audio_address",
             "speed": "",

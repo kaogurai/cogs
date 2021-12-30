@@ -9,13 +9,19 @@ class GoogleTranslatePlugin:
         self.session = session
         self.voices = voices
         self.name = "Google Translate"
+        self.limit = 200
 
     async def generate_url(self, voice: str, text: str):
         params = {
             "ie": "UTF-8",
             "client": "tw-ob",
             "tl": self.voices[voice]["apiName"],
-            "q": text,
+            "q": text[: self.limit],
+            "ttsspeed": "1",
+            "total": "1",
+            "idx": "0",
+            "prev": "input",
+            "textlen": len(text),
         }
 
         url = f"{self.GOOGLE_TRANSLATE_BASE_URL}?{urllib.parse.urlencode(params)}"

@@ -9,13 +9,14 @@ class NaverPlugin:
         self.session = session
         self.voices = voices
         self.name = "Naver"
+        self.limit = 1000
 
     async def generate_url(self, voice: str, text: str):
         params = {
             "speaker": self.voices[voice]["apiName"],
             "service": "dictionary",
             "speech_fmt": "mp3",
-            "text": text,
+            "text": text[: self.limit],
             "volume": 5,
         }
 

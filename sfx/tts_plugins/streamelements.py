@@ -9,11 +9,12 @@ class StreamElementsPlugin:
         self.session = session
         self.voices = voices
         self.name = "StreamElements"
+        self.limit = 1000
 
     async def generate_url(self, voice: str, text: str):
         params = {
             "voice": self.voices[voice]["apiName"],
-            "text": text,
+            "text": text[: self.limit],
         }
 
         url = f"{self.STREAMELEMENTS_BASE_URL}?{urllib.parse.urlencode(params)}"
