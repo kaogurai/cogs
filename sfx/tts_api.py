@@ -6,7 +6,6 @@ async def generate_url(self, voice: str, text: str, translate: bool):
     Input: voice: str, text: str, speed: int
     Output: url:str
     """
-    text = text[:1000]
     if translate:
         text = await _translate_text(self, voices[voice]["languageCode"], text)
     plugin = voices[voice]["api"](voices, self.session)
