@@ -1,3 +1,4 @@
+from .tts_plugins.festival import FestivalPlugin
 from .tts_plugins.googletranslate import GoogleTranslatePlugin
 from .tts_plugins.marytts import MaryTTSPlugin
 from .tts_plugins.nanotts import NanoTTSPlugin
@@ -2656,4 +2657,130 @@ voices = {
         "gender": "Female",
         "languageCode": "zh-CN",
     },
+
+
+
+
+
+
+
+    "Alan": {
+        "api": FestivalPlugin,
+        "apiName": "awb",
+        "languageName": "English (British)",
+        "gender": "Male",
+        "languageCode": "en-GB",
+    },
+    "Nick": {
+        "api": FestivalPlugin,
+        "apiName": "nick1",
+        "languageName": "English (British)",
+        "gender": "Male",
+        "languageCode": "en-GB",
+    },
+    "Oscar": {
+        "api": FestivalPlugin,
+        "apiName": "nick2",
+        "languageName": "English (British)",
+        "gender": "Male",
+        "languageCode": "en-GB",
+    },
+    "Ava": {
+        "api": FestivalPlugin,
+        "apiName": "nina",
+        "languageName": "English (British)",
+        "gender": "Female",
+        "languageCode": "en-GB",
+    },
+    "Molly": {
+        "api": FestivalPlugin,
+        "apiName": "hts2010_anna",
+        "languageName": "English (British)",
+        "gender": "Female",
+        "languageCode": "en-GB",
+    },
+    "Annabelle": {
+        "api": FestivalPlugin,
+        "apiName": "hts2010_fiona",
+        "languageName": "English (British)",
+        "gender": "Female",
+        "languageCode": "en-GB",
+    },
+    "Christine": {
+        "api": FestivalPlugin,
+        "apiName": "hts2010_christine",
+        "languageName": "English (British)",
+        "gender": "Female",
+        "languageCode": "en-GB",
+    },
+    "Peter": {
+        "api": FestivalPlugin,
+        "apiName": "hts2010_peter",
+        "languageName": "English (British)",
+        "gender": "Male",
+        "languageCode": "en-GB",
+    },
+    "James": {
+        "api": FestivalPlugin,
+        "apiName": "hts2011_james",
+        "languageName": "English (British)",
+        "gender": "Male",
+        "languageCode": "en-GB",
+    },
+    "Alana": {
+        "api": FestivalPlugin,
+        "apiName": "hts2010_slt",
+        "languageName": "English",
+        "gender": "Female",
+        "languageCode": "en-US",
+    },
+    "Theo": {
+        "api": FestivalPlugin,
+        "apiName": "hts2010_rjs",
+        "languageName": "English (British)",
+        "gender": "Male",
+        "languageCode": "en-GB",
+    },
+    "Roger": {
+        "api": FestivalPlugin,
+        "apiName": "hts2010_roger",
+        "languageName": "English (British)",
+        "gender": "Male",
+        "languageCode": "en-GB",
+    },
+    "Tom": {
+        "api": FestivalPlugin,
+        "apiName": "hts2010_tom",
+        "languageName": "English",
+        "gender": "Male",
+        "languageCode": "en-US",
+    },
+    "Mateo": {
+        "api": FestivalPlugin,
+        "apiName": "hts2010_uvigo3",
+        "languageName": "Spanish",
+        "gender": "Male",
+        "languageCode": "es",
+    },
+    "Leo": {
+        "api": FestivalPlugin,
+        "apiName": "hts2010_leo",
+        "languageName": "German (Austria)",
+        "gender": "Male",
+        "languageCode": "de-at",
+    },
+    "Karson": {
+        "api": FestivalPlugin,
+        "apiName": "diphone_kal",
+        "languageName": "English",
+        "gender": "Male",
+        "languageCode": "en-US",
+    },
+    "Archie": {
+        "api": FestivalPlugin,
+        "apiName": "diphone_rab",
+        "languageName": "English (British)",
+        "gender": "Male",
+        "languageCode": "en-GB",
+    }
 }
