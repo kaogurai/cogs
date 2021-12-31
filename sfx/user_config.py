@@ -14,9 +14,12 @@ class UserConfigMixin(MixinMeta):
             yield l[i : i + n]
 
     @commands.command(aliases=["voicelist", "voicelists"])
-    async def listvoices(self, ctx):
+    async def listvoices(self, ctx, give_examples: bool = False):
         """
         Lists all of the TTS voices.
+
+        If you want to see examples of what the voices look like, you can pass True as an argument. 
+        Keep in mind this will make the command go much slower.
         """
         pages = []
         voices_list = [voice for voice in voices.keys()]
@@ -24,12 +27,15 @@ class UserConfigMixin(MixinMeta):
         for chunk in divided:
             embed = discord.Embed(color=await ctx.embed_color())
             for voice in chunk:
-                url = await generate_url(
-                    self,
-                    voice,
-                    f"Hi, I'm {voice}, nice to meet you.",
-                    False,
-                )
+                if give_examples:
+                    url = await generate_url(
+                        self,
+                        voice,
+                        f"Hi, I'm {voice}, nice to meet you.",
+                        False,
+                    )
+                else:
+                    url = None
                 plugin = voices[voice]["api"](voices, self.session)
                 m = ""
                 if url:
