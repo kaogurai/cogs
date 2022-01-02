@@ -18,7 +18,7 @@ class UserConfigMixin(MixinMeta):
         """
         Lists all of the TTS voices.
 
-        If you want to see examples of what the voices look like, you can pass True as an argument. 
+        If you want to see examples of what the voices look like, you can pass True as an argument.
         Keep in mind this will make the command go much slower.
         """
         pages = []

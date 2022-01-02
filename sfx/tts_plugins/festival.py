@@ -4,7 +4,6 @@ import json
 class FestivalPlugin:
 
     FESTIVAL_BASE_URL = "https://www.cstr.ed.ac.uk/cgi-bin/cstr/festivalspeak.cgi"
-    
 
     def __init__(self, voices, session):
         self.session = session
@@ -28,8 +27,7 @@ class FestivalPlugin:
             mainly_dict = split_first[1].strip()
             fully_seperated = mainly_dict.split(")")
             only_dict = fully_seperated[0].strip()
-            replace_quotes = only_dict.replace("\'", "\"")
+            replace_quotes = only_dict.replace("'", '"')
             loaded = json.loads(replace_quotes)
-            url = loaded['wavurl']
+            url = loaded["wavurl"]
             return url
-

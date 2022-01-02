@@ -1933,7 +1933,7 @@ voices = {
         "gender": "Male",
         "languageCode": "vi-VN",
     },
-    "phuong": {
+    "Phuong": {
         "api": StreamElementsPlugin,
         "apiExtra": "GCP",
         "apiName": "vi-VN-Wavenet-C",
@@ -2029,7 +2029,7 @@ voices = {
         "gender": "Male",
         "languageCode": "zh-CN",
     },
-    "HanHan": {
+    "Hanhan": {
         "api": StreamElementsPlugin,
         "apiExtra": "Azure",
         "apiName": "HanHan",
@@ -2657,13 +2657,6 @@ voices = {
         "gender": "Female",
         "languageCode": "zh-CN",
     },
-
-
-
-
-
-
-
     "Alan": {
         "api": FestivalPlugin,
         "apiName": "awb",
@@ -2782,5 +2775,5 @@ voices = {
         "languageName": "English (British)",
         "gender": "Male",
         "languageCode": "en-GB",
-    }
+    },
 }
