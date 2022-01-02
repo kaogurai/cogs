@@ -1,6 +1,6 @@
 import discord
 from redbot.core import commands
-from redbot.core.utils.chat_formatting import humanize_list
+from redbot.core.utils import AsyncIter
 from redbot.core.utils.menus import DEFAULT_CONTROLS, menu
 
 from .abc import MixinMeta
@@ -24,9 +24,9 @@ class UserConfigMixin(MixinMeta):
         pages = []
         voices_list = [voice for voice in voices.keys()]
         divided = self.divide_chunks(voices_list, 9)
-        for chunk in divided:
+        async for chunk in AsyncIter(divided):
             embed = discord.Embed(color=await ctx.embed_color())
-            for voice in chunk:
+            async for voice in AsyncIter(chunk):
                 if give_examples:
                     url = await generate_url(
                         self,
