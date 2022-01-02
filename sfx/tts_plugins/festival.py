@@ -1,4 +1,4 @@
-import urllib
+import json
 
 
 class FestivalPlugin:
@@ -19,11 +19,17 @@ class FestivalPlugin:
             "AJAX": "on",
         }
 
-        async with self.session.post(self.FESTIVAL_BASE_URL, params=params) as resp:
+        async with self.session.get(self.FESTIVAL_BASE_URL, params=params) as resp:
             if resp.status != 200:
                 return None
 
             resp = await resp.text()
-            # THIS DOESN'T WORK I NEED TO DO SOMETHING TO GET THE URL
-            return resp
+            split_first = resp.split("(")
+            mainly_dict = split_first[1].strip()
+            fully_seperated = mainly_dict.split(")")
+            only_dict = fully_seperated[0].strip()
+            replace_quotes = only_dict.replace("\'", "\"")
+            loaded = json.loads(replace_quotes)
+            url = loaded['wavurl']
+            return url
 
