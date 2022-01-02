@@ -1,3 +1,4 @@
+from .tts_plugins.fifteenai import FifteenAIPlugin
 from .tts_plugins.googletranslate import GoogleTranslatePlugin
 from .tts_plugins.marytts import MaryTTSPlugin
 from .tts_plugins.nanotts import NanoTTSPlugin
@@ -2655,5 +2656,5 @@ voices = {
         "languageName": "Chinese",
         "gender": "Female",
         "languageCode": "zh-CN",
-    },
+    }
 }
