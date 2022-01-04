@@ -27,7 +27,7 @@ class SFX(
 ):
     """Plays sound effects or text-to-speech."""
 
-    __version__ = "4.3.1"
+    __version__ = "4.3.2"
 
     def __init__(self, bot):
         self.bot = bot
@@ -99,7 +99,7 @@ class SFX(
             self.id = api_tokens.get("id")
             self.key = api_tokens.get("key")
 
-    async def play_sfx(self, vc, channel, is_tts, author_data, text, link):
+    async def play_sfx(self, vc, channel, is_tts, author_data, text, link, track_info):
         try:
             player = lavalink.get_player(vc.guild.id)
         except KeyError:
@@ -122,6 +122,10 @@ class SFX(
                 return
 
         track = tracks.tracks[0]
+        track_title, track_requester = track_info
+        track.title = track_title
+        track.requester = track_requester
+        track.author = ""
         self.repeat_state[vc.guild.id] = repeat_state
 
         # No queue or anything, just add and play

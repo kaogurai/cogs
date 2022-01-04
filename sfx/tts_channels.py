@@ -163,6 +163,7 @@ class TTSChannelMixin(MixinMeta):
             return
 
         url = await generate_url(self, author_voice, text, author_translate)
+        track_info = ("Text to Speech", message.author)
 
         await self.play_sfx(
             message.author.voice.channel,
@@ -171,4 +172,5 @@ class TTSChannelMixin(MixinMeta):
             author_data,
             text,
             url,
+            track_info,
         )

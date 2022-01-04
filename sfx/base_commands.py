@@ -46,8 +46,15 @@ class BaseCommandsMixin(MixinMeta):
             return
 
         url = await generate_url(self, author_voice, text, author_translate)
+        track_info = ("Text to Speech", ctx.author)
         await self.play_sfx(
-            ctx.author.voice.channel, ctx.channel, True, author_data, text, url
+            ctx.author.voice.channel,
+            ctx.channel,
+            True,
+            author_data,
+            text,
+            url,
+            track_info,
         )
 
     async def sfx_check(ctx):
@@ -114,5 +121,8 @@ class BaseCommandsMixin(MixinMeta):
 
             data = await resp.json()
             url = data["previews"]["preview-hq-mp3"]
+            track_info = (data["description"], ctx.author)
 
-        await self.play_sfx(ctx.author.voice.channel, ctx.channel, False, None, None, url)
+        await self.play_sfx(
+            ctx.author.voice.channel, ctx.channel, False, None, None, url, track_info
+        )
