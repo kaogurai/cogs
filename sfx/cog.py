@@ -27,7 +27,7 @@ class SFX(
 ):
     """Plays sound effects or text-to-speech."""
 
-    __version__ = "4.3.2"
+    __version__ = "4.3.3"
 
     def __init__(self, bot):
         self.bot = bot
@@ -127,6 +127,11 @@ class SFX(
         track.requester = track_requester
         track.author = ""
         self.repeat_state[vc.guild.id] = repeat_state
+
+        if not is_tts:
+            await channel.send(f"Playing {track.title[:100]}...")
+        else:
+            await channel.send(f"Playing your message...")
 
         # No queue or anything, just add and play
         if not player.current and not player.queue:

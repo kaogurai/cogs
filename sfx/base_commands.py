@@ -89,40 +89,45 @@ class BaseCommandsMixin(MixinMeta):
                     "I do not have permissions to connect to and speak in this channel."
                 )
                 return
+        async with ctx.typing():
 
-        async with self.session.get(
-            "https://freesound.org/apiv2/search/text/",
-            params={"query": sound, "token": self.key, "filter": "duration:[0.5 TO 5]"},
-        ) as resp:
-            if resp.status != 200:
-                await ctx.send(
-                    "Something went wrong when searching for the sound. Please try again later."
-                )
-                return
+            async with self.session.get(
+                "https://freesound.org/apiv2/search/text/",
+                params={
+                    "query": sound,
+                    "token": self.key,
+                    "filter": "duration:[0.5 TO 5]",
+                },
+            ) as resp:
+                if resp.status != 200:
+                    await ctx.send(
+                        "Something went wrong when searching for the sound. Please try again later."
+                    )
+                    return
 
-            data = await resp.json()
-            results = data["results"]
+                data = await resp.json()
+                results = data["results"]
 
-            if not results:
-                await ctx.send("No sounds found for your query.")
-                return
+                if not results:
+                    await ctx.send("No sounds found for your query.")
+                    return
 
-            sound_id = results[0]["id"]
+                sound_id = results[0]["id"]
 
-        async with self.session.get(
-            f"https://freesound.org/apiv2/sounds/{sound_id}/",
-            params={"token": self.key},
-        ) as resp:
-            if resp.status != 200:
-                await ctx.send(
-                    "Something went wrong when getting the sound. Please try again later."
-                )
-                return
+            async with self.session.get(
+                f"https://freesound.org/apiv2/sounds/{sound_id}/",
+                params={"token": self.key},
+            ) as resp:
+                if resp.status != 200:
+                    await ctx.send(
+                        "Something went wrong when getting the sound. Please try again later."
+                    )
+                    return
 
-            data = await resp.json()
-            url = data["previews"]["preview-hq-mp3"]
-            track_info = (data["description"], ctx.author)
+                data = await resp.json()
+                url = data["previews"]["preview-hq-mp3"]
+                track_info = (data["description"], ctx.author)
 
-        await self.play_sfx(
-            ctx.author.voice.channel, ctx.channel, False, None, None, url, track_info
-        )
+            await self.play_sfx(
+                ctx.author.voice.channel, ctx.channel, False, None, None, url, track_info
+            )
