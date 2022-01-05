@@ -118,7 +118,7 @@ class KaoTools(commands.Cog):
         if len(sorted_prefixes) > 500:
             return
         d = (
-            "**Hey there!** <a:bounce:778449468717531166>\n"
+            "**Hey there!**\n"
             f"My prefixes in this server are {humanize_list(prefixes)}\n"
             f"You can type `{sorted_prefixes[0]}help` to view all commands!\n"
             f"Need some help? Join my [support server!]({SUPPORT_SERVER})\n"
