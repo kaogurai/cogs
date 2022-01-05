@@ -3,6 +3,7 @@ import unicodedata
 from abc import ABC
 
 import aiohttp
+import discord
 import lavalink
 import unidecode
 from redbot.core import Config, commands
@@ -27,7 +28,7 @@ class SFX(
 ):
     """Plays sound effects or text-to-speech."""
 
-    __version__ = "4.3.3"
+    __version__ = "4.3.4"
 
     def __init__(self, bot):
         self.bot = bot
@@ -108,6 +109,10 @@ class SFX(
         repeat_state = player.repeat
         player.repeat = False
 
+        tts_msg = None
+        if is_tts:
+            tts_msg = await channel.send("Generating audio...")
+
         tracks = await player.load_tracks(query=link)
         if not tracks.tracks:
             # Naver is the only voice i consider reliable, so if another source fails, use Anna/Naver
@@ -121,6 +126,10 @@ class SFX(
                 await channel.send("Something went wrong.")
                 return
 
+        if is_tts:
+            with contextlib.suppress(discord.HTTPException):
+                await tts_msg.delete()
+
         track = tracks.tracks[0]
         track_title, track_requester = track_info
         track.title = track_title
@@ -128,10 +137,10 @@ class SFX(
         track.author = ""
         self.repeat_state[vc.guild.id] = repeat_state
 
-        if not is_tts:
-            await channel.send(f"Playing {track.title[:100]}...")
-        else:
+        if is_tts:
             await channel.send(f"Playing your message...")
+        else:
+            await channel.send(f"Playing **{track.title[:100]}**...")
 
         # No queue or anything, just add and play
         if not player.current and not player.queue:
