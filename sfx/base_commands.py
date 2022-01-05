@@ -69,7 +69,7 @@ class BaseCommandsMixin(MixinMeta):
     @commands.check(sfx_check)
     async def sfx(self, ctx, *, sound: str):
         """
-        Plays an sound effect.
+        Plays a sound effect.
 
         Sounds are found on https://freesound.org
         """
