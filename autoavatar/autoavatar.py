@@ -23,7 +23,7 @@ class AutoAvatar(commands.Cog):
     Chooses a random avatar to set from a preset list or can scrape we heart it.
     """
 
-    __version__ = "1.1.1"
+    __version__ = "1.2.0"
 
     def __init__(self, bot):
         self.bot = bot
@@ -35,10 +35,9 @@ class AutoAvatar(commands.Cog):
             "current_channel": None,
             "auto_color": False,
             "weheartit": False,
-            "weheartit_query": None,  # deprecated
             "weheartit_queries": [],
             "weheartit_query_most_popular": False,
-            "migrated_to_multi_query": False,
+            "we_heart_it_cache": ["", "", "", "", "", "", "", "", "", ""],
         }
         self.config.register_global(**default_global)
         self.bot.loop.create_task(self.migrate_to_multi_query())
@@ -52,15 +51,6 @@ class AutoAvatar(commands.Cog):
     def format_help_for_context(self, ctx):
         pre_processed = super().format_help_for_context(ctx)
         return f"{pre_processed}\n\nCog Version: {self.__version__}"
-
-    async def migrate_to_multi_query(self):
-        if await self.config.migrated_to_multi_query():
-            return
-        query = await self.config.weheartit_query()
-        if not query:
-            return
-        await self.config.weheartit_queries.set(query)
-        await self.config.migrated_to_multi_query.set(True)
 
     def get_color(self, avatar):
         try:
@@ -120,16 +110,18 @@ class AutoAvatar(commands.Cog):
             return 404
 
         link = None
-        while True:
-            if maybe_bypass_random is False:
-                link = random.choice(links)
-            else:
-                link = links[0]
-            if link != current_avatar:
+        cache = await self.config.we_heart_it_cache()
+        for link in links:
+            if link not in cache:
                 async with self.session.get(link) as request:
                     if request.status == 200:
+                        cache.insert(0, link)
+                        cache.pop()
+                        await self.config.we_heart_it_cache.set(cache)
                         return link
-            maybe_bypass_random = False
+
+        link = random.choice(links)
+        return link
 
     async def change_avatar(self, ctx):
         all_avatars = await self.config.avatars()
