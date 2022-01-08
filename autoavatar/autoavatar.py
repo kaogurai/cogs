@@ -23,7 +23,7 @@ class AutoAvatar(commands.Cog):
     Chooses a random avatar to set from a preset list or can scrape we heart it.
     """
 
-    __version__ = "1.1.0"
+    __version__ = "1.1.1"
 
     def __init__(self, bot):
         self.bot = bot
@@ -115,6 +115,9 @@ class AutoAvatar(commands.Cog):
             for y in before_interlaced:
                 with contextlib.suppress(IndexError):
                     links.append(y[x])
+
+        if not links:
+            return 404
 
         link = None
         while True:

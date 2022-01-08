@@ -14,7 +14,7 @@
 |----------|--------|---------------------|
 | AiTools  | v1.0.0 | Brainshop.ai cog |
 | AliasInjector  | v1.0.5 | Monkeypatches aliases into commands |
-| AutoAvatar | v1.1.0 | Picks random bot avatar |
+| AutoAvatar | v1.1.1 | Picks random bot avatar |
 | Notes    | v1.0.0 | Write notes on users for moderators to share |
 | Radio | v1.0.2 | Save radio stations to be easily played |
 | Screenshot | v1.0.0 | Takes a screenshot of the given link |
