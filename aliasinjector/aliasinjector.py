@@ -12,7 +12,7 @@ class AliasInjector(commands.Cog):
     Injects aliases into the discord.py command objects.
     """
 
-    __version__ = "1.0.4"
+    __version__ = "1.0.5"
 
     def __init__(self, bot):
         self.bot = bot
@@ -34,12 +34,13 @@ class AliasInjector(commands.Cog):
             command_obj = self.bot.get_command(command)
             if not command_obj:
                 continue
+            new_command_obj = command_obj.copy()
             new = aliases[command]
             for alias in new:
-                if alias not in command_obj.aliases:
-                    self.bot.remove_command(command_obj.qualified_name)
-                    command_obj.aliases.append(alias)
-                    self.bot.add_command(command_obj)
+                if alias not in new_command_obj.aliases:
+                    self.bot.remove_command(new_command_obj.qualified_name)
+                    new_command_obj.aliases.append(alias)
+                    self.bot.add_command(new_command_obj)
 
     async def remove_aliases(self):
         aliases = await self.config.aliases()
@@ -47,10 +48,11 @@ class AliasInjector(commands.Cog):
             a = aliases[command]
             command_obj = self.bot.get_command(command)
             if command_obj:
-                self.bot.remove_command(command_obj.qualified_name)
+                new_command_obj = command_obj.copy()
+                self.bot.remove_command(new_command_obj.qualified_name)
                 for alias in a:
-                    command_obj.aliases.remove(alias)
-                self.bot.add_command(command_obj)
+                    new_command_obj.aliases.remove(alias)
+                self.bot.add_command(new_command_obj)
 
     def cog_unload(self):
         self.bot.loop.create_task(self.remove_aliases())
@@ -69,14 +71,14 @@ class AliasInjector(commands.Cog):
         pass
 
     @aliasinjector.command()
-    async def add(self, ctx, alias, *, command):
+    async def add(self, ctx, alias, *, command_name):
         """
         Adds an alias to a command.
         """
         if len(alias) > 60:
             await ctx.send("Alias must be 60 characters or less.")
             return
-        command = self.bot.get_command(command)
+        command = self.bot.get_command(command_name)
         if not command:
             await ctx.send("That command doesn't exist.")
             return
@@ -84,12 +86,12 @@ class AliasInjector(commands.Cog):
             await ctx.send("That alias already exists.")
             return
         a = await self.config.aliases()
-        aliases = a.get(command.qualified_name, [])
+        aliases = a.get(command_name, [])
         aliases.append(alias)
-        a[command.qualified_name] = aliases
+        a[command_name] = aliases
         await self.config.aliases.set(a)
         await self.reload_aliases()
-        await ctx.send(f"Added alias `{alias}` to `{command.qualified_name}`.")
+        await ctx.send(f"Added alias `{alias}` to `{command_name}`.")
 
     @aliasinjector.command()
     async def remove(self, ctx, alias, *, command_name):
@@ -106,13 +108,14 @@ class AliasInjector(commands.Cog):
             await ctx.send("That alias doesn't exist.")
             return
         if command:
+            new_command_obj = command.copy()
             self.bot.remove_command(command_name)
-            command.aliases.remove(alias)
-            self.bot.add_command(command)
+            new_command_obj.aliases.remove(alias)
+            self.bot.add_command(new_command_obj)
         aliases.remove(alias)
         a[command_name] = aliases
         await self.config.aliases.set(a)
-        await ctx.send(f"Removed alias `{alias}` from `{command.qualified_name}`.")
+        await ctx.send(f"Removed alias `{alias}` from `{command_name}`.")
 
     @aliasinjector.command()
     async def clear(self, ctx):
