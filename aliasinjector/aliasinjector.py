@@ -12,7 +12,7 @@ class AliasInjector(commands.Cog):
     Injects aliases into the discord.py command objects.
     """
 
-    __version__ = "1.0.6"
+    __version__ = "1.0.7"
 
     def __init__(self, bot):
         self.bot = bot
@@ -47,7 +47,10 @@ class AliasInjector(commands.Cog):
             a = aliases[command]
             command_obj = self.bot.get_command(command)
             if command_obj:
-                self.bot.remove_command(command_obj.qualified_name)
+                try:
+                    self.bot.remove_command(command_obj.qualified_name)
+                except ValueError:
+                    continue
                 for alias in a:
                     command_obj.aliases.remove(alias)
                 self.bot.add_command(command_obj)

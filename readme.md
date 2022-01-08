@@ -13,7 +13,7 @@
 | Name | Version | Description |
 |----------|--------|---------------------|
 | AiTools  | v1.0.0 | Brainshop.ai cog |
-| AliasInjector  | v1.0.6 | Monkeypatches aliases into commands |
+| AliasInjector  | v1.0.7 | Monkeypatches aliases into commands |
 | AutoAvatar | v1.2.1 | Picks random bot avatar |
 | Notes    | v1.0.0 | Write notes on users for moderators to share |
 | Radio | v1.0.2 | Save radio stations to be easily played |
