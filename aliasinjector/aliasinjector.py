@@ -12,7 +12,7 @@ class AliasInjector(commands.Cog):
     Injects aliases into the discord.py command objects.
     """
 
-    __version__ = "1.0.0"
+    __version__ = "1.0.1"
 
     def __init__(self, bot):
         self.bot = bot
@@ -92,23 +92,24 @@ class AliasInjector(commands.Cog):
         await ctx.send(f"Added alias `{alias}` to `{command.qualified_name}`.")
 
     @aliasinjector.command()
-    async def remove(self, ctx, alias, *, command):
+    async def remove(self, ctx, alias, *, command_name):
         """
         Removes an alias from a command.
         """
-        command = self.bot.get_command(command)
+        command = self.bot.get_command(command_name)
         if not command:
             await ctx.send("That command doesn't exist.")
             return
         a = await self.config.aliases()
-        aliases = a.get(command.qualified_name, [])
+        aliases = a.get(command_name, [])
         if alias not in aliases:
             await ctx.send("That alias doesn't exist.")
             return
-        self.bot.remove_command(alias)
-        command.aliases.remove(alias)
-        self.bot.add_command(command)
-        a[command.name] = command.aliases
+        if command:
+            self.bot.remove_command(command)
+            command.aliases.remove(alias)
+            self.bot.add_command(command)
+        a[command_name] = aliases
         await self.config.aliases.set(a)
         await ctx.send(f"Removed alias `{alias}` from `{command.qualified_name}`.")
 
