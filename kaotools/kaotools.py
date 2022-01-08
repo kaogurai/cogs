@@ -354,27 +354,6 @@ class KaoTools(commands.Cog):
         embed.set_image(url=user.avatar_url_as(size=4096))
         await ctx.send(embed=embed)
 
-    @commands.command()
-    async def ping(self, ctx: commands.Context):
-        """
-        Pong.
-        """
-        before = time.monotonic()
-        msg = await ctx.send("Pong!")
-        after = time.monotonic()
-        embed = discord.Embed(
-            color=await ctx.embed_color(),
-            title="Pong!",
-            description=(
-                f"Websocket Latency: {round(self.bot.latency * 1000, 2)} ms\n"
-                f"Message Latency: {round((after - before) * 1000, 2)} ms"
-            ),
-        )
-        try:
-            await msg.edit(content=None, embed=embed)
-        except discord.NotFound:
-            await ctx.send(embed=embed)
-
     @commands.bot_has_permissions(external_emojis=True)
     @commands.bot_has_permissions(embed_links=True)
     @commands.command(aliases=["info"])
