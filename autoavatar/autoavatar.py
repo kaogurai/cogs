@@ -23,7 +23,7 @@ class AutoAvatar(commands.Cog):
     Chooses a random avatar to set from a preset list or can scrape we heart it.
     """
 
-    __version__ = "1.2.0"
+    __version__ = "1.2.1"
 
     def __init__(self, bot):
         self.bot = bot
@@ -40,7 +40,6 @@ class AutoAvatar(commands.Cog):
             "we_heart_it_cache": ["", "", "", "", "", "", "", "", "", ""],
         }
         self.config.register_global(**default_global)
-        self.bot.loop.create_task(self.migrate_to_multi_query())
 
     def cog_unload(self):
         self.bot.loop.create_task(self.session.close())
