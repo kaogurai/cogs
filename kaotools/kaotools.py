@@ -121,8 +121,6 @@ class KaoTools(commands.Cog):
             "**Hey there!**\n"
             f"My prefixes in this server are {humanize_list(prefixes)}\n"
             f"You can type `{sorted_prefixes[0]}help` to view all commands!\n"
-            f"Need some help? Join my [support server!]({SUPPORT_SERVER})\n"
-            f"Looking to invite me? [Click here!]({await self.invite_url()})"
         )
         embed = discord.Embed(
             colour=await self.bot.get_embed_colour(message.channel), description=d
@@ -263,7 +261,7 @@ class KaoTools(commands.Cog):
             return
 
         if not bot.bot:
-            await ctx.send("Dumbass")
+            await ctx.send("That user isn't a bot.")
             return
 
         embed = discord.Embed(
