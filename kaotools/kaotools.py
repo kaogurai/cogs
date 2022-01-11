@@ -613,7 +613,7 @@ class KaoTools(commands.Cog):
             return
         await ctx.send(f"Unused: \n" + box(humanize_list(repos), lang="py"))
 
-    @commands.command(aliases=["definition", "def", "synonym", "antonym"])
+    @commands.command(aliases=["definition", "synonym", "antonym"])
     async def define(self, ctx, *, thing_to_define):
         """Define a word or phrase."""
         url_encoded = urllib.parse.quote(thing_to_define)
