@@ -611,7 +611,7 @@ class KaoTools(commands.Cog):
         if not repos:
             await ctx.send("All repos are currently being used!")
             return
-        await ctx.send(f"Unused: \n" + box(repos, lang="py"))
+        await ctx.send(f"Unused: \n" + box(humanize_list(repos), lang="py"))
 
     @commands.command(aliases=["definition", "def", "synonym", "antonym"])
     async def define(self, ctx, *, thing_to_define):
