@@ -1,14 +1,11 @@
 import contextlib
 import random
 import re
-import sys
-import time
 import urllib
 from copy import copy
 
 import aiohttp
 import discord
-import redbot
 from redbot.cogs.downloader.converters import InstalledCog
 from redbot.core import Config, commands
 from redbot.core.utils import AsyncIter
@@ -352,52 +349,6 @@ class KaoTools(commands.Cog):
         embed.set_image(url=user.avatar_url_as(size=4096))
         await ctx.send(embed=embed)
 
-    @commands.bot_has_permissions(external_emojis=True)
-    @commands.bot_has_permissions(embed_links=True)
-    @commands.command(aliases=["info"])
-    async def botinfo(self, ctx: commands.Context):
-        """
-        Shows info about kaogurai.
-        """
-        author_repo = "https://github.com/Twentysix26"
-        org_repo = "https://github.com/Cog-Creators"
-        red_repo = org_repo + "/Red-DiscordBot"
-        red_pypi = "https://pypi.org/project/Red-DiscordBot"
-        red_server_url = "https://discord.gg/red"
-        dpy_repo = "https://github.com/Rapptz/discord.py"
-        python_url = "https://www.python.org/"
-        kao_repo = "https://github.com/kaogurai/red"
-
-        dpy_version = "[{}]({})".format(discord.__version__, dpy_repo)
-        python_version = "[{}.{}.{}]({})".format(*sys.version_info[:3], python_url)
-        red_version = "[{}]({})".format(redbot.__version__, red_pypi)
-
-        about = (
-            "This bot is a [custom fork]({}) of [Red, an open source Discord bot]({}) "
-            "created by [Twentysix]({}) and [improved by many]({}).\n\n"
-            "Red is backed by a passionate community who contributes and "
-            "creates content for everyone to enjoy. [Join us today]({}) "
-            "and help us improve!\n\n"
-            "(c) Cog Creators"
-        ).format(kao_repo, red_repo, author_repo, org_repo, red_server_url)
-        links = (
-            "Click [here]({}) to invite me. You'll need at least 50 members, and 50% of your members must be human.\n\n"
-            "If you have any questions, join my [support server]({})"
-        ).format(await self.invite_url(), SUPPORT_SERVER)
-        embed = discord.Embed(color=(await ctx.embed_colour()))
-        embed.add_field(
-            name="<:python:817953344118063156> Python",
-            value=python_version,
-        )
-        embed.add_field(
-            name="<:discordpy:817952974788624395> discord.py",
-            value=dpy_version,
-        )
-        embed.add_field(name="<:red:230319279424143360> Red", value=red_version)
-        embed.add_field(name="About Red", value=about, inline=False)
-        embed.add_field(name="Inviting kaogurai", value=links, inline=False)
-        await ctx.send(embed=embed)
-
     @commands.command(aliases=["oldestmessage"])
     @commands.bot_has_permissions(read_message_history=True, embed_links=True)
     async def firstmessage(
@@ -661,3 +612,35 @@ class KaoTools(commands.Cog):
             await ctx.send("All repos are currently being used!")
             return
         await ctx.send(f"Unused: \n" + box(repos, lang="py"))
+
+    @commands.command(aliases=["definition", "def", "synonym", "antonym"])
+    async def define(self, ctx, *, thing_to_define):
+        """Define a word or phrase."""
+        url_encoded = urllib.parse.quote(thing_to_define)
+        url = "https://api.dictionaryapi.dev/api/v2/entries/en/{url_encoded}"
+        async with self.session.get(url.format(url_encoded=url_encoded)) as resp:
+            if resp.status == 404:
+                await ctx.send("I couldn't find a definition for that.")
+                return
+            if resp.status != 200:
+                await ctx.send("Something went wrong when trying to get the definition.")
+                return
+            data = await resp.json()
+        embeds = []
+        for i, result in enumerate(data):
+            embed = discord.Embed(color=await ctx.embed_color())
+            embed.title = f"{result['word']} ({result['meanings'][0]['partOfSpeech']})"
+            embed.description = result['meanings'][0]['definitions'][0]["definition"]
+            if 'example' in result['meanings'][0]['definitions'][0]:
+                embed.add_field(name="Example", value=result['meanings'][0]['definitions'][0]["example"])
+            if result['meanings'][0]['definitions'][0]["synonyms"]:
+                embed.add_field(name="Synonyms", value=", ".join(result['meanings'][0]['definitions'][0]["synonyms"]))
+            if result['meanings'][0]['definitions'][0]["antonyms"]:
+                embed.add_field(name="Antonyms", value=", ".join(result['meanings'][0]['definitions'][0]["antonyms"]))
+            if len(data) > 1:
+                embed.set_footer(text=f"Result {i + 1}/{len(data)}")
+            embeds.append(embed)
+        if len(embeds) == 1:
+            await ctx.send(embed=embeds[0])
+        else:
+            await menu(ctx, embeds, DEFAULT_CONTROLS)
