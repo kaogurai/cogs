@@ -629,7 +629,12 @@ class KaoTools(commands.Cog):
         embeds = []
         for i, result in enumerate(data):
             embed = discord.Embed(color=await ctx.embed_color())
-            embed.title = f"{result['word']} ({result['meanings'][0]['partOfSpeech']})"
+            if 'partOfSpeech' in result['meanings'][0]:
+                embed.title = f"{result['word']} ({result['meanings'][0]['partOfSpeech']})"
+            else:
+                embed.title = result['word']
+            if "phonetics" in result and result["phonetics"]:
+                embed.url = result["phonetics"][0]["audio"]
             embed.description = result['meanings'][0]['definitions'][0]["definition"]
             if 'example' in result['meanings'][0]['definitions'][0]:
                 embed.add_field(name="Example", value=result['meanings'][0]['definitions'][0]["example"])
