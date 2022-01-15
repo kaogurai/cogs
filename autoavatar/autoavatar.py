@@ -62,11 +62,9 @@ class AutoAvatar(commands.Cog):
         return int
 
     async def get_we_heart_it_image(self):
-        current_avatar = await self.config.current_avatar()
         queries = await self.config.weheartit_queries()
         most_popular = await self.config.weheartit_query_most_popular()
         url = WE_HEART_IT_BASE_URL
-        maybe_bypass_random = False
         urls = []
         if queries:
             for query in queries:
@@ -77,7 +75,6 @@ class AutoAvatar(commands.Cog):
                 else:
                     url = WE_HEART_IT_QUERY_URL.format(query=query)
                     urls.append(url)
-                    maybe_bypass_random = True
         links = []
         before_interlaced = []
         for num, url in enumerate(urls):
@@ -142,14 +139,19 @@ class AutoAvatar(commands.Cog):
 
             new_avatar = random.choice(all_avatars)
 
-        async with self.session.get(new_avatar) as request:
-            if request.status == 200:
-                avatar = await request.read()
-            else:
-                if not we_heart_it:
-                    all_avatars.remove(new_avatar)
-                    await self.config.avatars.set(all_avatars)
-                return
+        for x in range(5):
+            try:
+                async with self.session.get(new_avatar) as request:
+                    if request.status == 200:
+                        avatar = await request.read()
+                        break
+                    else:
+                        if not we_heart_it:
+                            all_avatars.remove(new_avatar)
+                            await self.config.avatars.set(all_avatars)
+                        return
+            except aiohttp.ServerDisconnectedError:
+                continue
 
         if auto_color:
             result = await self.bot.loop.run_in_executor(None, self.get_color, avatar)
