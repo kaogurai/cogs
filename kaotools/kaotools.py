@@ -633,8 +633,9 @@ class KaoTools(commands.Cog):
                 embed.title = f"{result['word']} ({result['meanings'][0]['partOfSpeech']})"
             else:
                 embed.title = result['word']
-            if "phonetics" in result and result["phonetics"]:
-                embed.url = result["phonetics"][0]["audio"]
+            if "phonetics" in result and result["phonetics"] and "audio" in result["phonetics"][0]:
+                audio = result["phonetics"][0]["audio"]
+                embed.url = f"https:{audio}"
             embed.description = result['meanings'][0]['definitions'][0]["definition"]
             if 'example' in result['meanings'][0]['definitions'][0]:
                 embed.add_field(name="Example", value=result['meanings'][0]['definitions'][0]["example"])
