@@ -151,6 +151,9 @@ class AutoAvatar(commands.Cog):
                             await self.config.avatars.set(all_avatars)
                         return
             except aiohttp.ServerDisconnectedError:
+                if x == 4:
+                    await ctx.send("There seems to be issues with weheartit currently.")
+                    return
                 continue
 
         if auto_color:
