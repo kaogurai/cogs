@@ -128,7 +128,7 @@ class KaoTools(commands.Cog):
     async def on_guild_join(self, guild: discord.Guild):
         """
         Leave guilds in the blacklist
-        Leave guilds with less than 50 members
+        Leave guilds with less than 35 members
         Leave guilds with more than 50% bots
         Don't leave guilds in the whitelist
         """
@@ -140,13 +140,13 @@ class KaoTools(commands.Cog):
             await guild.leave()
             return
         botcount = len([x async for x in AsyncIter(guild.members) if x.bot])
-        if guild.member_count < 50 or botcount / guild.member_count > 0.5:
+        if guild.member_count < 35 or botcount / guild.member_count > 0.5:
             if hasattr(guild, "system_channel") and guild.system_channel:
                 with contextlib.suppress(discord.Forbidden):
                     m = (
                         "I'm leaving this server because it doesn't meet my requirements.\n\n"
                         "Remember:\n"
-                        "1. Your server needs more at least 50 members\n"
+                        "1. Your server needs more at least 35 members\n"
                         "2. You can't have more than 50% of your members be bots"
                     )
                     embed = discord.Embed(
@@ -252,7 +252,7 @@ class KaoTools(commands.Cog):
                 description=d,
             )
             embed.set_footer(
-                text="Note: You need 50 members and 50% of your member count must be human."
+                text="Note: You need 35 members and 50% of your member count must be human."
             )
             await ctx.send(embed=embed)
             return
