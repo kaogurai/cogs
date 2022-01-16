@@ -409,9 +409,12 @@ class KaoTools(commands.Cog):
         """
         Calculates the amount of love between you and the bot.
         """
-        love = random.randint(0, 100)
         if user2 is None:
             user2 = ctx.author
+        state = random.getstate()
+        random.seed(user.id + user2.id)
+        love = random.randint(0, 100)
+        random.setstate(state)
         ua = user.avatar_url_as(static_format="png")
         u2a = user2.avatar_url_as(static_format="png")
         u = f"https://api.martinebot.com/v1/imagesgen/ship?percent={love}&first_user={ua}&second_user={u2a}&no_69_percent_emoji=false"
