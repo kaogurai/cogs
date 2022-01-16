@@ -407,7 +407,7 @@ class KaoTools(commands.Cog):
     @commands.command(aliases=["ship", "lovecalc"])
     async def lovecalculator(self, ctx, user: discord.User, user2: discord.User = None):
         """
-        Calculates the amount of love between you and the bot.
+        Calculates the amount of love between two users.
         """
         if user2 is None:
             user2 = ctx.author
