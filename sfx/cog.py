@@ -137,9 +137,7 @@ class SFX(
         track.author = ""
         self.repeat_state[vc.guild.id] = repeat_state
 
-        if is_tts:
-            await channel.send(f"Playing your message...")
-        else:
+        if not is_tts:
             await channel.send(f"Playing **{track.title[:100]}**...")
 
         # No queue or anything, just add and play
