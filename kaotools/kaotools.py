@@ -2,26 +2,30 @@ import contextlib
 import random
 import re
 import urllib
+from abc import ABC
 from io import BytesIO
-from copy import copy
 
 import aiohttp
 import discord
-from redbot.cogs.downloader.converters import InstalledCog
 from redbot.core import Config, commands
-from redbot.core.utils import AsyncIter
-from redbot.core.utils.chat_formatting import box, humanize_list, pagify
+from redbot.core.utils.chat_formatting import humanize_list, pagify
 from redbot.core.utils.menus import DEFAULT_CONTROLS, menu
 from zalgo_text import zalgo
 
 from .deezer import Deezer
+from .guildmanager import GuildManager
+from .owner import OwnerCommands
 
 SUPPORT_SERVER = "https://discord.gg/p6ehU9qhg8"
 
 
-class KaoTools(commands.Cog):
+class CompositeMetaClass(type(commands.Cog), type(ABC)):
+    """Another thing I stole from last.fm for ABC"""
+
+
+class KaoTools(GuildManager, OwnerCommands, commands.Cog, metaclass=CompositeMetaClass):
     """
-    Random things that make kaogurai kaogurai.
+    Random bot tools.
     """
 
     def __init__(self, bot):
@@ -99,9 +103,7 @@ class KaoTools(commands.Cog):
 
     @commands.Cog.listener()
     async def on_message_without_command(self, message: discord.Message):
-        if message.author.bot:
-            return
-        if not message.guild:
+        if message.author.bot or not message.guild:
             return
         if not message.channel.permissions_for(message.guild.me).send_messages:
             return
@@ -127,40 +129,6 @@ class KaoTools(commands.Cog):
             colour=await self.bot.get_embed_colour(message.channel), description=d
         )
         await message.channel.send(embed=embed)
-
-    @commands.Cog.listener()
-    async def on_guild_join(self, guild: discord.Guild):
-        """
-        Leave guilds in the blacklist
-        Leave guilds with less than 25 members
-        Leave guilds with more than 50% bots
-        Don't leave guilds in the whitelist
-        """
-        if not guild:
-            return
-        if guild.id in await self.config.whitelist():
-            return
-        if guild.id in await self.config.blacklist():
-            await guild.leave()
-            return
-        botcount = len([x async for x in AsyncIter(guild.members) if x.bot])
-        if guild.member_count < 25 or botcount / guild.member_count > 0.5:
-            if hasattr(guild, "system_channel") and guild.system_channel:
-                with contextlib.suppress(discord.Forbidden):
-                    m = (
-                        "I'm leaving this server because it doesn't meet my requirements.\n\n"
-                        "Remember:\n"
-                        "1. Your server needs more at least 35 members\n"
-                        "2. You can't have more than 50% of your members be bots"
-                    )
-                    embed = discord.Embed(
-                        title="Hey there!",
-                        color=await self.bot.get_embed_colour(guild.system_channel),
-                        description=m,
-                    )
-                    await guild.system_channel.send(embed=embed)
-            await guild.leave()
-            return
 
     @commands.command(aliases=["yt"])
     async def youtube(self, ctx, *, video: str):
@@ -220,7 +188,7 @@ class KaoTools(commands.Cog):
                 description=d,
             )
             embed.set_footer(
-                text="Note: You need 35 members and 50% of your member count must be human."
+                text="Note: You need 25 members and 50% of your member count must be human."
             )
             await ctx.send(embed=embed)
             return
@@ -448,142 +416,6 @@ class KaoTools(commands.Cog):
         for page in pagify(msg):
             await ctx.send(page)
 
-    @commands.command()
-    @commands.is_owner()
-    @commands.bot_has_permissions(attach_files=True)
-    async def deezerdl(self, ctx, *, song: str):
-        """
-        Download a song from Deezer.
-        """
-        tracks = await self.deezerclient.search("track", song)
-        if not tracks:
-            return await ctx.send("I couldn't find anything for your query.")
-        track = tracks[0]
-        if int(track["FILESIZE"]) > 8000000:
-            return await ctx.send("Sorry, that song is too big to download.")
-        title = track["SNG_TITLE"]
-        artist = track["ART_NAME"]
-        name = f"{artist} - {title}.mp3"
-        await ctx.send(f"Downloading {title} by {artist}...")
-        async with ctx.typing():
-            binary = await self.deezerclient.download(track)
-            await ctx.send(file=discord.File(fp=binary, filename=name))
-
-    @commands.command()
-    @commands.is_owner()
-    @commands.bot_has_permissions(attach_files=True)
-    async def deezerplay(self, ctx, *, song: str):
-        """
-        Play a song from Deezer.
-        """
-        tracks = await self.deezerclient.search("track", song)
-        if not tracks:
-            return await ctx.send("I couldn't find anything for your query.")
-        track = tracks[0]
-        if int(track["FILESIZE"]) > 8000000:
-            return await ctx.send("Sorry, that song is too big to download.")
-        title = track["SNG_TITLE"]
-        artist = track["ART_NAME"]
-        await ctx.send(f"Playing {title} by {artist}...")
-        async with ctx.typing():
-            binary = await self.deezerclient.download(track)
-            m = await ctx.send(file=discord.File(fp=binary, filename=f"{title}.mp3"))
-        url = m.attachments[0].url
-        msg = copy(ctx.message)
-        msg.author = ctx.author
-        msg.content = ctx.prefix + f"play {url}"
-
-        ctx.bot.dispatch("message", msg)
-
-    @commands.is_owner()
-    @commands.group(aliases=["guildmgr"])
-    async def guildmanager(self, ctx):
-        """
-        Manage bot guilds.
-        """
-
-    @guildmanager.command()
-    async def whitelist(self, ctx, id: int = None):
-        """
-        Whitelist a guild or remove a guild from the whitelist.
-
-        The whitelist will be listed if no guild is provided
-        """
-        list = await self.config.whitelist()
-        if not id and not list:
-            return await ctx.send("There are no guilds on the whitelist.")
-        if not id:
-            string = "Whitelisted Guilds:\n"
-            for guild in list:
-                string += f"{guild}\n"
-            for page in pagify(string, delims=["\n"]):
-                await ctx.send(page)
-            return
-        if id in list:
-            list.remove(id)
-            await self.config.whitelist.set(list)
-            await ctx.send(f"Removed {id} from the whitelist.")
-            return
-        list.append(id)
-        await self.config.whitelist.set(list)
-        await ctx.send(f"Added {id} to the whitelist.")
-
-    @guildmanager.command()
-    async def blacklist(self, ctx, id: int = None):
-        """
-        Blacklist a guild or remove a guild from the whitelist.
-
-        The blacklist will be listed if no guild is provided
-        """
-        list = await self.config.blacklist()
-        if not id and not list:
-            return await ctx.send("There are no guilds on the blacklist.")
-        if not id:
-            string = "Blacklisted Guilds:\n"
-            for guild in list:
-                string += f"{guild}\n"
-            for page in pagify(string, delims=["\n"]):
-                await ctx.send(page)
-            return
-        if id in list:
-            list.remove(id)
-            await self.config.whitelist.set(list)
-            await ctx.send(f"Removed {id} from the blacklist.")
-            return
-        list.append(id)
-        await self.config.whitelist.set(list)
-        await ctx.send(f"Added {id} to the blacklist.")
-
-    @commands.is_owner()
-    @commands.command()
-    async def updr(self, ctx, *cogs: InstalledCog):
-        """Update cogs without questioning about reload."""
-        ctx.assume_yes = True
-        cog_update_command = ctx.bot.get_command("cog update")
-        if not cog_update_command:
-            await ctx.send(f"I can't find `{ctx.prefix}cog update` command")
-            return
-        await ctx.invoke(cog_update_command, *cogs)
-
-    @commands.command()
-    @commands.is_owner()
-    async def unusedrepos(self, ctx):
-        """View unused downloader repos."""
-        repo_cog = self.bot.get_cog("Downloader")
-        if not repo_cog:
-            return await ctx.send("Downloader cog not found.")
-        repos = [r.name for r in repo_cog._repo_manager.repos]
-        active_repos = {c.repo_name for c in await repo_cog.installed_cogs()}
-        for r in active_repos:
-            try:
-                repos.remove(r)
-            except:
-                pass
-        if not repos:
-            await ctx.send("All repos are currently being used!")
-            return
-        await ctx.send(f"Unused: \n" + box(humanize_list(repos), lang="py"))
-
     @commands.command(aliases=["definition", "synonym", "antonym"])
     async def define(self, ctx, *, thing_to_define):
         """Define a word or phrase."""
@@ -658,7 +490,9 @@ class KaoTools(commands.Cog):
                     return
                 key = resp.url.query["speech_key"]
 
-            async with self.session.get(f"http://talkobamato.me/synth/output/{key}/obama.mp4") as resp:
+            async with self.session.get(
+                f"http://talkobamato.me/synth/output/{key}/obama.mp4"
+            ) as resp:
                 if resp.status != 200:
                     await ctx.send("Something went wrong when trying to get the video.")
                     return
