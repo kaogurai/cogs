@@ -2,6 +2,7 @@ import contextlib
 import random
 import re
 import urllib
+from io import BytesIO
 from copy import copy
 
 import aiohttp
@@ -131,7 +132,7 @@ class KaoTools(commands.Cog):
     async def on_guild_join(self, guild: discord.Guild):
         """
         Leave guilds in the blacklist
-        Leave guilds with less than 35 members
+        Leave guilds with less than 25 members
         Leave guilds with more than 50% bots
         Don't leave guilds in the whitelist
         """
@@ -143,7 +144,7 @@ class KaoTools(commands.Cog):
             await guild.leave()
             return
         botcount = len([x async for x in AsyncIter(guild.members) if x.bot])
-        if guild.member_count < 35 or botcount / guild.member_count > 0.5:
+        if guild.member_count < 25 or botcount / guild.member_count > 0.5:
             if hasattr(guild, "system_channel") and guild.system_channel:
                 with contextlib.suppress(discord.Forbidden):
                     m = (
@@ -160,42 +161,6 @@ class KaoTools(commands.Cog):
                     await guild.system_channel.send(embed=embed)
             await guild.leave()
             return
-
-    @commands.command(hidden=True)
-    async def asia(self, ctx):
-        """
-        RIP ASIA
-        """
-        await ctx.send(
-            "asia is the best person on this earth and loves videos of emo kids dancing"
-        )
-        await ctx.send(
-            "https://cdn.discordapp.com/attachments/768663090337677315/795133511673053225/emokidsyummy.mp4"
-        )
-
-    @commands.bot_has_permissions(embed_links=True)
-    @commands.command(hidden=True)
-    async def maddie(self, ctx):
-        """
-        Cool Cat :)
-        """
-        embed = discord.Embed(
-            description="maddie is a cool cat + is emotionally attached to this cat’s birthday party :revolving_hearts::revolving_hearts::revolving_hearts::revolving_hearts:",
-            color=11985904,
-        )
-        embed.set_image(
-            url="https://cdn.discordapp.com/attachments/768663090337677315/796118254128332820/image0.jpg"
-        )
-        await ctx.send(embed=embed)
-
-    @commands.command(hidden=True)
-    async def oofchair(self, ctx):
-        """
-        Cool bot dev
-        """
-        await ctx.send(
-            "oof is p cool :) he's also a bot developer! check out his bot here: http://pwnbot.xyz/"
-        )
 
     @commands.command(aliases=["yt"])
     async def youtube(self, ctx, *, video: str):
@@ -671,3 +636,32 @@ class KaoTools(commands.Cog):
             await ctx.send(embed=embeds[0])
         else:
             await menu(ctx, embeds, DEFAULT_CONTROLS)
+
+    @commands.command()
+    @commands.bot_has_permissions(attach_files=True)
+    async def obama(self, ctx, *, text: str):
+        """
+        Generate a video of Obama saying something.
+
+        There is a limit of 280 characters.
+        """
+        if len(text) > 280:
+            await ctx.send("Your message needs to be 280 characters or less.")
+            return
+        async with ctx.typing():
+            async with self.session.post(
+                "http://talkobamato.me/synthesize.py",
+                data={"input_text": text},
+            ) as resp:
+                if resp.status != 200:
+                    await ctx.send("Something went wrong when trying to get the video.")
+                    return
+                key = resp.url.query["speech_key"]
+
+            async with self.session.get(f"http://talkobamato.me/synth/output/{key}/obama.mp4") as resp:
+                if resp.status != 200:
+                    await ctx.send("Something went wrong when trying to get the video.")
+                    return
+                file = BytesIO(await resp.read())
+                file.seek(0)
+                await ctx.send(file=discord.File(file, "obama.mp4"))
