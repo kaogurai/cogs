@@ -1,3 +1,6 @@
+import io
+from typing import Optional
+
 import discord
 from redbot.core import commands
 
@@ -10,26 +13,26 @@ class BaseCommandsMixin(MixinMeta):
     @commands.command()
     @commands.cooldown(rate=1, per=3, type=discord.ext.commands.cooldowns.BucketType.user)
     @commands.guild_only()
-    async def tts(self, ctx, *, text):
+    async def tts(self, ctx, file: Optional[bool] = False, *, text: str):
         """
         Plays the given text as TTS in your current voice channel.
         """
-
-        if not ctx.author.voice or not ctx.author.voice.channel:
-            await ctx.send("You are not connected to a voice channel.")
-            return
-
-        if ctx.guild.me.voice and ctx.guild.me.voice.channel:
-            if ctx.author.voice.channel != ctx.guild.me.voice.channel:
-                await ctx.send("You are not in my voice channel.")
+        if not file:
+            if not ctx.author.voice or not ctx.author.voice.channel:
+                await ctx.send("You are not connected to a voice channel.")
                 return
-        else:
-            current_perms = ctx.author.voice.channel.permissions_for(ctx.guild.me)
-            if not current_perms.speak or not current_perms.connect:
-                await ctx.send(
-                    "I do not have permissions to connect to and speak in this channel."
-                )
-                return
+
+            if ctx.guild.me.voice and ctx.guild.me.voice.channel:
+                if ctx.author.voice.channel != ctx.guild.me.voice.channel:
+                    await ctx.send("You are not in my voice channel.")
+                    return
+            else:
+                current_perms = ctx.author.voice.channel.permissions_for(ctx.guild.me)
+                if not current_perms.speak or not current_perms.connect:
+                    await ctx.send(
+                        "I do not have permissions to connect to and speak in this channel."
+                    )
+                    return
 
         author_data = await self.config.user(ctx.author).all()
         author_voice = author_data["voice"]
@@ -46,6 +49,21 @@ class BaseCommandsMixin(MixinMeta):
             return
 
         url = await generate_url(self, author_voice, text, author_translate)
+
+        if file:
+            async with self.session.get(url) as resp:
+                if resp.status != 200:
+                    await ctx.send("Something went wrong. Try again later.")
+                    return
+                data = await resp.read()
+                f = io.BytesIO(data)
+                f.seek(0)
+                await ctx.send(
+                    content="Here's your TTS file!",
+                    file=discord.File(fp=f, filename="tts.mp3"),
+                )
+                return
+
         track_info = ("Text to Speech", ctx.author)
         await self.play_sfx(
             ctx.author.voice.channel,
@@ -67,28 +85,30 @@ class BaseCommandsMixin(MixinMeta):
     @commands.cooldown(rate=1, per=3, type=discord.ext.commands.cooldowns.BucketType.user)
     @commands.guild_only()
     @commands.check(sfx_check)
-    async def sfx(self, ctx, *, sound: str):
+    async def sfx(self, ctx, file: Optional[bool] = False, *, sound: str):
         """
         Plays a sound effect.
 
         Sounds are found on https://freesound.org
         """
 
-        if not ctx.author.voice or not ctx.author.voice.channel:
-            await ctx.send("You are not connected to a voice channel.")
-            return
+        if not file:
+            if not ctx.author.voice or not ctx.author.voice.channel:
+                await ctx.send("You are not connected to a voice channel.")
+                return
 
-        if ctx.guild.me.voice and ctx.guild.me.voice.channel:
-            if ctx.author.voice.channel != ctx.guild.me.voice.channel:
-                await ctx.send("You are not in my voice channel.")
-                return
-        else:
-            current_perms = ctx.author.voice.channel.permissions_for(ctx.guild.me)
-            if not current_perms.speak or not current_perms.connect:
-                await ctx.send(
-                    "I do not have permissions to connect to and speak in this channel."
-                )
-                return
+            if ctx.guild.me.voice and ctx.guild.me.voice.channel:
+                if ctx.author.voice.channel != ctx.guild.me.voice.channel:
+                    await ctx.send("You are not in my voice channel.")
+                    return
+            else:
+                current_perms = ctx.author.voice.channel.permissions_for(ctx.guild.me)
+                if not current_perms.speak or not current_perms.connect:
+                    await ctx.send(
+                        "I do not have permissions to connect to and speak in this channel."
+                    )
+                    return
+
         async with ctx.typing():
 
             async with self.session.get(
@@ -127,6 +147,20 @@ class BaseCommandsMixin(MixinMeta):
                 data = await resp.json()
                 url = data["previews"]["preview-hq-mp3"]
                 track_info = (data["description"], ctx.author)
+
+            if file:
+                async with self.session.get(url) as resp:
+                    if resp.status != 200:
+                        await ctx.send("Something went wrong. Try again later.")
+                        return
+                    data = await resp.read()
+                    f = io.BytesIO(data)
+                    f.seek(0)
+                    await ctx.send(
+                        content="Here's your SFX file!",
+                        file=discord.File(fp=f, filename="sfx.mp3"),
+                    )
+                    return
 
             await self.play_sfx(
                 ctx.author.voice.channel, ctx.channel, False, None, None, url, track_info

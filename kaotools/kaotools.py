@@ -632,20 +632,35 @@ class KaoTools(commands.Cog):
         embeds = []
         for i, result in enumerate(data):
             embed = discord.Embed(color=await ctx.embed_color())
-            if 'partOfSpeech' in result['meanings'][0]:
-                embed.title = f"{result['word']} ({result['meanings'][0]['partOfSpeech']})"
+            if "partOfSpeech" in result["meanings"][0]:
+                embed.title = (
+                    f"{result['word']} ({result['meanings'][0]['partOfSpeech']})"
+                )
             else:
-                embed.title = result['word']
-            if "phonetics" in result and result["phonetics"] and "audio" in result["phonetics"][0]:
+                embed.title = result["word"]
+            if (
+                "phonetics" in result
+                and result["phonetics"]
+                and "audio" in result["phonetics"][0]
+            ):
                 audio = result["phonetics"][0]["audio"]
                 embed.url = f"https:{audio}"
-            embed.description = result['meanings'][0]['definitions'][0]["definition"]
-            if 'example' in result['meanings'][0]['definitions'][0]:
-                embed.add_field(name="Example", value=result['meanings'][0]['definitions'][0]["example"])
-            if result['meanings'][0]['definitions'][0]["synonyms"]:
-                embed.add_field(name="Synonyms", value=", ".join(result['meanings'][0]['definitions'][0]["synonyms"]))
-            if result['meanings'][0]['definitions'][0]["antonyms"]:
-                embed.add_field(name="Antonyms", value=", ".join(result['meanings'][0]['definitions'][0]["antonyms"]))
+            embed.description = result["meanings"][0]["definitions"][0]["definition"]
+            if "example" in result["meanings"][0]["definitions"][0]:
+                embed.add_field(
+                    name="Example",
+                    value=result["meanings"][0]["definitions"][0]["example"],
+                )
+            if result["meanings"][0]["definitions"][0]["synonyms"]:
+                embed.add_field(
+                    name="Synonyms",
+                    value=", ".join(result["meanings"][0]["definitions"][0]["synonyms"]),
+                )
+            if result["meanings"][0]["definitions"][0]["antonyms"]:
+                embed.add_field(
+                    name="Antonyms",
+                    value=", ".join(result["meanings"][0]["definitions"][0]["antonyms"]),
+                )
             if len(data) > 1:
                 embed.set_footer(text=f"Result {i + 1}/{len(data)}")
             embeds.append(embed)
