@@ -106,17 +106,20 @@ class KaoTools(commands.Cog):
             return
         if await self.bot.allowed_by_whitelist_blacklist(who=message.author) is False:
             return
-        if not re.compile(rf"^<@!?{self.bot.user.id}>$").match(message.content):
+        app = await self.bot.application_info()
+        if not re.compile(rf"^<@!?{app.id}>$").match(message.content):
             return
         prefixes = await self.bot.get_prefix(message.channel)
-        if f"<@!{self.bot.user.id}> " in prefixes:
-            prefixes.remove(f"<@!{self.bot.user.id}> ")
+        if f"<@!{app.id}> " in prefixes:
+            prefixes.remove(f"<@!{app.id}> ")
         sorted_prefixes = sorted(prefixes, key=len)
         if len(sorted_prefixes) > 500:
             return
+        prefixes_s = "es" if len(sorted_prefixes) > 1 else ""
+        are_is = "are" if len(sorted_prefixes) > 1 else "is"
         d = (
             "**Hey there!**\n"
-            f"My prefixes in this server are {humanize_list(prefixes)}\n"
+            f"My prefix{prefixes_s} in this server {are_is} {humanize_list(prefixes)}\n"
             f"You can type `{sorted_prefixes[0]}help` to view all commands!\n"
         )
         embed = discord.Embed(
