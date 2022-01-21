@@ -28,7 +28,7 @@ class SFX(
 ):
     """Plays sound effects or text-to-speech."""
 
-    __version__ = "4.4.0"
+    __version__ = "4.4.1"
 
     def __init__(self, bot):
         self.bot = bot

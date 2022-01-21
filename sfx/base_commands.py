@@ -157,7 +157,7 @@ class BaseCommandsMixin(MixinMeta):
                     f = io.BytesIO(data)
                     f.seek(0)
                     await ctx.send(
-                        content="Here's your SFX file!",
+                        content=f"Here's '{data['description']}'",
                         file=discord.File(fp=f, filename="sfx.mp3"),
                     )
                     return
