@@ -153,8 +153,8 @@ class BaseCommandsMixin(MixinMeta):
                     if resp.status != 200:
                         await ctx.send("Something went wrong. Try again later.")
                         return
-                    data = await resp.read()
-                    f = io.BytesIO(data)
+                    file_data = await resp.read()
+                    f = io.BytesIO(file_data)
                     f.seek(0)
                     await ctx.send(
                         content=f"Here's '{data['description']}'",

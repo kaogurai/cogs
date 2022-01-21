@@ -18,6 +18,6 @@
 | Notes    | v1.0.0 | Write notes on users for moderators to share |
 | Radio | v1.0.2 | Save radio stations to be easily played |
 | Screenshot | v1.0.0 | Takes a screenshot of the given link |
-| SFX | v4.4.1 | Plays SFX & TTS in voice channels (originally made by baiumbg) |
+| SFX | v4.4.2 | Plays SFX & TTS in voice channels (originally made by baiumbg) |
 | SmartLyrics | v1.1.0 | Get lyrics of your current song from 4 different sources |
 
