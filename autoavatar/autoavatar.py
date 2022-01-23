@@ -53,8 +53,9 @@ class AutoAvatar(commands.Cog):
         return f"{pre_processed}\n\nCog Version: {self.__version__}"
 
     def get_color(self, avatar):
-
-        colors = colorgram.extract(avatar, 1)
+        bio = BytesIO(avatar)
+        bio.seek(0)
+        colors = colorgram.extract(bio, 1)
         color = colors[0].rgb
         int = (color[0] << 16) + (color[1] << 8) + color[2]
         return int
