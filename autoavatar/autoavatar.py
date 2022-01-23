@@ -5,6 +5,7 @@ import urllib
 from io import BytesIO
 
 import aiohttp
+import colorgram
 import discord
 from bs4 import BeautifulSoup
 from PIL import Image
@@ -52,12 +53,9 @@ class AutoAvatar(commands.Cog):
         return f"{pre_processed}\n\nCog Version: {self.__version__}"
 
     def get_color(self, avatar):
-        try:
-            img = Image.open(BytesIO(avatar)).convert("RGB")
-        except Exception:
-            return
-        resized = img.resize((1, 1))
-        color = resized.getpixel((0, 0))
+
+        colors = colorgram.extract(avatar, 1)
+        color = colors[0].rgb
         int = (color[0] << 16) + (color[1] << 8) + color[2]
         return int
 
