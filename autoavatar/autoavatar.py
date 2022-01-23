@@ -8,7 +8,6 @@ import aiohttp
 import colorgram
 import discord
 from bs4 import BeautifulSoup
-from PIL import Image
 from redbot.core import Config, commands
 from redbot.core.utils.chat_formatting import humanize_list, pagify
 
@@ -57,7 +56,7 @@ class AutoAvatar(commands.Cog):
         bio.seek(0)
         colors = colorgram.extract(bio, 1)
         color = colors[0].rgb
-        int = (color[0] << 16) + (color[1] << 8) + color[2]
+        int = (color[0] << 16) + (color[1] << 8) + color[2]  # RGB -> int
         return int
 
     async def get_we_heart_it_image(self):
