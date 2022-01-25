@@ -6,7 +6,6 @@ from .abc import MixinMeta
 class JoinAndLeaveMixin(MixinMeta):
     @commands.Cog.listener()
     async def on_voice_state_update(self, user, before, after):
-        print(user, before.channel, after.channel)
 
         guild_config = await self.config.guild(user.guild).all()
         if not guild_config["allow_join_and_leave"]:
@@ -27,7 +26,7 @@ class JoinAndLeaveMixin(MixinMeta):
 
             track_info = ("Join Sound", user)
 
-            await self.play_sfx(
+            await self.play_sound(
                 after.channel,
                 None,
                 "joinleave",
@@ -48,7 +47,7 @@ class JoinAndLeaveMixin(MixinMeta):
                     return
 
             track_info = ("Leave Sound", user)
-            await self.play_sfx(
+            await self.play_sound(
                 before.channel,
                 None,
                 "joinleave",
@@ -57,12 +56,17 @@ class JoinAndLeaveMixin(MixinMeta):
             )
             return
 
-    @commands.command()
+    @commands.group()
+    async def joinandleave(self, ctx):
+        """Join and leave sounds."""
+        pass
+
+    @joinandleave.command()
     @commands.guild_only()
     @commands.admin_or_permissions(manage_guild=True)
-    async def joinandleave(self, ctx):
+    async def toggle(self, ctx):
         """
-        Toggle join and leave sounds being played in voice channels.
+        Toggle join and leave sounds being played in voice channels in this server.
         """
         conf = await self.config.guild(ctx.guild).allow_join_and_leave()
         await self.config.guild(ctx.guild).allow_join_and_leave.set(not conf)
@@ -72,12 +76,12 @@ class JoinAndLeaveMixin(MixinMeta):
             else "Join and leave sounds will no longer be played in voice channels."
         )
 
-    @commands.command()
-    async def setjoinsound(self, ctx, url: str = None):
+    @joinandleave.command()
+    async def setjoin(self, ctx, url: str = None):
         """
         Set the sound that plays when you join a voice channel.
 
-        Providing no attachment or url will remove the current join sound.
+        Providing no attachment or url will clear the current sound.
         """
         if not url:
             attachments = ctx.message.attachments
@@ -100,12 +104,12 @@ class JoinAndLeaveMixin(MixinMeta):
             "I've set your sound that will be played upon you joining a voice channel."
         )
 
-    @commands.command()
-    async def setleavesound(self, ctx, url: str = None):
+    @joinandleave.command()
+    async def setleave(self, ctx, url: str = None):
         """
         Set the sound that plays when you leave a voice channel.
 
-        Providing no attachment or url will remove the current leave sound.
+        Providing no attachment or url will clear the current sound.
         """
         if not url:
             attachments = ctx.message.attachments

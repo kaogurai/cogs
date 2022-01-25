@@ -29,9 +29,9 @@ class SFX(
     TTSChannelMixin,
     metaclass=CompositeMetaClass,
 ):
-    """Plays sound effects or text-to-speech."""
+    """Plays sound effects, text-to-speech, and sounds when you join or leave a voice channel."""
 
-    __version__ = "4.5.0"
+    __version__ = "4.5.1"
 
     def __init__(self, bot):
         self.bot = bot
@@ -105,7 +105,7 @@ class SFX(
             self.id = api_tokens.get("id")
             self.key = api_tokens.get("key")
 
-    async def play_sfx(self, vc, channel, type: str, urls: list, track_info: tuple):
+    async def play_sound(self, vc, channel, type: str, urls: list, track_info: tuple):
         """
         Plays an audio file in a voice channel.
 

@@ -66,7 +66,7 @@ class BaseCommandsMixin(MixinMeta):
                 return
 
         track_info = ("Text to Speech", ctx.author)
-        await self.play_sfx(
+        await self.play_sound(
             ctx.author.voice.channel,
             ctx.channel,
             "tts",
@@ -86,7 +86,7 @@ class BaseCommandsMixin(MixinMeta):
     @commands.check(sfx_check)
     async def sfx(self, ctx, file: Optional[bool] = False, *, sound: str):
         """
-        Plays a sound effect.
+        Plays a sound effect in your current voice channel.
 
         Sounds are found on https://freesound.org
         """
@@ -161,7 +161,7 @@ class BaseCommandsMixin(MixinMeta):
                     )
                     return
 
-            await self.play_sfx(
+            await self.play_sound(
                 ctx.author.voice.channel,
                 ctx.channel,
                 "sfx",
