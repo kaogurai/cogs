@@ -31,7 +31,7 @@ class SFX(
 ):
     """Plays sound effects, text-to-speech, and sounds when you join or leave a voice channel."""
 
-    __version__ = "4.5.2"
+    __version__ = "4.5.3"
 
     def __init__(self, bot):
         self.bot = bot

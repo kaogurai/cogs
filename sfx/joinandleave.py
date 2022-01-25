@@ -94,11 +94,6 @@ class JoinAndLeaveMixin(MixinMeta):
             await ctx.send("You need to provide a .mp3 or .wav file.")
             return
 
-        async with self.session.get(url) as resp:
-            if resp.status != 200:
-                await ctx.send("That URL doesn't seem to work.")
-                return
-
         await self.config.user(ctx.author).join_sound.set(url)
         await ctx.send(
             "I've set your sound that will be played upon you joining a voice channel."
@@ -121,11 +116,6 @@ class JoinAndLeaveMixin(MixinMeta):
         if not url.endswith((".mp3", ".wav")):
             await ctx.send("You need to provide a .mp3 or .wav file.")
             return
-
-        async with self.session.get(url) as resp:
-            if resp.status != 200:
-                await ctx.send("That URL doesn't seem to work.")
-                return
 
         await self.config.user(ctx.author).join_sound.set(url)
         await ctx.send(
