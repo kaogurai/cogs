@@ -10,6 +10,7 @@ class FestivalPlugin:
         self.voices = voices
         self.name = "Festival"
         self.limit = 70
+        self.needs_request = True
 
     async def generate_url(self, voice: str, text: str):
         params = {

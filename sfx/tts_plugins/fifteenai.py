@@ -17,6 +17,7 @@ class FifteenAIPlugin:
         self.voices = voices
         self.name = "15.ai"
         self.limit = 200
+        self.needs_request = True
 
     async def generate_url(self, voice: str, text: str):
         text = re.sub(r"[0-9]", "", text)

@@ -10,6 +10,7 @@ class StreamElementsPlugin:
         self.voices = voices
         self.name = "StreamElements"
         self.limit = 1000
+        self.needs_request = False
 
     async def generate_url(self, voice: str, text: str):
         params = {

@@ -10,6 +10,7 @@ class MaryTTSPlugin:
         self.voices = voices
         self.name = "MaryTTS"
         self.limit = 1000
+        self.needs_request = False
 
     async def generate_url(self, voice: str, text: str):
         params = {

@@ -1,6 +1,7 @@
 import contextlib
 import unicodedata
 from abc import ABC
+from csv import list_dialects
 
 import aiohttp
 import discord
@@ -9,6 +10,7 @@ import unidecode
 from redbot.core import Config, commands
 
 from .base_commands import BaseCommandsMixin
+from .joinandleave import JoinAndLeaveMixin
 from .tts_api import generate_url
 from .tts_channels import TTSChannelMixin
 from .user_config import UserConfigMixin
@@ -22,13 +24,14 @@ class CompositeMetaClass(type(commands.Cog), type(ABC)):
 class SFX(
     BaseCommandsMixin,
     commands.Cog,
+    JoinAndLeaveMixin,
     UserConfigMixin,
     TTSChannelMixin,
     metaclass=CompositeMetaClass,
 ):
     """Plays sound effects or text-to-speech."""
 
-    __version__ = "4.4.3"
+    __version__ = "4.5.0"
 
     def __init__(self, bot):
         self.bot = bot
@@ -37,8 +40,10 @@ class SFX(
         user_config = {
             "voice": "Anna",
             "translate": False,
+            "join_sound": "",
+            "leave_sound": "",
         }
-        guild_config = {"channels": []}
+        guild_config = {"channels": [], "allow_join_and_leave": False}
         self.config.register_user(**user_config)
         self.config.register_guild(**guild_config)
         lavalink.register_event_listener(self.ll_check)
@@ -100,7 +105,17 @@ class SFX(
             self.id = api_tokens.get("id")
             self.key = api_tokens.get("key")
 
-    async def play_sfx(self, vc, channel, is_tts, author_data, text, link, track_info):
+    async def play_sfx(self, vc, channel, type: str, urls: list, track_info: tuple):
+        """
+        Plays an audio file in a voice channel.
+
+        Parameters:
+        vc: The voice channel to play the audio in.
+        channel: The text channel to send messages in. Can be None.
+        type: The type of SFX to play. (joinleave, tts, sfx)
+        urls: The list of URLs to play. (Only more than one link is supported for TTS)
+        track_info: Tuple of track name and author (discord.py object).
+        """
         try:
             player = lavalink.get_player(vc.guild.id)
         except KeyError:
@@ -109,26 +124,18 @@ class SFX(
         repeat_state = player.repeat
         player.repeat = False
 
-        tts_msg = None
-        if is_tts:
-            tts_msg = await channel.send("Generating audio...")
-
-        tracks = await player.load_tracks(query=link)
+        tracks = await player.load_tracks(query=urls[0])
         if not tracks.tracks:
-            # Naver is the only voice i consider reliable, so if another source fails, use Anna/Naver
-            if is_tts and voices[author_data["voice"]]["api"] != "Naver":
-                link = await generate_url(self, "Anna", text, author_data["translate"])
-                tracks = await player.load_tracks(query=link)
+            if type == "tts":
+                tracks = await player.load_tracks(query=urls[1])
                 if not tracks.tracks:
-                    await channel.send("Something went wrong.")
+                    if channel:
+                        await channel.send("Something went wrong.")
                     return
             else:
-                await channel.send("Something went wrong.")
+                if channel:
+                    await channel.send("Something went wrong.")
                 return
-
-        if is_tts:
-            with contextlib.suppress(discord.HTTPException):
-                await tts_msg.delete()
 
         track = tracks.tracks[0]
         track_title, track_requester = track_info
@@ -137,7 +144,7 @@ class SFX(
         track.author = ""
         self.repeat_state[vc.guild.id] = repeat_state
 
-        if not is_tts:
+        if type == "sfx":
             await channel.send(f"Playing **{track.title[:100]}**...")
 
         # No queue or anything, just add and play

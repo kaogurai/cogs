@@ -49,6 +49,7 @@ class BaseCommandsMixin(MixinMeta):
             return
 
         url = await generate_url(self, author_voice, text, author_translate)
+        backup_url = await generate_url(self, "Anna", text, author_translate)
 
         if file:
             async with self.session.get(url) as resp:
@@ -68,10 +69,8 @@ class BaseCommandsMixin(MixinMeta):
         await self.play_sfx(
             ctx.author.voice.channel,
             ctx.channel,
-            True,
-            author_data,
-            text,
-            url,
+            "tts",
+            [url, backup_url],
             track_info,
         )
 
@@ -163,5 +162,9 @@ class BaseCommandsMixin(MixinMeta):
                     return
 
             await self.play_sfx(
-                ctx.author.voice.channel, ctx.channel, False, None, None, url, track_info
+                ctx.author.voice.channel,
+                ctx.channel,
+                "sfx",
+                [url],
+                track_info,
             )

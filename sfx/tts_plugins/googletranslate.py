@@ -10,6 +10,7 @@ class GoogleTranslatePlugin:
         self.voices = voices
         self.name = "Google Translate"
         self.limit = 200
+        self.needs_request = False
 
     async def generate_url(self, voice: str, text: str):
         params = {
