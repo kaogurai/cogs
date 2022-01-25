@@ -3,6 +3,7 @@ from typing import Optional
 
 import discord
 from redbot.core import commands
+from redbot.core.utils.chat_formatting import escape
 
 from .abc import MixinMeta
 from .tts_api import generate_url
@@ -115,7 +116,7 @@ class BaseCommandsMixin(MixinMeta):
                 params={
                     "query": sound,
                     "token": self.key,
-                    "filter": "duration:[0.5 TO 5]",
+                    "filter": "duration:[0.5 TO 15]",
                 },
             ) as resp:
                 if resp.status != 200:
@@ -145,7 +146,9 @@ class BaseCommandsMixin(MixinMeta):
 
                 data = await resp.json()
                 url = data["previews"]["preview-hq-mp3"]
-                track_info = (data["description"], ctx.author)
+
+            name = escape(data["name"].split(f".{data['type']}")[0])
+            track_info = (name, ctx.author)
 
             if file:
                 async with self.session.get(url) as resp:
@@ -156,8 +159,8 @@ class BaseCommandsMixin(MixinMeta):
                     f = io.BytesIO(file_data)
                     f.seek(0)
                     await ctx.send(
-                        content=f"Here's '{data['description']}'",
-                        file=discord.File(fp=f, filename=f"{data['description']}.mp3"),
+                        content=f"Here's '{name}'!",
+                        file=discord.File(fp=f, filename=f"{name}.mp3"),
                     )
                     return
 
