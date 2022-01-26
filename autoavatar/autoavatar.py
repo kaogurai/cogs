@@ -23,7 +23,7 @@ class AutoAvatar(commands.Cog):
     Chooses a random avatar to set from a preset list or can scrape we heart it.
     """
 
-    __version__ = "1.2.1"
+    __version__ = "1.2.2"
 
     def __init__(self, bot):
         self.bot = bot
@@ -148,9 +148,12 @@ class AutoAvatar(commands.Cog):
                             all_avatars.remove(new_avatar)
                             await self.config.avatars.set(all_avatars)
                         return
-            except aiohttp.ServerDisconnectedError:
+            except (aiohttp.ServerDisconnectedError, aiohttp.ServerTimeoutError):
                 if x == 4:
-                    await ctx.send("There seems to be issues with weheartit currently.")
+                    if we_heart_it:
+                        await ctx.send("There seems to be an issue with weheartit currently.")
+                    else:
+                        await ctx.send("There seems to be an issue trying to download an avatar.")
                     return
                 continue
 

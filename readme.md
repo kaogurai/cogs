@@ -14,10 +14,10 @@
 |----------|--------|---------------------|
 | AiTools  | v1.0.0 | Brainshop.ai cog |
 | AliasInjector  | v1.0.7 | Monkeypatches aliases into commands |
-| AutoAvatar | v1.2.1 | Picks random bot avatar |
+| AutoAvatar | v1.2.2 | Picks random bot avatar |
 | Notes    | v1.0.0 | Write notes on users for moderators to share |
 | Radio | v1.0.2 | Save radio stations to be easily played |
 | Screenshot | v1.0.0 | Takes a screenshot of the given link |
-| SFX | v4.5.3 | Plays SFX, TTS, and join/leave in voice channels (originally made by baiumbg) |
+| SFX | v4.5.3 | Plays SFX, TTS, and join/leave sounds in voice channels (originally made by baiumbg) |
 | SmartLyrics | v1.1.0 | Get lyrics of your current song from 4 different sources |
 
