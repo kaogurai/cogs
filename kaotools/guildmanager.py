@@ -31,7 +31,7 @@ class GuildManager(MixinMeta):
                     m = (
                         "I'm leaving this server because it doesn't meet my requirements.\n\n"
                         "Remember:\n"
-                        "1. Your server needs more at least 35 members\n"
+                        "1. Your server needs more at least 25 members\n"
                         "2. You can't have more than 50% of your members be bots"
                     )
                     embed = discord.Embed(
