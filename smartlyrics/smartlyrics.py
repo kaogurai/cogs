@@ -7,15 +7,13 @@ from redbot.core import commands
 from redbot.core.utils.chat_formatting import pagify
 from redbot.core.utils.menus import DEFAULT_CONTROLS, menu
 
-from .deezer import Deezer
-
 
 class SmartLyrics(commands.Cog):
     """
     Gets lyrics for your current song.
     """
 
-    __version__ = "1.1.0"
+    __version__ = "1.1.1"
 
     def __init__(self, bot):
         self.bot = bot
