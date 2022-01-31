@@ -25,14 +25,14 @@ class GuildManager(MixinMeta):
             await guild.leave()
             return
         botcount = len([x async for x in AsyncIter(guild.members) if x.bot])
-        if guild.member_count < 50 or botcount / guild.member_count >= 0.5:
+        if guild.member_count < 50 or botcount / guild.member_count >= 0.25:
             if hasattr(guild, "system_channel") and guild.system_channel:
                 with contextlib.suppress(discord.Forbidden):
                     m = (
                         "I'm leaving this server because it doesn't meet my requirements.\n\n"
                         "Remember:\n"
                         "1. Your server needs more at least 50 members\n"
-                        "2. You can't have more than 50% of your members be bots"
+                        "2. You can't have more than 25% of your members be bots"
                     )
                     embed = discord.Embed(
                         title="Hey there!",
