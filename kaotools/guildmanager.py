@@ -40,8 +40,27 @@ class GuildManager(MixinMeta):
                         description=m,
                     )
                     await guild.system_channel.send(embed=embed)
+                        
             await guild.leave()
             return
+
+        kao_channel = self.bot.get_channel(768663090337677312)
+        joined = int(guild.created_at.timestamp())
+        m = (
+            f"• Guild Name: {guild.name}\n"
+            f"• Guild ID: {guild.id}\n"
+            f"• Member Count: {guild.member_count}\n"
+            f"• Bot Count: {botcount}\n"
+            f"• Guild Owner {guild.owner} ({guild.owner.id})\n"
+            f"• Guild Creation: <t:{joined}> (<t:{joined}:R>)"
+        )
+        embed = discord.Embed(
+            title="I joined a new server!",
+            description=m,
+            color=await self.bot.get_embed_colour(kao_channel),
+        )
+        await kao_channel.send(embed=embed)
+
 
     @commands.is_owner()
     @commands.group(aliases=["guildmgr"])
