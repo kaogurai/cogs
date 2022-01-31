@@ -25,7 +25,7 @@ class GuildManager(MixinMeta):
             await guild.leave()
             return
         botcount = len([x async for x in AsyncIter(guild.members) if x.bot])
-        if botcount / guild.member_count >= 0.5:
+        if guild.member_count < 50 or botcount / guild.member_count >= 0.5:
             if hasattr(guild, "system_channel") and guild.system_channel:
                 with contextlib.suppress(discord.Forbidden):
                     m = (
