@@ -163,13 +163,12 @@ class TTSChannelMixin(MixinMeta):
             return
 
         url = await generate_url(self, author_voice, text, author_translate)
-        backup_url = await generate_url(self, "Anna", text, author_translate)
         track_info = ("Text to Speech", message.author)
 
         await self.play_sound(
             message.author.voice.channel,
             message.channel,
             "tts",
-            [url, backup_url],
+            url,
             track_info,
         )

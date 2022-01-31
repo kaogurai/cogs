@@ -30,7 +30,7 @@ class JoinAndLeaveMixin(MixinMeta):
                 after.channel,
                 None,
                 "joinleave",
-                [user_config["join_sound"]],
+                user_config["join_sound"],
                 track_info,
             )
             return
@@ -51,7 +51,7 @@ class JoinAndLeaveMixin(MixinMeta):
                 before.channel,
                 None,
                 "joinleave",
-                [user_config["leave_sound"]],
+                user_config["leave_sound"],
                 track_info,
             )
             return

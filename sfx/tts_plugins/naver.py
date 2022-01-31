@@ -11,6 +11,7 @@ class NaverPlugin:
         self.name = "Naver"
         self.limit = 1000
         self.needs_request = False
+        self.use_ipv6 = False
 
     async def generate_url(self, voice: str, text: str):
         params = {

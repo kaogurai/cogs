@@ -1,20 +1,17 @@
 import contextlib
 import unicodedata
 from abc import ABC
-from csv import list_dialects
 
 import aiohttp
-import discord
 import lavalink
 import unidecode
 from redbot.core import Config, commands
 
 from .base_commands import BaseCommandsMixin
 from .joinandleave import JoinAndLeaveMixin
-from .tts_api import generate_url
+from .proxy import ProxyMixin
 from .tts_channels import TTSChannelMixin
 from .user_config import UserConfigMixin
-from .voices import voices
 
 
 class CompositeMetaClass(type(commands.Cog), type(ABC)):
@@ -25,13 +22,14 @@ class SFX(
     BaseCommandsMixin,
     commands.Cog,
     JoinAndLeaveMixin,
-    UserConfigMixin,
+    ProxyMixin,
     TTSChannelMixin,
+    UserConfigMixin,
     metaclass=CompositeMetaClass,
 ):
     """Plays sound effects, text-to-speech, and sounds when you join or leave a voice channel."""
 
-    __version__ = "4.5.3"
+    __version__ = "4.6.0"
 
     def __init__(self, bot):
         self.bot = bot
@@ -42,6 +40,7 @@ class SFX(
             "translate": False,
             "join_sound": "",
             "leave_sound": "",
+            "proxy_url": "",
         }
         guild_config = {"channels": [], "allow_join_and_leave": False}
         self.config.register_user(**user_config)
@@ -73,7 +72,7 @@ class SFX(
             with contextlib.suppress(KeyError):
                 self.channel_cache[guild] = all_guilds[guild]["channels"]
 
-    # We modify the player repeat state to avoid issues with SFX, so we need to set it back if the TTS hasn't ended
+    # We modify the player repeat state to avoid issues with SFX, so we need to set it back if the SFX hasn't ended
     async def reset_player_states(self):
         for guild_id in self.last_track_info.keys():
             try:
@@ -105,7 +104,7 @@ class SFX(
             self.id = api_tokens.get("id")
             self.key = api_tokens.get("key")
 
-    async def play_sound(self, vc, channel, type: str, urls: list, track_info: tuple):
+    async def play_sound(self, vc, channel, type: str, url: str, track_info: tuple):
         """
         Plays an audio file in a voice channel.
 
@@ -113,7 +112,7 @@ class SFX(
         vc: The voice channel to play the audio in.
         channel: The text channel to send messages in. Can be None.
         type: The type of SFX to play. (joinleave, tts, sfx)
-        urls: The list of URLs to play. (Only more than one link is supported for TTS)
+        url: The URL to play.
         track_info: Tuple of track name and author (discord.py object).
         """
         try:
@@ -124,17 +123,10 @@ class SFX(
         repeat_state = player.repeat
         player.repeat = False
 
-        tracks = await player.load_tracks(query=urls[0])
+        tracks = await player.load_tracks(query=url)
         if not tracks.tracks:
-            if type == "tts":
-                tracks = await player.load_tracks(query=urls[1])
-                if not tracks.tracks:
-                    if channel:
-                        await channel.send("Something went wrong.")
-                    return
-            else:
-                if channel:
-                    await channel.send("Something went wrong.")
+            if channel:
+                await channel.send("Something went wrong.")
                 return
 
         track = tracks.tracks[0]

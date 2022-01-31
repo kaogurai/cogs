@@ -1,3 +1,5 @@
+from urllib.parse import quote_plus
+
 from .voices import voices
 
 
@@ -6,10 +8,15 @@ async def generate_url(self, voice: str, text: str, translate: bool):
     Input: voice: str, text: str, speed: int
     Output: url:str
     """
+    proxy_url = await self.config.proxy_url()
     if translate:
         text = await _translate_text(self, voices[voice]["languageCode"], text)
     plugin = voices[voice]["api"](voices, self.session)
     url = await plugin.generate_url(voice, text)
+    if proxy_url and plugin.use_ipv6:
+        if proxy_url.endswith("/"):
+            proxy_url = proxy_url[:-1]
+        url = f"{proxy_url}/{quote_plus(url)}"
     return url
 
 

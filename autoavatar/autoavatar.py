@@ -151,9 +151,13 @@ class AutoAvatar(commands.Cog):
             except (aiohttp.ServerDisconnectedError, aiohttp.ServerTimeoutError):
                 if x == 4:
                     if we_heart_it:
-                        await ctx.send("There seems to be an issue with weheartit currently.")
+                        await ctx.send(
+                            "There seems to be an issue with weheartit currently."
+                        )
                     else:
-                        await ctx.send("There seems to be an issue trying to download an avatar.")
+                        await ctx.send(
+                            "There seems to be an issue trying to download an avatar."
+                        )
                     return
                 continue
 
