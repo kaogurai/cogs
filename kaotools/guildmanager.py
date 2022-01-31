@@ -13,7 +13,7 @@ class GuildManager(MixinMeta):
     async def on_guild_join(self, guild: discord.Guild):
         """
         Leave guilds in the blacklist
-        Leave guilds with less than 25 members
+        Leave guilds with less than 50 members
         Leave guilds with more than 50% bots
         Don't leave guilds in the whitelist
         """
@@ -25,13 +25,13 @@ class GuildManager(MixinMeta):
             await guild.leave()
             return
         botcount = len([x async for x in AsyncIter(guild.members) if x.bot])
-        if guild.member_count < 25 or botcount / guild.member_count > 0.5:
+        if guild.member_count < 50 or botcount / guild.member_count > 0.5:
             if hasattr(guild, "system_channel") and guild.system_channel:
                 with contextlib.suppress(discord.Forbidden):
                     m = (
                         "I'm leaving this server because it doesn't meet my requirements.\n\n"
                         "Remember:\n"
-                        "1. Your server needs more at least 25 members\n"
+                        "1. Your server needs more at least 50 members\n"
                         "2. You can't have more than 50% of your members be bots"
                     )
                     embed = discord.Embed(

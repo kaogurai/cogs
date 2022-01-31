@@ -188,7 +188,7 @@ class KaoTools(GuildManager, OwnerCommands, commands.Cog, metaclass=CompositeMet
                 description=d,
             )
             embed.set_footer(
-                text="Note: You need 25 members and 50% of your member count must be human."
+                text="Note: You need 50 members and 50% of your member count must be human."
             )
             await ctx.send(embed=embed)
             return
