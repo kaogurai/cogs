@@ -1,0 +1,8 @@
+{
+    "author" : ["alec"],
+    "name": "PhisherMan",
+    "short" : "Protects users against phishing attacks using phisherman.gg",
+    "description" : "Protects users against phishing attacks using phisherman.gg",
+    "install_msg": "Thanks for installing!\n\nFor this cog to work, you'll need to get a phisherman API key. Right now they aren't widely available, but if you get one, use the `[p]set api phisherman key <key>` command to set it.",
+    "tags" : ["phishing", "moderation", "automod"]
+}

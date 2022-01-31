@@ -360,34 +360,6 @@ class KaoTools(GuildManager, OwnerCommands, commands.Cog, metaclass=CompositeMet
         e.set_footer(text="Powered by api.martinebot.com")
         await ctx.send(embed=e)
 
-    @commands.command(aliases=["pp", "dingdong"])
-    async def penis(self, ctx, *users: discord.Member):
-        """
-        Get user's penis size!
-        """
-        if not users:
-            users = (ctx.author,)
-
-        penises = {}
-        msg = ""
-        state = random.getstate()
-
-        for user in users:
-            random.seed(user.id)
-
-            dong_size = random.randint(0, 30)
-
-            penises[user] = "8{}D".format("=" * dong_size)
-
-        random.setstate(state)
-        dongs = sorted(penises.items(), key=lambda x: x[1])
-
-        for user, dong in dongs:
-            msg += "**{}'s size:**\n{}\n".format(user.display_name, dong)
-
-        for page in pagify(msg):
-            await ctx.send(page)
-
     @commands.command(aliases=["listemojis", "emojilist"])
     @commands.guild_only()
     @commands.admin_or_permissions(manage_emojis=True)

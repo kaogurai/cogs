@@ -16,6 +16,7 @@
 | AliasInjector  | v1.0.7 | Monkeypatches aliases into commands |
 | AutoAvatar | v1.2.2 | Picks random bot avatar |
 | Notes    | v1.0.0 | Write notes on users for moderators to share |
+| PhisherMan | v1.0.0 | Detect phishing URLs using [phisherman](https://phisherman.gg) | 
 | Radio | v1.0.2 | Save radio stations to be easily played |
 | Screenshot | v1.0.0 | Takes a screenshot of the given link |
 | SFX | v4.5.3 | Plays SFX, TTS, and join/leave sounds in voice channels (originally made by baiumbg) |
