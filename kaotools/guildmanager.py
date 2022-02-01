@@ -82,7 +82,11 @@ class GuildManager(MixinMeta):
         if not id:
             string = "Whitelisted Guilds:\n"
             for guild in list:
-                string += f"{guild}\n"
+                guild_obj = self.bot.get_guild(guild)
+                if guild_obj:
+                    string += f"{guild_obj.name} ({guild_obj.id})\n"
+                else:
+                    string += f"{guild_obj.id}\n"
             for page in pagify(string, delims=["\n"]):
                 await ctx.send(page)
             return
