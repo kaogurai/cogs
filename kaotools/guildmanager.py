@@ -19,12 +19,31 @@ class GuildManager(MixinMeta):
         """
         if not guild:
             return
-        if guild.id in await self.config.whitelist():
-            return
         if guild.id in await self.config.blacklist():
             await guild.leave()
             return
+
         botcount = len([x async for x in AsyncIter(guild.members) if x.bot])
+        kao_channel = self.bot.get_channel(768663090337677312)
+        joined = int(guild.created_at.timestamp())
+        m = (
+            f"• Guild Name: {guild.name}\n"
+            f"• Guild ID: {guild.id}\n"
+            f"• Member Count: {guild.member_count}\n"
+            f"• Bot Count: {botcount}\n"
+            f"• Guild Owner {guild.owner} ({guild.owner.id})\n"
+            f"• Guild Creation: <t:{joined}> (<t:{joined}:R>)"
+        )
+
+        if guild.id in await self.config.whitelist():
+            embed = discord.Embed(
+                title="I joined a whitelisted server!",
+                description=m,
+                color=await self.bot.get_embed_colour(kao_channel),
+            )
+            await kao_channel.send(embed=embed)
+            return
+        
         if guild.member_count < 50 or botcount / guild.member_count > 0.5:
             if hasattr(guild, "system_channel") and guild.system_channel:
                 with contextlib.suppress(discord.Forbidden):
@@ -44,16 +63,6 @@ class GuildManager(MixinMeta):
             await guild.leave()
             return
 
-        kao_channel = self.bot.get_channel(768663090337677312)
-        joined = int(guild.created_at.timestamp())
-        m = (
-            f"• Guild Name: {guild.name}\n"
-            f"• Guild ID: {guild.id}\n"
-            f"• Member Count: {guild.member_count}\n"
-            f"• Bot Count: {botcount}\n"
-            f"• Guild Owner {guild.owner} ({guild.owner.id})\n"
-            f"• Guild Creation: <t:{joined}> (<t:{joined}:R>)"
-        )
         embed = discord.Embed(
             title="I joined a new server!",
             description=m,
