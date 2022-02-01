@@ -24,7 +24,7 @@ class GuildManager(MixinMeta):
             return
 
         botcount = len([x async for x in AsyncIter(guild.members) if x.bot])
-        kao_channel = self.bot.get_channel(768663090337677312)
+        kao_channel = self.bot.get_channel(818684148847345714)
         joined = int(guild.created_at.timestamp())
         m = (
             f"• Guild Name: {guild.name}\n"
