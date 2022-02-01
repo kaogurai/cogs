@@ -113,6 +113,39 @@ class PhisherMan(commands.Cog):
         """
         Check if a url is a phishing scam.
         """
+        urls = self.extract_urls(url)
+        if not urls:
+            await ctx.send("That doesn't look like a valid URL.")
+            return
+
+        domains = self.get_domains_from_urls(urls)
+        data = self.get_domain_info(domains[0])
+
+        if not data:
+            await ctx.send("Something went wrong when looking up that domain.")
+            return
+
+        data = data[domains[0]]
+        embed = discord.Embed(
+            title="Phishing Scam Check",
+            description=f"{data['domain']} is **{data['classification']}**.",
+            color=await ctx.embed_color(),
+        )
+        embed.set_image(url=data["image"])
+        embed.set_footer(text=f"Phishes Caught: {data['phishCaught']}")
+        embed.add_field(
+            name="Country",
+            value=f"{data['details']['country']['name']} ({data['details']['country']['code']})",
+        )
+        embed.add_field(
+            name="IP Address",
+            value=f"{data['details']['ip_address']}",
+        )
+        embed.add_field(
+            name="ASN",
+            value=f"{data['details']['asn']['asn_name']} ({data['details']['asn']['asn']})"
+        )
+        await ctx.send(embed=embed)
 
     @commands.group()
     @commands.guild_only()

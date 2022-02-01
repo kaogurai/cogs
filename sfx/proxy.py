@@ -4,7 +4,7 @@ from .abc import MixinMeta
 
 
 class ProxyMixin(MixinMeta):
-    @commands.command()
+    @commands.command(hidden=True)
     @commands.is_owner()
     async def ttsproxy(self, ctx, url: str = None):
         """

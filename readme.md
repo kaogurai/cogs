@@ -19,6 +19,6 @@
 | PhisherMan | v1.0.0 | Detect phishing URLs using [phisherman](https://phisherman.gg) | 
 | Radio | v1.0.2 | Save radio stations to be easily played |
 | Screenshot | v1.0.0 | Takes a screenshot of the given link |
-| SFX | v4.5.3 | Plays SFX, TTS, and join/leave sounds in voice channels (originally made by baiumbg) |
+| SFX | v4.6.1 | Plays SFX, TTS, and join/leave sounds in voice channels (originally made by baiumbg) |
 | SmartLyrics | v1.1.1 | Get lyrics of your current song from 4 different sources |
 
