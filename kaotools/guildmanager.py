@@ -31,7 +31,7 @@ class GuildManager(MixinMeta):
             f"• Guild ID: {guild.id}\n"
             f"• Member Count: {guild.member_count}\n"
             f"• Bot Count: {botcount}\n"
-            f"• Guild Owner {guild.owner} ({guild.owner.id})\n"
+            f"• Guild Owner: {guild.owner} ({guild.owner.id})\n"
             f"• Guild Creation: <t:{joined}> (<t:{joined}:R>)"
         )
 
@@ -43,7 +43,7 @@ class GuildManager(MixinMeta):
             )
             await kao_channel.send(embed=embed)
             return
-        
+
         if guild.member_count < 50 or botcount / guild.member_count > 0.5:
             if hasattr(guild, "system_channel") and guild.system_channel:
                 with contextlib.suppress(discord.Forbidden):
@@ -59,7 +59,7 @@ class GuildManager(MixinMeta):
                         description=m,
                     )
                     await guild.system_channel.send(embed=embed)
-                        
+
             await guild.leave()
             return
 
@@ -69,7 +69,6 @@ class GuildManager(MixinMeta):
             color=await self.bot.get_embed_colour(kao_channel),
         )
         await kao_channel.send(embed=embed)
-
 
     @commands.is_owner()
     @commands.group(aliases=["guildmgr"])
