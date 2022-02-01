@@ -60,18 +60,31 @@ class PhisherMan(commands.Cog):
         for url in urls:
             parsed = urlparse(url)
             domains.append(parsed.netloc)
+        return list(set(domains))  # Removes duplicates
 
-    async def get_domain_info(self, url: str):
+    async def get_domain_info(self, domain: str):
         """
         Get information about a domain.
         """
+        async with self.session.get(
+            f"https://api.phisherman.gg/v2/domains/info/{domain}"
+        ) as request:
+            if request.status != 200:
+                return
+            data = await request.json()
+            return data
 
-    async def get_domain_safety(self, url: str):
+    async def get_domain_safety(self, domain: str):
         """
         Get safety information about a domain.
-
-        Possible outcomes are: "safe", "suspicious", "malicious"
         """
+        async with self.session.get(
+            f"https://api.phisherman.gg/v2/domains/check/{domain}"
+        ) as request:
+            if request.status != 200:
+                return
+            data = await request.json()
+            return data
 
     @commands.Cog.listener()
     async def on_message_without_command(self, message: discord.Message):
