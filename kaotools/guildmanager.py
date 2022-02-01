@@ -84,9 +84,9 @@ class GuildManager(MixinMeta):
             for guild in list:
                 guild_obj = self.bot.get_guild(guild)
                 if guild_obj:
-                    string += f"{guild_obj.name} ({guild_obj.id})\n"
+                    string += f"{guild_obj.name} ({guild})\n"
                 else:
-                    string += f"{guild_obj.id}\n"
+                    string += f"{guild}\n"
             for page in pagify(string, delims=["\n"]):
                 await ctx.send(page)
             return
