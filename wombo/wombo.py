@@ -12,7 +12,7 @@ class Wombo(commands.Cog):
     Generate incredible art using AI.
     """
 
-    __version__ = "1.0.4"
+    __version__ = "1.0.5"
 
     def __init__(self, bot):
         self.bot = bot
@@ -62,8 +62,8 @@ class Wombo(commands.Cog):
             if req.status == 200:
                 resp = await req.text()
                 resp = json.loads(resp)
-                if "nudity" in resp:
-                    return resp["nudity"]
+                if "nudity_percentage" in resp:
+                    return resp["nudity_percentage"] > 0.2
             return False
 
     async def get_bearer_token(self):
