@@ -13,7 +13,7 @@ class AntiPhishing(commands.Cog):
     Protects users against phishing attacks.
     """
 
-    __version__ = "1.0.0"
+    __version__ = "1.0.1"
 
     def __init__(self, bot):
         self.bot = bot
@@ -210,7 +210,7 @@ class AntiPhishing(commands.Cog):
                         reason=f"Sent a phishing link: {data['matches'][0]['domain']}",
                     )
 
-    @commands.command(aliases=["checkforphish", "checkscam", "checkforscam"])
+    @commands.command(aliases=["checkforphish", "checkscam", "checkforscam", "checkphishing"])
     @commands.bot_has_permissions(embed_links=True)
     async def checkphish(self, ctx, url: str):
         """
@@ -295,7 +295,7 @@ class AntiPhishing(commands.Cog):
 
         await ctx.send(embed=embed)
 
-    @commands.group()
+    @commands.group(aliases=["antiphish"])
     @commands.guild_only()
     @commands.admin_or_permissions(manage_guild=True)
     async def antiphishing(self, ctx):
@@ -309,8 +309,8 @@ class AntiPhishing(commands.Cog):
         Choose the action that occurs when a user sends a phishing scam.
 
         Options:
-        `ignore` - Does nothing
-        `notify` - Sends a message to the channel and says it's a phishing scam
+        `ignore` - Disables the anti-phishing integration (default)
+        `notify` - Sends a message to the channel and says it's a phishing scam 
         `delete` - Deletes the message
         `kick` - Kicks the author
         `ban` - Bans the author

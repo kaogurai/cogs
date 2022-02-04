@@ -13,7 +13,6 @@
 | Name | Version | Description |
 |----------|--------|---------------------|
 | AiTools  | v1.0.0 | Brainshop.ai cog |
-| AliasInjector  | v1.0.7 | Monkeypatches aliases into commands |
 | AntiPhishing  | v1.0.0 | Protect users against phishing scams |
 | AutoAvatar | v1.2.2 | Picks random bot avatar |
 | Notes    | v1.0.0 | Write notes on users for moderators to share |
