@@ -12,7 +12,7 @@ class Wombo(commands.Cog):
     Generate incredible art using AI.
     """
 
-    __version__ = "1.0.7"
+    __version__ = "1.0.8"
 
     def __init__(self, bot):
         self.bot = bot
@@ -64,7 +64,7 @@ class Wombo(commands.Cog):
                     resp = await req.text()
                     resp = json.loads(resp)
                     if "nudity_percentage" in resp:
-                        return resp["nudity_percentage"] > 0.25
+                        return resp["nudity_percentage"] > 0.5
         except aiohttp.ClientError:
             pass
         return False
