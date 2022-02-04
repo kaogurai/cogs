@@ -1,5 +1,6 @@
 import asyncio
 import contextlib
+import json
 
 import aiohttp
 import discord
@@ -59,7 +60,8 @@ class Wombo(commands.Cog):
             "http://api.rest7.com/v1/detect_nudity.php", params=params
         ) as req:
             if req.status == 200:
-                resp = await req.json()
+                resp = await req.text()
+                resp = json.loads(resp)
                 if "nudity" in resp:
                     return resp["nudity"]
             return False
