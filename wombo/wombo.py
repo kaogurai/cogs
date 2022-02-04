@@ -11,7 +11,7 @@ class Wombo(commands.Cog):
     Generate incredible art using AI.
     """
 
-    __version__ = "1.0.1"
+    __version__ = "1.0.2"
 
     def __init__(self, bot):
         self.bot = bot
@@ -52,6 +52,24 @@ class Wombo(commands.Cog):
         style = style.lower()
         if style in styles:
             return styles[style]
+
+    def check_nsfw(self, message):
+        bad_words = [
+            "penis",
+            "dick",
+            "boobs",
+            "vagina",
+            "sex",
+            "porn",
+            "ass",
+            "milf",
+            "dilf",
+            "cum",
+            "fuck",
+        ]
+        for word in bad_words:
+            if word in message:
+                return True
 
     async def get_bearer_token(self):
         params = {"key": "AIzaSyDCvp5MTJLUdtBYEKYWXJrlLzu1zuKM6Xw"}
@@ -136,6 +154,12 @@ class Wombo(commands.Cog):
             text = args[0].strip()
             if text == "":
                 await ctx.send("You need to specify text to draw.")
+                return
+
+        if not ctx.channel.is_nsfw():
+            nsfw = self.check_nsfw(text)
+            if nsfw:
+                await ctx.send("This channel is not NSFW.")
                 return
 
         style = self.get_style(style)

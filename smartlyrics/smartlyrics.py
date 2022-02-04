@@ -205,11 +205,16 @@ class SmartLyrics(commands.Cog):
         username = await lastfmcog.config.user(ctx.author).lastfm_username()
         if lastfmcog and username:
             try:
-                trackname, artistname, albumname, imageurl  = await lastfmcog.get_current_track(ctx, username)
-            except: 
+                (
+                    trackname,
+                    artistname,
+                    albumname,
+                    imageurl,
+                ) = await lastfmcog.get_current_track(ctx, username)
+            except:
                 await ctx.send("Please provide a query to search.")
                 return
-            
+
             trackname = f"{trackname} {artistname}"
             results = await self.get_lyrics(trackname)
             if results:
