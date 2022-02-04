@@ -13,7 +13,7 @@ class AntiPhishing(commands.Cog):
     Protects users against phishing attacks.
     """
 
-    __version__ = "1.0.3"
+    __version__ = "1.0.4"
 
     def __init__(self, bot):
         self.bot = bot
@@ -68,7 +68,7 @@ class AntiPhishing(commands.Cog):
         Extract URLs from a message.
         """
         return re.findall(
-            r"(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z0-9][a-z0-9-]{0,61}[a-z0-9]",
+            r"(?:[A-z0-9](?:[A-z0-9-]{0,61}[A-z0-9])?\.)+[A-z0-9][A-z0-9-]{0,61}[A-z0-9]",
             message,
         )
 
