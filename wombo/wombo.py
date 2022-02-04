@@ -11,7 +11,7 @@ class Wombo(commands.Cog):
     Generate incredible art using AI.
     """
 
-    __version__ = "1.0.0"
+    __version__ = "1.0.1"
 
     def __init__(self, bot):
         self.bot = bot
@@ -114,10 +114,13 @@ class Wombo(commands.Cog):
 
             await asyncio.sleep(1.5)
 
-    @commands.command(aliases=["draw", "aiart"])
+    @commands.command(aliases=["draw", "aiart"], usage="<text> [--style <style>]")
     async def wombo(self, ctx, *, text: str):
         """
         Generate art using AI.
+
+        Possible styles:
+        synthwave, ukiyoe, none, steampunk, fantasy, vibrant, hd, pastel, psychic, darkfantasy, mystical, festive, baroque, etching, sdali, wuhtercuhler, provenance, rosegold
         """
         if len(text) > 100:
             await ctx.send("The text needs to be 100 characters or less.")
