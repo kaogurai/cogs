@@ -1,0 +1,9 @@
+{
+    "author" : ["alec"],
+    "name": "AntiPhishing",
+    "short" : "Protects users against phishing attacks.",
+    "description" : "Protects users against phishing attacks.",
+    "install_msg": "Thanks for installing!",
+    "tags" : ["phishing", "moderation", "automod"],
+    "hidden" : true
+}

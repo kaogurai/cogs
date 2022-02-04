@@ -1,8 +1,8 @@
-from .phisherman import PhisherMan
+from .antiphishing import AntiPhishing
 
 
 async def setup(bot):
-    cog = PhisherMan(bot)
+    cog = AntiPhishing(bot)
     bot.add_cog(cog)
 
 
