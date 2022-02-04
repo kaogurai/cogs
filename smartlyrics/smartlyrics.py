@@ -13,7 +13,7 @@ class SmartLyrics(commands.Cog):
     Gets lyrics for your current song.
     """
 
-    __version__ = "1.1.1"
+    __version__ = "1.1.2"
 
     def __init__(self, bot):
         self.bot = bot
@@ -193,7 +193,6 @@ class SmartLyrics(commands.Cog):
                         return
 
         statustext = self.get_user_status_song(ctx.author)
-
         if statustext:
             results = await self.get_lyrics(statustext)
             if results:
@@ -203,28 +202,15 @@ class SmartLyrics(commands.Cog):
                 await ctx.send(f"Nothing was found for `{statustext}`")
                 return
 
-        if lastfmcog and await lastfmcog.config.user(ctx.author).lastfm_username():
+        username = await lastfmcog.config.user(ctx.author).lastfm_username()
+        if lastfmcog and username:
             try:
-                data = await lastfmcog.api_request(
-                    ctx,
-                    {
-                        "user": await lastfmcog.config.user(ctx.author).lastfm_username(),
-                        "method": "user.getrecenttracks",
-                        "limit": 1,
-                    },
-                )
-            except:
-                await ctx.send(
-                    "Uh oh, there was an error accessing your Last.FM account."
-                )
-                return
-
-            tracks = data["recenttracks"]["track"]
-            if not tracks:
+                trackname, artistname, albumname, imageurl  = await lastfmcog.get_current_track(ctx, username)
+            except: 
                 await ctx.send("Please provide a query to search.")
                 return
-            latesttrack = data["recenttracks"]["track"][0]
-            trackname = latesttrack["name"] + " " + latesttrack["artist"]["#text"]
+            
+            trackname = f"{trackname} {artistname}"
             results = await self.get_lyrics(trackname)
             if results:
                 await self.create_menu(ctx, results, "Last.fm")
