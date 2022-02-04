@@ -11,7 +11,7 @@ class Wombo(commands.Cog):
     Generate incredible art using AI.
     """
 
-    __version__ = "1.0.3"
+    __version__ = "1.0.4"
 
     def __init__(self, bot):
         self.bot = bot
@@ -60,7 +60,8 @@ class Wombo(commands.Cog):
         ) as req:
             if req.status == 200:
                 resp = await req.json()
-                return resp["nudity"]
+                if "nudity" in resp:
+                    return resp["nudity"]
             return False
 
     async def get_bearer_token(self):
@@ -146,12 +147,6 @@ class Wombo(commands.Cog):
             text = args[0].strip()
             if text == "":
                 await ctx.send("You need to specify text to draw.")
-                return
-
-        if not ctx.channel.is_nsfw():
-            nsfw = self.check_nsfw(text)
-            if nsfw:
-                await ctx.send("This channel is not NSFW.")
                 return
 
         style = self.get_style(style)
