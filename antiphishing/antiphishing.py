@@ -13,7 +13,7 @@ class AntiPhishing(commands.Cog):
     Protects users against phishing attacks.
     """
 
-    __version__ = "1.0.2"
+    __version__ = "1.0.3"
 
     def __init__(self, bot):
         self.bot = bot
@@ -38,28 +38,28 @@ class AntiPhishing(commands.Cog):
             await modlog.register_casetype(
                 name="phish_found",
                 default_setting=True,
-                image="🔒",
+                image="🎣",
                 case_str="Phishing Link Detected",
             )
             # delete setting
             await modlog.register_casetype(
                 name="phish_deleted",
                 default_setting=True,
-                image="🔒",
+                image="🎣",
                 case_str="Phishing Link Detected - Auto-Deleted",
             )
             # kick setting
             await modlog.register_casetype(
                 name="phish_kicked",
                 default_setting=True,
-                image="🔒",
+                image="🎣",
                 case_str="Phishing Link Detected - Auto-Kicked",
             )
             # ban setting
             await modlog.register_casetype(
                 name="phish_banned",
                 default_setting=True,
-                image="🔒",
+                image="🎣",
                 case_str="Phishing Link Detected - Auto-Banned",
             )
 
