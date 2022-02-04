@@ -64,7 +64,7 @@ class Wombo(commands.Cog):
                     resp = await req.text()
                     resp = json.loads(resp)
                     if "nudity_percentage" in resp:
-                        return resp["nudity_percentage"] > 0.5
+                        return resp["nudity_percentage"] > 0.25
         except aiohttp.ClientError:
             pass
         return False
@@ -185,7 +185,10 @@ class Wombo(commands.Cog):
                 if is_nsfw:
                     with contextlib.suppress(discord.NotFound):
                         await m.delete()
-                    await ctx.send("This channel is not NSFW.")
+                    try:
+                        await m.edit("This channel is not NSFW.")
+                    except discord.NotFound:
+                        await ctx.send("This channel is not NSFW.")
                     return
 
             embed = discord.Embed(title="Here's your art!", color=await ctx.embed_color())
