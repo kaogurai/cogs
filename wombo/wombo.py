@@ -11,7 +11,7 @@ class Wombo(commands.Cog):
     Generate incredible art using AI.
     """
 
-    __version__ = "1.0.2"
+    __version__ = "1.0.3"
 
     def __init__(self, bot):
         self.bot = bot
@@ -53,23 +53,15 @@ class Wombo(commands.Cog):
         if style in styles:
             return styles[style]
 
-    def check_nsfw(self, message):
-        bad_words = [
-            "penis",
-            "dick",
-            "boobs",
-            "vagina",
-            "sex",
-            "porn",
-            "ass",
-            "milf",
-            "dilf",
-            "cum",
-            "fuck",
-        ]
-        for word in bad_words:
-            if word in message:
-                return True
+    async def check_nsfw(self, link):
+        params = {"url": link}
+        async with self.session.get(
+            "http://api.rest7.com/v1/detect_nudity.php", params=params
+        ) as req:
+            if req.status == 200:
+                resp = await req.json()
+                return resp["nudity"]
+            return False
 
     async def get_bearer_token(self):
         params = {"key": "AIzaSyDCvp5MTJLUdtBYEKYWXJrlLzu1zuKM6Xw"}
@@ -187,6 +179,14 @@ class Wombo(commands.Cog):
                     await m.delete()
                 await ctx.send("Failed to generate art. Please try again later.")
                 return
+
+            if not ctx.channel.is_nsfw():
+                is_nsfw = await self.check_nsfw(link)
+                if is_nsfw:
+                    with contextlib.suppress(discord.NotFound):
+                        await m.delete()
+                    await ctx.send("This channel is not NSFW.")
+                    return
 
             embed = discord.Embed(title="Here's your art!", color=await ctx.embed_color())
             embed.set_image(url=link)
