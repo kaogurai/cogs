@@ -12,7 +12,7 @@ class Wombo(commands.Cog):
     Generate incredible art using AI.
     """
 
-    __version__ = "1.0.5"
+    __version__ = "1.0.6"
 
     def __init__(self, bot):
         self.bot = bot
@@ -56,15 +56,18 @@ class Wombo(commands.Cog):
 
     async def check_nsfw(self, link):
         params = {"url": link}
-        async with self.session.get(
-            "http://api.rest7.com/v1/detect_nudity.php", params=params
-        ) as req:
-            if req.status == 200:
-                resp = await req.text()
-                resp = json.loads(resp)
-                if "nudity_percentage" in resp:
-                    return resp["nudity_percentage"] > 0.2
-            return False
+        try:
+            async with self.session.get(
+                "http://api.rest7.com/v1/detect_nudity.php", params=params
+            ) as req:
+                if req.status == 200:
+                    resp = await req.text()
+                    resp = json.loads(resp)
+                    if "nudity_percentage" in resp:
+                        return resp["nudity_percentage"] > 0.2
+        except aiohttp.ClientError:
+            pass
+        return False
 
     async def get_bearer_token(self):
         params = {"key": "AIzaSyDCvp5MTJLUdtBYEKYWXJrlLzu1zuKM6Xw"}
