@@ -64,7 +64,7 @@ class Wombo(commands.Cog):
                     resp = await req.text()
                     resp = json.loads(resp)
                     if "nudity_percentage" in resp:
-                        return resp["nudity_percentage"] > 0.2
+                        return resp["nudity_percentage"] > 0.1
         except aiohttp.ClientError:
             pass
         return False
