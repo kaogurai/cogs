@@ -13,7 +13,7 @@ class AntiPhishing(commands.Cog):
     Protects users against phishing attacks.
     """
 
-    __version__ = "1.0.4"
+    __version__ = "1.1.0"
 
     def __init__(self, bot):
         self.bot = bot
@@ -172,14 +172,19 @@ class AntiPhishing(commands.Cog):
                     )
 
             if action == "kick":
-                if message.channel.permissions_for(message.guild.me).kick_members:
-                    if (
-                        message.author.top_role >= message.guild.me.top_role
-                        or message.author == message.guild.owner
-                    ):
-                        return
+                if (
+                    message.channel.permissions_for(message.guild.me).kick_members
+                    and message.channel.permissions_for(message.guild.me).manage_messages
+                ):
+                    with contextlib.suppress(discord.NotFound):
+                        await message.delete()
+                        if (
+                            message.author.top_role >= message.guild.me.top_role
+                            or message.author == message.guild.owner
+                        ):
+                            return
 
-                    await message.author.kick()
+                        await message.author.kick()
 
                     await modlog.create_case(
                         guild=message.guild,
@@ -191,14 +196,19 @@ class AntiPhishing(commands.Cog):
                         reason=f"Sent a phishing link: {data['matches'][0]['domain']}",
                     )
             if action == "ban":
-                if message.channel.permissions_for(message.guild.me).ban_members:
-                    if (
-                        message.author.top_role >= message.guild.me.top_role
-                        or message.author == message.guild.owner
-                    ):
-                        return
+                if (
+                    message.channel.permissions_for(message.guild.me).ban_members
+                    and message.channel.permissions_for(message.guild.me).manage_messages
+                ):
+                    with contextlib.suppress(discord.NotFound):
+                        await message.delete()
+                        if (
+                            message.author.top_role >= message.guild.me.top_role
+                            or message.author == message.guild.owner
+                        ):
+                            return
 
-                    await message.author.ban()
+                        await message.author.ban()
 
                     await modlog.create_case(
                         guild=message.guild,
@@ -210,7 +220,9 @@ class AntiPhishing(commands.Cog):
                         reason=f"Sent a phishing link: {data['matches'][0]['domain']}",
                     )
 
-    @commands.command(aliases=["checkforphish", "checkscam", "checkforscam", "checkphishing"])
+    @commands.command(
+        aliases=["checkforphish", "checkscam", "checkforscam", "checkphishing"]
+    )
     @commands.bot_has_permissions(embed_links=True)
     async def checkphish(self, ctx, url: str):
         """
@@ -310,10 +322,10 @@ class AntiPhishing(commands.Cog):
 
         Options:
         `ignore` - Disables the anti-phishing integration (default)
-        `notify` - Sends a message to the channel and says it's a phishing scam 
+        `notify` - Sends a message to the channel and says it's a phishing scam
         `delete` - Deletes the message
-        `kick` - Kicks the author
-        `ban` - Bans the author
+        `kick` - Kicks the author (also deletes the message)
+        `ban` - Bans the author (also deletes the message)
         """
         if action not in ["ignore", "notify", "delete", "kick", "ban"]:
             await ctx.send(
