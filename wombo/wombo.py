@@ -12,7 +12,7 @@ class Wombo(commands.Cog):
     Generate incredible art using AI.
     """
 
-    __version__ = "1.0.6"
+    __version__ = "1.0.7"
 
     def __init__(self, bot):
         self.bot = bot
