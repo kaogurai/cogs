@@ -12,7 +12,7 @@ class Wombo(commands.Cog):
     Generate incredible art using AI.
     """
 
-    __version__ = "1.0.8"
+    __version__ = "1.0.9"
 
     def __init__(self, bot):
         self.bot = bot
@@ -186,7 +186,7 @@ class Wombo(commands.Cog):
                     with contextlib.suppress(discord.NotFound):
                         await m.delete()
                     try:
-                        await m.edit("This channel is not NSFW.")
+                        await m.edit(content="This channel is not NSFW.")
                     except discord.NotFound:
                         await ctx.send("This channel is not NSFW.")
                     return
