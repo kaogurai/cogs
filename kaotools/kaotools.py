@@ -3,18 +3,17 @@ import random
 import re
 import urllib
 from abc import ABC
-from io import BytesIO
 
 import aiohttp
 import discord
 from redbot.core import Config, commands
 from redbot.core.utils.chat_formatting import humanize_list, pagify
 from redbot.core.utils.menus import DEFAULT_CONTROLS, menu
-from zalgo_text import zalgo
 
-from .deezer import Deezer
 from .guildmanager import GuildManager
+from .image import ImageMixin
 from .owner import OwnerCommands
+from .text import TextMixin
 
 SUPPORT_SERVER = "https://discord.gg/p6ehU9qhg8"
 
@@ -23,7 +22,14 @@ class CompositeMetaClass(type(commands.Cog), type(ABC)):
     """Another thing I stole from last.fm for ABC"""
 
 
-class KaoTools(GuildManager, OwnerCommands, commands.Cog, metaclass=CompositeMetaClass):
+class KaoTools(
+    GuildManager,
+    ImageMixin,
+    OwnerCommands,
+    TextMixin,
+    commands.Cog,
+    metaclass=CompositeMetaClass,
+):
     """
     Random bot tools.
     """
@@ -37,7 +43,6 @@ class KaoTools(GuildManager, OwnerCommands, commands.Cog, metaclass=CompositeMet
         }
         self.config.register_global(**default_global)
         self.session = aiohttp.ClientSession()
-        self.deezerclient = Deezer()
         setattr(
             bot._connection,
             "parse_interaction_create",
@@ -306,60 +311,6 @@ class KaoTools(GuildManager, OwnerCommands, commands.Cog, metaclass=CompositeMet
         else:
             await ctx.send("No messages found.")
 
-    @commands.command()
-    async def vowelify(self, ctx: commands.Context, *, text: str):
-        """
-        Multiplies all vowels in a sentence.
-        """
-        uwuified = "".join(
-            [c if c in "aeiouAEIOU" else (c * 3 if c not in "aeiou" else c) for c in text]
-        )
-        await ctx.send(uwuified[:1000])
-
-    @commands.command(aliases=["uwuify", "owo", "owoify"])
-    async def uwu(self, ctx: commands.Context, *, text: str):
-        """
-        Uwuifies a sentence.
-        """
-        encoded = urllib.parse.quote(text)
-        async with self.session.get(
-            f"https://owo.l7y.workers.dev/?text={encoded}"
-        ) as req:
-            if req.status == 200:
-                data = await req.text()
-                await ctx.send(data[:1000])
-            else:
-                await ctx.send("Sorry, something went wrong.")
-
-    @commands.command(aliases=["zalgoify"])
-    async def zalgo(self, ctx: commands.Context, *, text: str):
-        """
-        Zalgoifies a sentence.
-        """
-        t = zalgo.zalgo().zalgofy(text)
-        await ctx.send(t[:2000])
-
-    @commands.bot_has_permissions(embed_links=True)
-    @commands.command(aliases=["ship", "lovecalc"])
-    async def lovecalculator(self, ctx, user: discord.User, user2: discord.User = None):
-        """
-        Calculates the amount of love between two users.
-        """
-        if user2 is None:
-            user2 = ctx.author
-        state = random.getstate()
-        random.seed(user.id + user2.id)
-        love = random.randint(0, 100)
-        random.setstate(state)
-        ua = user.avatar_url_as(static_format="png")
-        u2a = user2.avatar_url_as(static_format="png")
-        u = f"https://api.martinebot.com/v1/imagesgen/ship?percent={love}&first_user={ua}&second_user={u2a}&no_69_percent_emoji=false"
-        t = f"{user.name} and {user2.name} have {love}% compatibility."
-        e = discord.Embed(color=await ctx.embed_color(), title=t)
-        e.set_image(url=u)
-        e.set_footer(text="Powered by api.martinebot.com")
-        await ctx.send(embed=e)
-
     @commands.command(aliases=["listemojis", "emojilist"])
     @commands.guild_only()
     @commands.admin_or_permissions(manage_emojis=True)
@@ -440,34 +391,3 @@ class KaoTools(GuildManager, OwnerCommands, commands.Cog, metaclass=CompositeMet
             await ctx.send(embed=embeds[0])
         else:
             await menu(ctx, embeds, DEFAULT_CONTROLS)
-
-    @commands.command()
-    @commands.bot_has_permissions(attach_files=True)
-    async def obama(self, ctx, *, text: str):
-        """
-        Generate a video of Obama saying something.
-
-        There is a limit of 280 characters.
-        """
-        if len(text) > 280:
-            await ctx.send("Your message needs to be 280 characters or less.")
-            return
-        async with ctx.typing():
-            async with self.session.post(
-                "http://talkobamato.me/synthesize.py",
-                data={"input_text": text},
-            ) as resp:
-                if resp.status != 200:
-                    await ctx.send("Something went wrong when trying to get the video.")
-                    return
-                key = resp.url.query["speech_key"]
-
-            async with self.session.get(
-                f"http://talkobamato.me/synth/output/{key}/obama.mp4"
-            ) as resp:
-                if resp.status != 200:
-                    await ctx.send("Something went wrong when trying to get the video.")
-                    return
-                file = BytesIO(await resp.read())
-                file.seek(0)
-                await ctx.send(file=discord.File(file, "obama.mp4"))
