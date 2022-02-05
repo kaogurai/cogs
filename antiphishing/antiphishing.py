@@ -13,7 +13,7 @@ class AntiPhishing(commands.Cog):
     Protects users against phishing attacks.
     """
 
-    __version__ = "1.1.0"
+    __version__ = "1.1.1"
 
     def __init__(self, bot):
         self.bot = bot
@@ -100,8 +100,11 @@ class AntiPhishing(commands.Cog):
         data = {
             "message": message,
         }
+        headers = {
+            "User-Agent": f"Red-DiscordBot/aiohttp/{aiohttp.__version__}/discord.py/{discord.__version__}/AntiPhishing/{self.__version__} (https://github.com/kaogurai/cogs/tree/master/antiphishing) | Bot ID: {self.bot.user.id}",
+        }
         async with self.session.post(
-            f"https://anti-fish.bitflow.dev/check", json=data
+            f"https://anti-fish.bitflow.dev/check", json=data, headers=headers
         ) as request:
             if request.status not in [
                 200,
