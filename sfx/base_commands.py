@@ -52,6 +52,9 @@ class BaseCommandsMixin(MixinMeta):
         url = await generate_url(self, author_voice, text, author_translate)
 
         if file:
+            if not ctx.channel.permissions_for(ctx.guild.me).attach_files:
+                await ctx.send("I do not have permissions to send files in this channel.")
+                return
             async with self.session.get(url) as resp:
                 if resp.status != 200:
                     await ctx.send("Something went wrong. Try again later.")
@@ -150,6 +153,9 @@ class BaseCommandsMixin(MixinMeta):
             track_info = (name, ctx.author)
 
             if file:
+                if not ctx.channel.permissions_for(ctx.guild.me).attach_files:
+                    await ctx.send("I do not have permissions to send files in this channel.")
+                    return
                 async with self.session.get(url) as resp:
                     if resp.status != 200:
                         await ctx.send("Something went wrong. Try again later.")
