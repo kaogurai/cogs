@@ -13,7 +13,7 @@ class AntiPhishing(commands.Cog):
     Protects users against phishing attacks.
     """
 
-    __version__ = "1.1.1"
+    __version__ = "1.1.2"
 
     def __init__(self, bot):
         self.bot = bot
@@ -277,9 +277,10 @@ class AntiPhishing(commands.Cog):
             embed.add_field(name="IP Address", value=f"{ip_data['query']}")
 
         else:
-            domain = urlparse(url).netloc
+            if url.startswith("http") or url.startswith("https"):
+                url = urlparse(url).netloc
 
-            async with self.session.get(f"http://ip-api.com/json/{domain}") as request:
+            async with self.session.get(f"http://ip-api.com/json/{url}") as request:
                 if request.status != 200:
                     await ctx.send("Be careful, that URL is a phishing scam.")
                     return
@@ -306,7 +307,7 @@ class AntiPhishing(commands.Cog):
             embed.add_field(name="ASN", value=f"{ip_data['as']}")
             embed.add_field(name="Latitude", value=f"{ip_data['lat']}")
             embed.add_field(name="Longitude", value=f"{ip_data['lon']}")
-            embed.add_field(name="IP Address", value=f"{ip_data['as']}")
+            embed.add_field(name="IP Address", value=f"{ip_data['query']}")
 
         await ctx.send(embed=embed)
 
