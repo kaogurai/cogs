@@ -1,10 +1,12 @@
 import contextlib
 import re
-from urllib.parse import urlparse
+from urllib.parse import quote, urlparse
 
 import aiohttp
 import arrow
 import discord
+import redbot
+from discord.ext import tasks
 from redbot.core import Config, commands, modlog
 
 
@@ -13,14 +15,16 @@ class AntiPhishing(commands.Cog):
     Protects users against phishing attacks.
     """
 
-    __version__ = "1.1.2"
+    __version__ = "1.2.0"
 
     def __init__(self, bot):
         self.bot = bot
         self.config = Config.get_conf(self, identifier=73835)
-        self.config.register_guild(action="ignore")
+        self.config.register_guild(action="ignore", caught=0)
         self.session = aiohttp.ClientSession()
         self.bot.loop.create_task(self.register_casetypes())
+        self.bot.loop.create_task(self.get_phishing_domains())
+        self.domains = []
 
     def cog_unload(self):
         self.bot.loop.create_task(self.session.close())
@@ -63,6 +67,25 @@ class AntiPhishing(commands.Cog):
                 case_str="Phishing Link Detected - Auto-Banned",
             )
 
+    @tasks.loop(minutes=15)
+    async def get_phishing_domains(self):
+        domains = []
+
+        async with self.session.get(
+            "https://api.hyperphish.com/gimme-domains"
+        ) as request:
+            if request.status == 200:
+                data = await request.json()
+                domains.extend(data)
+
+        async with self.session.get("https://phish.sinking.yachts/v2/all") as request:
+            if request.status == 200:
+                data = await request.json()
+                domains.extend(data)
+
+        deduped = list(set(domains))
+        self.domains = deduped
+
     def extract_urls(self, message: str):
         """
         Extract URLs from a message.
@@ -72,11 +95,9 @@ class AntiPhishing(commands.Cog):
             message,
         )
 
-    def make_message_for_api(self, message: str):
+    def get_links(self, message: str):
         """
-        Make a message for the API.
-
-        For privacy reasons, I don't want to send the real message, so we'll remove everything that isn't a URL.
+        Get links from the message content
         """
         # Remove zero-width spaces
         message = message.replace("\u200b", "")
@@ -85,34 +106,125 @@ class AntiPhishing(commands.Cog):
         message = message.replace("\u2060", "")
         message = message.replace("\uFEFF", "")
         if message != "":
-            urls = self.extract_urls(message)
-            if not urls:
+            links = self.extract_urls(message)
+            if not links:
                 return
-            message = ""
-            for url in urls:
-                message += f"{url} "
-            return message
+            return list(set(links))
 
-    async def check_for_phishes(self, message: str):
+    async def get_redirects(self, url: str):
         """
-        Get information about a domain.
+        Get the real URL of a URL.
         """
+        if not url.startswith("http://") or not url.startswith("https://"):
+            url = f"https://{url}"
         data = {
-            "message": message,
+            "method": "G",
+            "redirection": "true",
+            "url": url,
+            "locationid": "25",
+            "headername": "User-Agent",
+            "headervalue": f"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/98.0.4758.80 Safari/537.36 Red-DiscordBot/{redbot.__version__} aiohttp/{aiohttp.__version__} discord.py/{discord.__version__} AntiPhishing/{self.__version__}",
         }
-        headers = {
-            "User-Agent": f"Red-DiscordBot/aiohttp/{aiohttp.__version__}/discord.py/{discord.__version__}/AntiPhishing/{self.__version__} (https://github.com/kaogurai/cogs/tree/master/antiphishing) | Bot ID: {self.bot.user.id}",
-        }
+        # I am very well aware that you could just use aiohttp to do this
+        # But, this way it's not sending requests from the bot's IP, since I don't want users to need to set up a proxy server
         async with self.session.post(
-            f"https://anti-fish.bitflow.dev/check", json=data, headers=headers
+            "https://www.site24x7.com/tools/restapi-tester", data=data
         ) as request:
-            if request.status not in [
-                200,
-                404,
-            ]:  # 404 is when the domain is not in the database
-                return
+            if request.status != 200:
+                return None, [
+                    url
+                ]  # If we can't get the real URL, just return the original one
             data = await request.json()
-            return data
+            if "responsecode" in data and "rurls" in data:
+                return data["responsecode"], data["rurls"]
+            return None, [url]
+
+    async def handle_phishing(self, message, domain):
+        action = await self.config.guild(message.guild).action()
+        if action == "notify":
+            if message.channel.permissions_for(message.guild.me).send_messages:
+                with contextlib.suppress(discord.NotFound):
+                    embed = discord.Embed(
+                        title="Warning",
+                        description=f"{message.author.mention} has sent a phishing link.\n\nDo not click on the link.",
+                        color=await self.bot.get_embed_color(message.guild),
+                    )
+                    embed.set_author(
+                        name=message.author.display_name,
+                        icon_url=message.author.avatar_url,
+                    )
+                    await message.reply(embed=embed)
+                await modlog.create_case(
+                    guild=message.guild,
+                    bot=self.bot,
+                    created_at=arrow.utcnow(),
+                    action_type="phish_found",
+                    user=message.author,
+                    moderator=message.guild.me,
+                    reason=f"Sent a phishing link: {domain}",
+                )
+        elif action == "delete":
+            if message.channel.permissions_for(message.guild.me).manage_messages:
+                with contextlib.suppress(discord.NotFound):
+                    await message.delete()
+
+                await modlog.create_case(
+                    guild=message.guild,
+                    bot=self.bot,
+                    created_at=arrow.utcnow(),
+                    action_type="phish_deleted",
+                    user=message.author,
+                    moderator=message.guild.me,
+                    reason=f"Sent a phishing link: {domain}",
+                )
+        elif action == "kick":
+            if (
+                message.channel.permissions_for(message.guild.me).kick_members
+                and message.channel.permissions_for(message.guild.me).manage_messages
+            ):
+                with contextlib.suppress(discord.NotFound):
+                    await message.delete()
+                    if (
+                        message.author.top_role >= message.guild.me.top_role
+                        or message.author == message.guild.owner
+                    ):
+                        return
+
+                    await message.author.kick()
+
+                await modlog.create_case(
+                    guild=message.guild,
+                    bot=self.bot,
+                    created_at=arrow.utcnow(),
+                    action_type="phish_kicked",
+                    user=message.author,
+                    moderator=message.guild.me,
+                    reason=f"Sent a phishing link: {domain}",
+                )
+        elif action == "ban":
+            if (
+                message.channel.permissions_for(message.guild.me).ban_members
+                and message.channel.permissions_for(message.guild.me).manage_messages
+            ):
+                with contextlib.suppress(discord.NotFound):
+                    await message.delete()
+                    if (
+                        message.author.top_role >= message.guild.me.top_role
+                        or message.author == message.guild.owner
+                    ):
+                        return
+
+                    await message.author.ban()
+
+                await modlog.create_case(
+                    guild=message.guild,
+                    bot=self.bot,
+                    created_at=arrow.utcnow(),
+                    action_type="phish_banned",
+                    user=message.author,
+                    moderator=message.guild.me,
+                    reason=f"Sent a phishing link: {domain}",
+                )
 
     @commands.Cog.listener()
     async def on_message_without_command(self, message: discord.Message):
@@ -125,103 +237,24 @@ class AntiPhishing(commands.Cog):
         if await self.bot.cog_disabled_in_guild(self, message.guild):
             return
 
-        fake_message = self.make_message_for_api(message.content)
-        if not fake_message:
+        links = self.get_links(message.content)
+        if not links:
             return
 
-        data = await self.check_for_phishes(fake_message)
-        if not data:
-            return
+        domains = []
 
-        if data["match"]:
-            action = await self.config.guild(message.guild).action()
-            if action == "ignore":
+        for link in links:
+            _, redirects = await self.get_redirects(link)
+            link = redirects[-1]
+            domains.append(link)
+
+        for domain in domains:
+            domain = urlparse(domain).netloc
+            if domain in self.domains:
+                await self.handle_phishing(message, domain)
+                count = await self.config.guild(message.guild).caught()
+                await self.config.guild(message.guild).caught.set(count + 1)
                 return
-            if action == "notify":
-                if message.channel.permissions_for(message.guild.me).send_messages:
-                    with contextlib.suppress(discord.NotFound):
-                        embed = discord.Embed(
-                            title="Warning",
-                            description=f"{message.author.mention} has sent a phishing link.\n\nDo not click on the link.",
-                            color=await self.bot.get_embed_color(message.guild),
-                        )
-                        embed.set_author(
-                            name=message.author.display_name,
-                            icon_url=message.author.avatar_url,
-                        )
-                        await message.reply(embed=embed)
-                    await modlog.create_case(
-                        guild=message.guild,
-                        bot=self.bot,
-                        created_at=arrow.utcnow(),
-                        action_type="phish_found",
-                        user=message.author,
-                        moderator=message.guild.me,
-                        reason=f"Sent a phishing link: {data['matches'][0]['domain']}",
-                    )
-            if action == "delete":
-                if message.channel.permissions_for(message.guild.me).manage_messages:
-                    with contextlib.suppress(discord.NotFound):
-                        await message.delete()
-
-                    await modlog.create_case(
-                        guild=message.guild,
-                        bot=self.bot,
-                        created_at=arrow.utcnow(),
-                        action_type="phish_deleted",
-                        user=message.author,
-                        moderator=message.guild.me,
-                        reason=f"Sent a phishing link: {data['matches'][0]['domain']}",
-                    )
-
-            if action == "kick":
-                if (
-                    message.channel.permissions_for(message.guild.me).kick_members
-                    and message.channel.permissions_for(message.guild.me).manage_messages
-                ):
-                    with contextlib.suppress(discord.NotFound):
-                        await message.delete()
-                        if (
-                            message.author.top_role >= message.guild.me.top_role
-                            or message.author == message.guild.owner
-                        ):
-                            return
-
-                        await message.author.kick()
-
-                    await modlog.create_case(
-                        guild=message.guild,
-                        bot=self.bot,
-                        created_at=arrow.utcnow(),
-                        action_type="phish_kicked",
-                        user=message.author,
-                        moderator=message.guild.me,
-                        reason=f"Sent a phishing link: {data['matches'][0]['domain']}",
-                    )
-            if action == "ban":
-                if (
-                    message.channel.permissions_for(message.guild.me).ban_members
-                    and message.channel.permissions_for(message.guild.me).manage_messages
-                ):
-                    with contextlib.suppress(discord.NotFound):
-                        await message.delete()
-                        if (
-                            message.author.top_role >= message.guild.me.top_role
-                            or message.author == message.guild.owner
-                        ):
-                            return
-
-                        await message.author.ban()
-
-                    await modlog.create_case(
-                        guild=message.guild,
-                        bot=self.bot,
-                        created_at=arrow.utcnow(),
-                        action_type="phish_banned",
-                        user=message.author,
-                        moderator=message.guild.me,
-                        reason=f"Sent a phishing link: {data['matches'][0]['domain']}",
-                    )
 
     @commands.command(
         aliases=["checkforphish", "checkscam", "checkforscam", "checkphishing"]
@@ -238,17 +271,14 @@ class AntiPhishing(commands.Cog):
             return
 
         url = urls[0]
+        status, redirects = await self.get_redirects(url)
+        real_url = redirects[-1]
+        domain = urlparse(real_url).netloc
 
-        data = await self.check_for_phishes(url)
-        if not data:
-            await ctx.send("Something went wrong when looking up the URL.")
-            return
-
-        if data["match"]:
-            if url.startswith("http") or url.startswith("https"):
-                url = urlparse(url).netloc
-
-            async with self.session.get(f"http://ip-api.com/json/{url}") as request:
+        if domain in self.domains:
+            async with self.session.get(
+                f"http://ip-api.com/json/{quote(domain)}"
+            ) as request:
                 if request.status != 200:
                     await ctx.send("Be careful, that URL is a phishing scam.")
                     return
@@ -260,7 +290,7 @@ class AntiPhishing(commands.Cog):
 
             embed = discord.Embed(
                 title="Warning",
-                description=f"{url} is a phishing scam.\n\nDo not click on the link.",
+                description=f"That URL is a phishing scam.\n\nDo not click on the link.",
                 color=await self.bot.get_embed_color(ctx.guild),
             )
             embed.add_field(
@@ -275,25 +305,35 @@ class AntiPhishing(commands.Cog):
             embed.add_field(name="Latitude", value=f"{ip_data['lat']}")
             embed.add_field(name="Longitude", value=f"{ip_data['lon']}")
             embed.add_field(name="IP Address", value=f"{ip_data['query']}")
+            if status:
+                embed.add_field(name="Status Code", value=f"{status}")
+
+            if len(redirects) > 1:
+                redirects_msg = ""
+                for x, redirect in enumerate(redirects):
+                    redirects_msg += f"{x+1}. {redirect}\n"
+                embed.add_field(
+                    name="Redirects", value=redirects_msg[:1000], inline=False
+                )
 
         else:
-            if url.startswith("http") or url.startswith("https"):
-                url = urlparse(url).netloc
 
-            async with self.session.get(f"http://ip-api.com/json/{url}") as request:
+            async with self.session.get(
+                f"http://ip-api.com/json/{quote(domain)}"
+            ) as request:
                 if request.status != 200:
-                    await ctx.send("Be careful, that URL is a phishing scam.")
+                    await ctx.send("No need to worry, that URL is not a phishing scam.")
                     return
 
                 ip_data = await request.json()
 
-            if ip_data["status"] == "fail":
-                await ctx.send("Be careful, that URL is a phishing scam.")
-                return
+                if ip_data["status"] == "fail":
+                    await ctx.send("No need to worry, that URL is not a phishing scam.")
+                    return
 
             embed = discord.Embed(
-                title="Safe",
-                description=f"{url} is a not phishing scam.\n\nNo need to worry.",
+                title="URL Safe",
+                description=f"That URL is a not phishing scam.",
                 color=await self.bot.get_embed_color(ctx.guild),
             )
             embed.add_field(
@@ -308,6 +348,15 @@ class AntiPhishing(commands.Cog):
             embed.add_field(name="Latitude", value=f"{ip_data['lat']}")
             embed.add_field(name="Longitude", value=f"{ip_data['lon']}")
             embed.add_field(name="IP Address", value=f"{ip_data['query']}")
+            if status:
+                embed.add_field(name="Status Code", value=f"{status}")
+            if len(redirects) > 1:
+                redirects_msg = ""
+                for x, redirect in enumerate(redirects):
+                    redirects_msg += f"{x+1}. {redirect}\n"
+                embed.add_field(
+                    name="Redirects", value=redirects_msg[:1000], inline=False
+                )
 
         await ctx.send(embed=embed)
 
@@ -339,3 +388,12 @@ class AntiPhishing(commands.Cog):
 
         await self.config.guild(ctx.guild).action.set(action)
         await ctx.send(f"Set the action to `{action}`.")
+
+    @antiphishing.command()
+    async def stats(self, ctx):
+        """
+        Shows the current stats for the anti-phishing integration.
+        """
+        caught = await self.config.guild(ctx.guild).caught()
+        s = "s" if caught != 1 else ""
+        await ctx.send(f"I've caught `{caught}` phishing scam{s} in this server!")

@@ -154,7 +154,9 @@ class BaseCommandsMixin(MixinMeta):
 
             if file:
                 if not ctx.channel.permissions_for(ctx.guild.me).attach_files:
-                    await ctx.send("I do not have permissions to send files in this channel.")
+                    await ctx.send(
+                        "I do not have permissions to send files in this channel."
+                    )
                     return
                 async with self.session.get(url) as resp:
                     if resp.status != 200:
