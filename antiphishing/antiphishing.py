@@ -15,7 +15,7 @@ class AntiPhishing(commands.Cog):
     Protects users against phishing attacks.
     """
 
-    __version__ = "1.2.0"
+    __version__ = "1.2.1"
 
     def __init__(self, bot):
         self.bot = bot
@@ -141,6 +141,9 @@ class AntiPhishing(commands.Cog):
 
     async def handle_phishing(self, message, domain):
         action = await self.config.guild(message.guild).action()
+        if not action == "ignore":
+            count = await self.config.guild(message.guild).caught()
+            await self.config.guild(message.guild).caught.set(count + 1)
         if action == "notify":
             if message.channel.permissions_for(message.guild.me).send_messages:
                 with contextlib.suppress(discord.NotFound):
@@ -252,8 +255,6 @@ class AntiPhishing(commands.Cog):
             domain = urlparse(domain).netloc
             if domain in self.domains:
                 await self.handle_phishing(message, domain)
-                count = await self.config.guild(message.guild).caught()
-                await self.config.guild(message.guild).caught.set(count + 1)
                 return
 
     @commands.command(
