@@ -7,6 +7,7 @@ from io import BytesIO
 import aiohttp
 import colorgram
 import discord
+import asyncio
 from bs4 import BeautifulSoup
 from redbot.core import Config, commands
 from redbot.core.utils.chat_formatting import humanize_list, pagify
@@ -23,7 +24,7 @@ class AutoAvatar(commands.Cog):
     Chooses a random avatar to set from a preset list or can scrape we heart it.
     """
 
-    __version__ = "1.2.2"
+    __version__ = "1.2.3"
 
     def __init__(self, bot):
         self.bot = bot
@@ -148,7 +149,7 @@ class AutoAvatar(commands.Cog):
                             all_avatars.remove(new_avatar)
                             await self.config.avatars.set(all_avatars)
                         return
-            except (aiohttp.ServerDisconnectedError, aiohttp.ServerTimeoutError):
+            except (aiohttp.ServerDisconnectedError, aiohttp.ServerTimeoutError, asyncio.TimeoutError):
                 if x == 4:
                     if we_heart_it:
                         await ctx.send(
