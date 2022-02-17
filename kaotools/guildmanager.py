@@ -27,8 +27,7 @@ class GuildManager(MixinMeta):
         kao_channel = self.bot.get_channel(818684148847345714)
         joined = int(guild.created_at.timestamp())
         m = (
-            f"• Guild Name: {guild.name}\n"
-            f"• Guild ID: {guild.id}\n"
+            f"• Guild: {guild.name} ({guild.id})\n"
             f"• Member Count: {guild.member_count}\n"
             f"• Bot Count: {botcount}\n"
             f"• Guild Owner: {guild.owner} ({guild.owner.id})\n"
