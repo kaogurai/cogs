@@ -395,7 +395,7 @@ class KaoTools(
             await menu(ctx, embeds, DEFAULT_CONTROLS)
 
     @commands.command(aliases=["dl", "musicdl", "musicdownload"])
-    @commands.bot_has_permissions(attach_files=True)
+    @commands.bot_has_permissions(attach_files=True, add_reactions=True, embed_links=True)
     async def download(self, ctx, *, song: str):
         """
         Download a song.
