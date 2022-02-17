@@ -1,3 +1,4 @@
+import asyncio
 import contextlib
 import datetime
 import random
@@ -7,7 +8,6 @@ from io import BytesIO
 import aiohttp
 import colorgram
 import discord
-import asyncio
 from bs4 import BeautifulSoup
 from redbot.core import Config, commands
 from redbot.core.utils.chat_formatting import humanize_list, pagify
@@ -149,7 +149,11 @@ class AutoAvatar(commands.Cog):
                             all_avatars.remove(new_avatar)
                             await self.config.avatars.set(all_avatars)
                         return
-            except (aiohttp.ServerDisconnectedError, aiohttp.ServerTimeoutError, asyncio.TimeoutError):
+            except (
+                aiohttp.ServerDisconnectedError,
+                aiohttp.ServerTimeoutError,
+                asyncio.TimeoutError,
+            ):
                 if x == 4:
                     if we_heart_it:
                         await ctx.send(

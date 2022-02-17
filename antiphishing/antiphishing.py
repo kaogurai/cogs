@@ -15,7 +15,7 @@ class AntiPhishing(commands.Cog):
     Protects users against phishing attacks.
     """
 
-    __version__ = "1.2.1"
+    __version__ = "1.2.2"
 
     def __init__(self, bot):
         self.bot = bot
@@ -79,6 +79,13 @@ class AntiPhishing(commands.Cog):
                 domains.extend(data)
 
         async with self.session.get("https://phish.sinking.yachts/v2/all") as request:
+            if request.status == 200:
+                data = await request.json()
+                domains.extend(data)
+
+        async with self.session.get(
+            "https://bad-domains.walshy.dev/domains.json"
+        ) as request:
             if request.status == 200:
                 data = await request.json()
                 domains.extend(data)
