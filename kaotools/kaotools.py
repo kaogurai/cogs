@@ -342,58 +342,6 @@ class KaoTools(
         for page in pagify(msg):
             await ctx.send(page)
 
-    @commands.command(aliases=["definition", "synonym", "antonym"])
-    async def define(self, ctx, *, thing_to_define: str):
-        """Define a word or phrase."""
-        url = f"https://api.dictionaryapi.dev/api/v2/entries/en/{urllib.parse.quote(thing_to_define)}"
-        async with self.session.get(url) as resp:
-            if resp.status == 404:
-                await ctx.send("I couldn't find a definition for that.")
-                return
-            if resp.status != 200:
-                await ctx.send("Something went wrong when trying to get the definition.")
-                return
-            data = await resp.json()
-        embeds = []
-        for i, result in enumerate(data):
-            embed = discord.Embed(color=await ctx.embed_color())
-            if "partOfSpeech" in result["meanings"][0]:
-                embed.title = (
-                    f"{result['word']} ({result['meanings'][0]['partOfSpeech']})"
-                )
-            else:
-                embed.title = result["word"]
-            if (
-                "phonetics" in result
-                and result["phonetics"]
-                and "audio" in result["phonetics"][0]
-            ):
-                audio = result["phonetics"][0]["audio"]
-                embed.url = f"https:{audio}"
-            embed.description = result["meanings"][0]["definitions"][0]["definition"]
-            if "example" in result["meanings"][0]["definitions"][0]:
-                embed.add_field(
-                    name="Example",
-                    value=result["meanings"][0]["definitions"][0]["example"],
-                )
-            if result["meanings"][0]["definitions"][0]["synonyms"]:
-                embed.add_field(
-                    name="Synonyms",
-                    value=", ".join(result["meanings"][0]["definitions"][0]["synonyms"]),
-                )
-            if result["meanings"][0]["definitions"][0]["antonyms"]:
-                embed.add_field(
-                    name="Antonyms",
-                    value=", ".join(result["meanings"][0]["definitions"][0]["antonyms"]),
-                )
-            if len(data) > 1:
-                embed.set_footer(text=f"Result {i + 1}/{len(data)}")
-            embeds.append(embed)
-        if len(embeds) == 1:
-            await ctx.send(embed=embeds[0])
-        else:
-            await menu(ctx, embeds, DEFAULT_CONTROLS)
-
     @commands.command(aliases=["dl", "musicdl", "musicdownload"])
     @commands.bot_has_permissions(attach_files=True, add_reactions=True, embed_links=True)
     async def download(self, ctx, *, song: str):
@@ -456,13 +404,13 @@ class KaoTools(
                     index = int(msg.content) - 1
                     audio = audios[index]
                 except (ValueError, IndexError):
-                    await ctx.send("That's not a valid number.")
+                    await ctx.send("That's not a valid option.")
                     return
 
                 async with self.session.get(audio["url"]) as resp:
                     if resp.status != 200:
                         await ctx.send(
-                            "Something went wrong when trying to get the song."
+                            "Something went wrong when trying to get the song. Please try again later."
                         )
                         return
                     data = await resp.read()
@@ -475,7 +423,7 @@ class KaoTools(
                 if len(data) > limit:
                     embed = discord.Embed(
                         color=await ctx.embed_color(),
-                        description=f"That song is too big to send on discord. Click [here]({audio['url']}) to download it.",
+                        description=f"That song is too big to send in this guild. Click [here]({audio['url']}) to download it.",
                         url=audio["url"],
                     )
                     await ctx.send(embed=embed)
