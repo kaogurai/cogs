@@ -63,13 +63,6 @@ class TextMixin(MixinMeta):
                 )
             else:
                 embed.title = result["word"]
-            if (
-                "phonetics" in result
-                and result["phonetics"]
-                and "audio" in result["phonetics"][0]
-            ):
-                audio = result["phonetics"][0]["audio"]
-                embed.url = f"https:{audio}"
             embed.description = result["meanings"][0]["definitions"][0]["definition"]
             if "example" in result["meanings"][0]["definitions"][0]:
                 embed.add_field(
