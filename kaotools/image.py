@@ -92,6 +92,10 @@ class ImageMixin(MixinMeta):
                     await ctx.send("Something went wrong when trying to get the text.")
                     return
                 data = await resp.json()
+        if "parsedResults" not in data:
+            await ctx.send("Sorry, the OCR backend isn't working.")
+            return
+
         results = data["ParsedResults"][0]["ParsedText"]
         if results != "":
             embed = discord.Embed(
