@@ -92,7 +92,8 @@ class ImageMixin(MixinMeta):
                     await ctx.send("Something went wrong when trying to get the text.")
                     return
                 data = await resp.json()
-        if "parsedResults" not in data:
+        print(data)
+        if "ParsedResults" not in data:
             await ctx.send("Sorry, the OCR backend isn't working.")
             return
 
