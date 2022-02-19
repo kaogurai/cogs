@@ -3,6 +3,7 @@ from io import BytesIO
 
 import discord
 from redbot.core import commands
+import asyncio
 
 from .abc import MixinMeta
 from typing import Optional
@@ -36,9 +37,19 @@ class ImageMixin(MixinMeta):
                 if resp.status != 200:
                     await ctx.send("Something went wrong when trying to get the video.")
                     return
-                file = BytesIO(await resp.read())
-                file.seek(0)
-                await ctx.send(file=discord.File(file, "obama.mp4"))
+                res = await resp.read()
+                if len(res) < 100: # File incomplete
+                    await asyncio.sleep(2)
+                    async with self.session.get(
+                        f"http://talkobamato.me/synth/output/{key}/obama.mp4"
+                    ) as resp:
+                        if resp.status != 200:
+                            await ctx.send("Something went wrong when trying to get the video.")
+                            return
+                        res = await resp.read()
+            bfile = BytesIO(res)
+            bfile.seek(0)
+            await ctx.send(file=discord.File(bfile, filename="obama.mp4"))
 
     @commands.bot_has_permissions(embed_links=True)
     @commands.command(aliases=["ship", "lovecalc"])
@@ -77,7 +88,7 @@ class ImageMixin(MixinMeta):
 
         if ctx.message.attachments:
             link = ctx.message.attachments[0].url
-            lang = image_url
+            lang = image_url or "english"
         else:
             link = image_url
 
@@ -140,7 +151,7 @@ class ImageMixin(MixinMeta):
                 data = await resp.json()
 
         if data["IsErroredOnProcessing"]:
-            await ctx.send("Sorry, the API backend isn't working correctly.")
+            await ctx.send("Sorry, the OCR backend isn't working correctly.")
             return
 
         results = data["ParsedResults"][0]["ParsedText"]
