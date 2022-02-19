@@ -7,6 +7,7 @@ from discord.ext import tasks
 from redbot.core import Config, commands
 from redbot.core.utils.chat_formatting import escape
 
+from .autotts import AutoTTSMixin
 from .channels import TTSChannelMixin
 from .commands import BaseCommandsMixin
 from .joinandleave import JoinAndLeaveMixin
@@ -18,16 +19,17 @@ class CompositeMetaClass(type(commands.Cog), type(ABC)):
 
 
 class SFX(
+    AutoTTSMixin,
+    TTSChannelMixin,
     BaseCommandsMixin,
     commands.Cog,
     JoinAndLeaveMixin,
-    TTSChannelMixin,
     UserConfigMixin,
     metaclass=CompositeMetaClass,
 ):
     """Plays sound effects, text-to-speech, and sounds when you join or leave a voice channel."""
 
-    __version__ = "5.0.1"
+    __version__ = "5.1.0"
 
     TTS_API_URL = "https://api.kaogurai.xyz/v1/tts"
     SFX_API_URL = "https://freesound.org/apiv2"
@@ -42,7 +44,11 @@ class SFX(
             "join_sound": "",
             "leave_sound": "",
         }
-        guild_config = {"channels": [], "allow_join_and_leave": False}
+        guild_config = {
+            "channels": [],
+            "allow_join_and_leave": True,
+            "allow_autotts": True,
+        }
         self.config.register_user(**user_config)
         self.config.register_guild(**guild_config)
         lavalink.register_event_listener(self.ll_check)
@@ -112,7 +118,7 @@ class SFX(
         Parameters:
         vc: The voice channel to play the audio in.
         channel: The text channel to send messages in. Can be None.
-        type: The type of SFX to play. (joinleave, tts, sfx)
+        type: The type of SFX to play. (joinleave, tts, sfx, autotts)
         url: The URL to play.
         track_info: Tuple of track name and author (discord.py object).
         """
@@ -126,7 +132,7 @@ class SFX(
 
         tracks = await player.load_tracks(query=url)
         if not tracks.tracks:
-            if channel:
+            if channel and type != "autotts":
                 await channel.send("Something went wrong.")
                 return
 

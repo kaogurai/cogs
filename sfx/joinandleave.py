@@ -6,6 +6,12 @@ from .abc import MixinMeta
 class JoinAndLeaveMixin(MixinMeta):
     @commands.Cog.listener()
     async def on_voice_state_update(self, user, before, after):
+        if user.bot:
+            return
+        if await self.bot.allowed_by_whitelist_blacklist(who=user) is False:
+            return
+        if await self.bot.cog_disabled_in_guild(self, user.guild):
+            return
 
         guild_config = await self.config.guild(user.guild).all()
         if not guild_config["allow_join_and_leave"]:
@@ -58,7 +64,7 @@ class JoinAndLeaveMixin(MixinMeta):
 
     @commands.group()
     async def joinandleave(self, ctx):
-        """Join and leave sounds."""
+        """Settings for join and leave sounds."""
         pass
 
     @joinandleave.command()

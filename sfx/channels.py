@@ -120,7 +120,6 @@ class TTSChannelMixin(MixinMeta):
         channel_list = await self.config.guild(message.guild).channels()
 
         if message.channel.id not in channel_list:
-            print("hi")
             return
 
         if not message.author.voice or not message.author.voice.channel:
@@ -137,7 +136,7 @@ class TTSChannelMixin(MixinMeta):
             author_voice = await self.config.user(message.author).voice()
 
         url = self.generate_url(author_voice, author_translate, message.clean_content)
-  
+
         track_info = ("Text to Speech", message.author)
 
         await self.play_sound(
