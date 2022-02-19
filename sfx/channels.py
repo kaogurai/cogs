@@ -28,8 +28,6 @@ class TTSChannelMixin(MixinMeta):
         if channel.id not in channel_list:
             channel_list.append(channel.id)
             await self.config.guild(ctx.guild).channels.set(channel_list)
-            self.channel_cache[ctx.guild.id] = channel_list
-
             await ctx.send(f"Okay, {channel.mention} will now be used as a TTS channel.")
         else:
             await ctx.send(
@@ -45,7 +43,6 @@ class TTSChannelMixin(MixinMeta):
         if channel.id in channel_list:
             channel_list.remove(channel.id)
             await self.config.guild(ctx.guild).channels.set(channel_list)
-            self.channel_cache[ctx.guild.id] = channel_list
             await ctx.send(f"Okay, {channel.mention} is no longer a TTS channel.")
         else:
             await ctx.send(
@@ -74,7 +71,6 @@ class TTSChannelMixin(MixinMeta):
                 return
             if predictate.result:
                 await self.config.guild(ctx.guild).channels.clear()
-                del self.channel_cache[ctx.guild.id]
                 await ctx.send("Okay, I've cleared all TTS channels for this server.")
             else:
                 await ctx.send("Okay, I won't clear any TTS channels.")
@@ -84,10 +80,7 @@ class TTSChannelMixin(MixinMeta):
         """
         Shows all the channels for automatic TTS.
         """
-        try:
-            channel_list = self.channel_cache[ctx.guild.id]
-        except KeyError:
-            channel_list = None
+        channel_list = await self.config.guild(ctx.guild).channels()
         if not channel_list:
             await ctx.send("This server doesn't have any TTS channels set up.")
         else:
@@ -124,14 +117,10 @@ class TTSChannelMixin(MixinMeta):
             return
         if await self.bot.cog_disabled_in_guild(self, message.guild):
             return
-        try:
-            channel_list = self.channel_cache[message.guild.id]
-        except KeyError:
-            return
+        channel_list = await self.config.guild(message.guild).channels()
 
-        if not channel_list:
-            return
         if message.channel.id not in channel_list:
+            print("hi")
             return
 
         if not message.author.voice or not message.author.voice.channel:
@@ -148,7 +137,7 @@ class TTSChannelMixin(MixinMeta):
             author_voice = await self.config.user(message.author).voice()
 
         url = self.generate_url(author_voice, author_translate, message.clean_content)
-
+  
         track_info = ("Text to Speech", message.author)
 
         await self.play_sound(

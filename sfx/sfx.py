@@ -27,7 +27,7 @@ class SFX(
 ):
     """Plays sound effects, text-to-speech, and sounds when you join or leave a voice channel."""
 
-    __version__ = "5.0.0"
+    __version__ = "5.0.1"
 
     TTS_API_URL = "https://api.kaogurai.xyz/v1/tts"
     SFX_API_URL = "https://freesound.org/apiv2"
@@ -50,9 +50,9 @@ class SFX(
         self.bot.loop.create_task(self.get_voices())
         self.last_track_info = {}
         self.current_sfx = {}
-        self.channel_cache = {}
         self.repeat_state = {}
         self.voices = []
+        self.autotts = []
 
     def cog_unload(self):
         self.bot.loop.create_task(self.session.close())
