@@ -1,17 +1,16 @@
-import contextlib
-import unicodedata
 from abc import ABC
+from urllib.parse import quote
 
 import aiohttp
 import lavalink
-import unidecode
+from discord.ext import tasks
 from redbot.core import Config, commands
+from redbot.core.utils.chat_formatting import escape
 
-from .base_commands import BaseCommandsMixin
+from .channels import TTSChannelMixin
+from .commands import BaseCommandsMixin
 from .joinandleave import JoinAndLeaveMixin
-from .proxy import ProxyMixin
-from .tts_channels import TTSChannelMixin
-from .user_config import UserConfigMixin
+from .userconfig import UserConfigMixin
 
 
 class CompositeMetaClass(type(commands.Cog), type(ABC)):
@@ -22,14 +21,16 @@ class SFX(
     BaseCommandsMixin,
     commands.Cog,
     JoinAndLeaveMixin,
-    ProxyMixin,
     TTSChannelMixin,
     UserConfigMixin,
     metaclass=CompositeMetaClass,
 ):
     """Plays sound effects, text-to-speech, and sounds when you join or leave a voice channel."""
 
-    __version__ = "4.6.2"
+    __version__ = "5.0.0"
+
+    TTS_API_URL = "https://api.kaogurai.xyz/v1/tts"
+    SFX_API_URL = "https://freesound.org/apiv2"
 
     def __init__(self, bot):
         self.bot = bot
@@ -40,18 +41,18 @@ class SFX(
             "translate": False,
             "join_sound": "",
             "leave_sound": "",
-            "proxy_url": "",
         }
         guild_config = {"channels": [], "allow_join_and_leave": False}
         self.config.register_user(**user_config)
         self.config.register_guild(**guild_config)
         lavalink.register_event_listener(self.ll_check)
-        self.bot.loop.create_task(self.fill_channel_cache())
         self.bot.loop.create_task(self.set_token())
+        self.bot.loop.create_task(self.get_voices())
         self.last_track_info = {}
         self.current_sfx = {}
         self.channel_cache = {}
         self.repeat_state = {}
+        self.voices = []
 
     def cog_unload(self):
         self.bot.loop.create_task(self.session.close())
@@ -65,12 +66,16 @@ class SFX(
         pre_processed = super().format_help_for_context(ctx)
         return f"{pre_processed}\n\nCog Version: {self.__version__}"
 
-    # Keeps all the TTS channels in a dict so we don't need to call config on every message
-    async def fill_channel_cache(self):
-        all_guilds = await self.config.all_guilds()
-        for guild in all_guilds:
-            with contextlib.suppress(KeyError):
-                self.channel_cache[guild] = all_guilds[guild]["channels"]
+    @tasks.loop(hours=24)
+    async def get_voices(self):
+        async with self.session.get(f"{self.TTS_API_URL}/voices") as req:
+            if req.status == 200:
+                self.voices = await req.json()
+
+    @tasks.loop(seconds=15)
+    async def get_voices_server_down(self):
+        if not self.voices:
+            await self.get_voices()
 
     # We modify the player repeat state to avoid issues with SFX, so we need to set it back if the SFX hasn't ended
     async def reset_player_states(self):
@@ -80,18 +85,6 @@ class SFX(
             except KeyError:
                 continue
             player.repeat = self.repeat_state[guild_id]
-
-    # full credits to kable
-    # https://github.com/kablekompany/Kable-Kogs/blob/master/decancer/decancer.py#L67
-    @staticmethod
-    def decancer_text(text):
-        text = unicodedata.normalize("NFKC", text)
-        text = unicodedata.normalize("NFD", text)
-        text = unidecode.unidecode(text)
-        text = text.encode("ascii", "ignore")
-        text = text.decode("utf-8")
-        if text != "":
-            return text
 
     async def set_token(self):
         token = await self.bot.get_shared_api_tokens("freesound")
@@ -103,6 +96,14 @@ class SFX(
         if service_name == "freesound":
             self.id = api_tokens.get("id")
             self.key = api_tokens.get("key")
+
+    def get_voice(self, voice: str):
+        for v in self.voices:
+            if v["name"] == voice:
+                return v
+
+    def generate_url(self, voice: str, translate: bool, text: str):
+        return f"{self.TTS_API_URL}/synthesize?voice={voice}&translate={translate}&text={quote(text)}"
 
     async def play_sound(self, vc, channel, type: str, url: str, track_info: tuple):
         """
@@ -137,7 +138,9 @@ class SFX(
         self.repeat_state[vc.guild.id] = repeat_state
 
         if type == "sfx":
-            await channel.send(f"Playing **{track.title[:100]}**...")
+            await channel.send(
+                f"Playing **{escape(track.title[:100], formatting=True)}**..."
+            )
 
         # No queue or anything, just add and play
         if not player.current and not player.queue:

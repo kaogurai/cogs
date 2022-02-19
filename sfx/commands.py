@@ -6,8 +6,6 @@ from redbot.core import commands
 from redbot.core.utils.chat_formatting import escape
 
 from .abc import MixinMeta
-from .tts_api import generate_url
-from .voices import voices
 
 
 class BaseCommandsMixin(MixinMeta):
@@ -39,17 +37,12 @@ class BaseCommandsMixin(MixinMeta):
         author_voice = author_data["voice"]
         author_translate = author_data["translate"]
 
-        if author_voice not in voices.keys():
+        is_voice = self.get_voice(author_voice)
+        if not is_voice:
             await self.config.user(ctx.author).voice.clear()
             author_voice = await self.config.user(ctx.author).voice()
 
-        text = self.decancer_text(text)
-
-        if not text:
-            await ctx.send("That's not a valid message, sorry.")
-            return
-
-        url = await generate_url(self, author_voice, text, author_translate)
+        url = self.generate_url(author_voice, author_translate, text)
 
         if file:
             if not ctx.channel.permissions_for(ctx.guild.me).attach_files:
@@ -114,7 +107,7 @@ class BaseCommandsMixin(MixinMeta):
         async with ctx.typing():
 
             async with self.session.get(
-                "https://freesound.org/apiv2/search/text/",
+                f"{self.SFX_API_URL}/search/text/",
                 params={
                     "query": sound,
                     "token": self.key,
@@ -137,7 +130,7 @@ class BaseCommandsMixin(MixinMeta):
                 sound_id = results[0]["id"]
 
             async with self.session.get(
-                f"https://freesound.org/apiv2/sounds/{sound_id}/",
+                f"{self.SFX_API_URL}/sounds/{sound_id}/",
                 params={"token": self.key},
             ) as resp:
                 if resp.status != 200:

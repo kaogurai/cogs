@@ -7,8 +7,6 @@ from redbot.core.utils.menus import DEFAULT_CONTROLS, menu
 from redbot.core.utils.predicates import MessagePredicate
 
 from .abc import MixinMeta
-from .tts_api import generate_url
-from .voices import voices
 
 
 class TTSChannelMixin(MixinMeta):
@@ -144,25 +142,13 @@ class TTSChannelMixin(MixinMeta):
         author_voice = author_data["voice"]
         author_translate = author_data["translate"]
 
-        if author_voice not in voices.keys():
+        is_voice = self.get_voice(author_voice)
+        if not is_voice:
             await self.config.user(message.author).voice.clear()
             author_voice = await self.config.user(message.author).voice()
 
-        text = self.decancer_text(message.clean_content)
+        url = self.generate_url(author_voice, author_translate, message.clean_content)
 
-        if text is None:
-            await message.channel.send("That's not a valid message, sorry.")
-            return
-
-        char_number = len(text)
-
-        if char_number > 1000:
-            await message.channel.send(
-                f"Sorry, I limit TTS to 1000 characters to avoid abuse. ({char_number}/1000)"
-            )
-            return
-
-        url = await generate_url(self, author_voice, text, author_translate)
         track_info = ("Text to Speech", message.author)
 
         await self.play_sound(

@@ -4,8 +4,6 @@ from redbot.core.utils import AsyncIter
 from redbot.core.utils.menus import DEFAULT_CONTROLS, menu
 
 from .abc import MixinMeta
-from .tts_api import generate_url
-from .voices import voices
 
 
 class UserConfigMixin(MixinMeta):
@@ -21,37 +19,34 @@ class UserConfigMixin(MixinMeta):
         Not all voices will have examples due to needing to send API requests to generate audio.
         """
         pages = []
-        voices_list = [voice for voice in voices.keys()]
-        divided = self.divide_chunks(voices_list, 9)
+        divided = self.divide_chunks(self.voices, 12)
+        if not divided:
+            await ctx.send(
+                "Something is going wrong with the TTS API, please try again later."
+            )
+            return
+
         async for chunk in AsyncIter(divided):
             embed = discord.Embed(color=await ctx.embed_color())
-            async for voice in AsyncIter(chunk):
-                plugin = voices[voice]["api"](voices, self.session)
-                if not plugin.needs_request:
-                    url = await generate_url(
-                        self,
-                        voice,
-                        f"Hi, I'm {voice}, nice to meet you.",
-                        False,
-                    )
-                else:
-                    url = None
+            for voice in chunk:
+                url = self.generate_url(
+                    voice["name"],
+                    False,
+                    f"Hi, I'm {voice['name']}, nice to meet you.",
+                )
                 m = ""
                 if url:
                     m += f"Example: [Click Here]({url})\n"
-                m += f"• Gender: {voices[voice]['gender']}\n"
-                m += f"• Language: {voices[voice]['languageName']}\n"
-                m += f"• Limit: {plugin.limit}\n"
-                m += f"• Source: {plugin.name}"
-                if "apiExtra" in voices[voice].keys():
-                    m += f" ({voices[voice]['apiExtra']})"
+                m += f"• Gender: {voice['gender']}\n"
+                m += f"• Language: {voice['languageName']}\n"
+                m += f"• Source: {voice['source']}"
 
-                embed.add_field(name=voice, value=m)
+                embed.add_field(name=voice["name"], value=m)
             pages.append(embed)
 
         for index, embed in enumerate(pages):
             embed.set_footer(
-                text=f"Page {index + 1}/{len(pages)} | {len(voices_list)} voices"
+                text=f"Page {index + 1}/{len(pages)} | {len(self.voices)} voices"
             )
 
         if len(pages) == 1:
@@ -76,13 +71,14 @@ class UserConfigMixin(MixinMeta):
 
         current_voice = await self.config.user(ctx.author).voice()
 
-        if voice is None:
+        if not voice:
             await ctx.send(f"Your current voice is **{current_voice}**")
             return
         voice = voice.title()
-        if voice in voices.keys():
-            await self.config.user(ctx.author).voice.set(voice)
-            await ctx.send(f"Your new TTS voice is: **{voice}**")
+        voice = self.get_voice(voice)
+        if voice:
+            await self.config.user(ctx.author).voice.set(voice["name"])
+            await ctx.send(f"Your new TTS voice is: **{voice['name']}**")
         else:
             await ctx.send(
                 f"Sorry, that's not a valid voice. You can view voices with the `{ctx.clean_prefix}listvoices` command."

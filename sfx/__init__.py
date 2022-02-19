@@ -1,6 +1,6 @@
 from redbot.core.bot import Red
 
-from .cog import SFX
+from .sfx import SFX
 
 
 async def setup(bot: Red) -> None:
