@@ -38,13 +38,15 @@ class ImageMixin(MixinMeta):
                     await ctx.send("Something went wrong when trying to get the video.")
                     return
                 res = await resp.read()
-                if len(res) < 100: # File incomplete
+                if len(res) < 100:  # File incomplete
                     await asyncio.sleep(2)
                     async with self.session.get(
                         f"http://talkobamato.me/synth/output/{key}/obama.mp4"
                     ) as resp:
                         if resp.status != 200:
-                            await ctx.send("Something went wrong when trying to get the video.")
+                            await ctx.send(
+                                "Something went wrong when trying to get the video."
+                            )
                             return
                         res = await resp.read()
             bfile = BytesIO(res)

@@ -37,7 +37,9 @@ class AutoTTSMixin(MixinMeta):
                     await self.config.guild(ctx.guild).allow_autotts.set(False)
                     await ctx.send("AutoTTS is now disallowed for this guild.")
             else:
-                await ctx.send("You need the `Manage Server` permission to use this command.")
+                await ctx.send(
+                    "You need the `Manage Server` permission to use this command."
+                )
 
     @commands.Cog.listener()
     async def on_message_without_command(self, message: discord.Message):

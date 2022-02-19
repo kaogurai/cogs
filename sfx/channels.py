@@ -107,15 +107,14 @@ class TTSChannelMixin(MixinMeta):
 
     @commands.Cog.listener()
     async def on_message_without_command(self, message: discord.Message):
-        if not message.guild:
-            return
-        if message.author.bot:
-            return
-        if not message.channel.permissions_for(message.guild.me).send_messages:
-            return
-        if await self.bot.allowed_by_whitelist_blacklist(who=message.author) is False:
-            return
-        if await self.bot.cog_disabled_in_guild(self, message.guild):
+        if (
+            not message.guild
+            or message.author.bot
+            or not message.channel.permissions_for(message.guild.me).send_messages
+            or await self.bot.allowed_by_whitelist_blacklist(who=message.author) is False
+            or await self.bot.cog_disabled_in_guild(self, message.guild)
+            or message.author.id in self.autotts
+        ):
             return
         channel_list = await self.config.guild(message.guild).channels()
 
