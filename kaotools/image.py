@@ -5,6 +5,7 @@ import discord
 from redbot.core import commands
 
 from .abc import MixinMeta
+from typing import Optional
 
 
 class ImageMixin(MixinMeta):
@@ -58,24 +59,67 @@ class ImageMixin(MixinMeta):
         await ctx.send(embed=e)
 
     @commands.command()
-    async def ocr(self, ctx, link: str = None):
+    async def ocr(self, ctx, image_url: Optional[str], lang: str = "english"):
         """
         Convert an image to text.
 
         You can either upload an image or provide a direct link.
 
         Supported formats: jpg, png, webp, pdf
+
+        You can also specify the language for more accurate results.
+
+        Supported languages: arabic, bulgarian, chinesesimplified, chinesetraditional, croatian, czech, danish, dutch, english, finnish, french, german, greek, hungarian, italian, japanese, korean, polish, portuguese, russian, slovenian, spanish, swedish, and turkish
         """
-        if not link and not ctx.message.attachments:
+        if not image_url and not ctx.message.attachments:
             await ctx.send("Please provide an image to convert to text.")
             return
 
-        if not link:
+        if ctx.message.attachments:
             link = ctx.message.attachments[0].url
+            lang = image_url
+        else:
+            link = image_url
 
-        filetype = link.split(".")[-1]
+        dot_split = link.split(".")[-1]
+        filetype = dot_split.split("?")[0]
         if filetype not in ["jpg", "png", "webp", "pdf"]:
             await ctx.send("Sorry, that format is not supported.")
+            return
+
+        langs = {
+            "arabic": "ara",
+            "bulgarian": "bul",
+            "chinesesimplified": "chs",
+            "chinesetraditional": "cht",
+            "croatian": "hrv",
+            "czech": "cze",
+            "danish": "dan",
+            "dutch": "dut",
+            "english": "eng",
+            "finnish": "fin",
+            "french": "fre",
+            "german": "ger",
+            "greek": "gre",
+            "hungarian": "hun",
+            "italian": "ita",
+            "japanese": "jpn",
+            "korean": "kor",
+            "polish": "pol",
+            "portuguese": "por",
+            "russian": "rus",
+            "slovenian": "slv",
+            "spanish": "spa",
+            "swedish": "swe",
+            "turkish": "tur",
+        }
+
+        if lang.lower() not in langs.keys():
+            await ctx.send(
+                "Sorry, that language is not supported.\n\nSupported languages: {}".format(
+                    ", ".join(langs.keys())
+                )
+            )
             return
 
         async with ctx.typing():
@@ -83,8 +127,10 @@ class ImageMixin(MixinMeta):
                 "https://api.ocr.space/parse/image",
                 data={
                     "apikey": "5a64d478-9c89-43d8-88e3-c65de9999580",  # Extracted from the web client
-                    "language": "eng",
+                    "language": langs[lang.lower()],
+                    "detectOrientation": "true",
                     "isOverlayRequired": "false",
+                    "scale": "true",
                     "url": link,
                 },
             ) as resp:
@@ -92,12 +138,12 @@ class ImageMixin(MixinMeta):
                     await ctx.send("Something went wrong when trying to get the text.")
                     return
                 data = await resp.json()
-        r = data["ParsedResults"]
-        if not r:
-            await ctx.send("Sorry, the API backend returned isn't working")
+
+        if data["IsErroredOnProcessing"]:
+            await ctx.send("Sorry, the API backend isn't working correctly.")
             return
 
-        results = r[0]["ParsedText"]
+        results = data["ParsedResults"][0]["ParsedText"]
         if results != "":
             embed = discord.Embed(
                 title="OCR Results",
