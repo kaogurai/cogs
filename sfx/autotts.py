@@ -29,13 +29,15 @@ class AutoTTSMixin(MixinMeta):
                 self.autotts.append(ctx.author.id)
                 await ctx.send("I will now automatically say your messages as TTS.")
         else:
-
-            if guild_setting:
-                await self.config.guild(ctx.guild).allow_autotts.set(True)
-                await ctx.send("AutoTTS is now allowed for this guild.")
+            if ctx.author.has_permissions(manage_guild=True):
+                if guild_setting:
+                    await self.config.guild(ctx.guild).allow_autotts.set(True)
+                    await ctx.send("AutoTTS is now allowed for this guild.")
+                else:
+                    await self.config.guild(ctx.guild).allow_autotts.set(False)
+                    await ctx.send("AutoTTS is now disallowed for this guild.")
             else:
-                await self.config.guild(ctx.guild).allow_autotts.set(False)
-                await ctx.send("AutoTTS is now disallowed for this guild.")
+                await ctx.send("You need the `Manage Server` permission to use this command.")
 
     @commands.Cog.listener()
     async def on_message_without_command(self, message: discord.Message):
