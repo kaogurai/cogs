@@ -121,7 +121,7 @@ class TTSChannelMixin(MixinMeta):
         if not message.author.voice or not message.author.voice.channel:
             await message.channel.send("You are not connected to a voice channel.")
             return
-        
+
         await self.play_tts(
             message.author,
             message.author.voice.channel,

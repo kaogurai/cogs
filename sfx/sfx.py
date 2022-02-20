@@ -214,9 +214,7 @@ class SFX(
         self.repeat_state[vc.guild.id] = repeat_state
 
         if type == "sfx":
-            await channel.send(
-                f"Playing **{track_title}**..."
-            )
+            await channel.send(f"Playing **{track_title}**...")
 
         # No queue or anything, just add and play
         if not player.current and not player.queue:
@@ -226,10 +224,7 @@ class SFX(
             return
 
         # There's already an SFX or TTS playing, so we can just skip it
-        if (
-            vc.guild.id in self.current_sfx.keys()
-            and self.current_sfx[vc.guild.id]
-        ):
+        if vc.guild.id in self.current_sfx.keys() and self.current_sfx[vc.guild.id]:
             player.queue.insert(0, track)
             await player.skip()
             self.current_sfx[vc.guild.id] = track

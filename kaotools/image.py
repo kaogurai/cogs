@@ -72,17 +72,17 @@ class ImageMixin(MixinMeta):
         await ctx.send(embed=e)
 
     @commands.command()
-    async def ocr(self, ctx, image_url: Optional[str], lang: str = "english"):
+    async def ocr(self, ctx, image_url: Optional[str], lang: str = "eng"):
         """
         Convert an image to text.
 
         You can either upload an image or provide a direct link.
 
-        Supported formats: jpg, png, webp, pdf
+        Supported formats: jpg, png, webp
 
         You can also specify the language for more accurate results.
 
-        Supported languages: arabic, bulgarian, chinesesimplified, chinesetraditional, croatian, czech, danish, dutch, english, finnish, french, german, greek, hungarian, italian, japanese, korean, polish, portuguese, russian, slovenian, spanish, swedish, and turkish
+        Supported languages: afr, amh, ara, asm, aze, aze_cyrl, bel, ben, bod, bos, bre, bul, cat, ceb, ces, chi_sim, chi_sim_vert, chi_tra, chi_tra_vert, chr, cos, cym, dan, deu, div, dzo, ell, eng, enm, epo, est, eus, fao, fas, fil, fin, fra, frk, frm, fry, gla, gle, glg, grc, guj, hat, heb, hin, hrv, hun, hye, iku, ind, isl, ita, ita_old, jav, jpn, jpn_vert, kan, kat, kat_old, kaz, khm, kir, kmr, kor, kor_vert, lao, lat, lav, lit, ltz, mal, mar, mkd, mlt, mon, mri, msa, mya, nep, nld, nor, oci, ori, osd, pan, pol, por, pus, que, ron, rus, san, sin, slk, slv, snd, spa, spa_old, sqi, srp, srp_latn, sun, swa, swe, syr, tam, tat, tel, tgk, tha, tir, ton, tur, uig, ukr, urd, uzb, uzb_cyrl, vie, yid, yor
         """
         if not image_url and not ctx.message.attachments:
             await ctx.send("Please provide an image to convert to text.")
@@ -90,73 +90,50 @@ class ImageMixin(MixinMeta):
 
         if ctx.message.attachments:
             link = ctx.message.attachments[0].url
-            lang = image_url or "english"
+            lang = image_url or "eng"
         else:
             link = image_url
 
         dot_split = link.split(".")[-1]
         filetype = dot_split.split("?")[0]
-        if filetype not in ["jpg", "png", "webp", "pdf"]:
+        if filetype not in ["jpg", "png", "webp"]:
             await ctx.send("Sorry, that format is not supported.")
             return
 
-        langs = {
-            "arabic": "ara",
-            "bulgarian": "bul",
-            "chinesesimplified": "chs",
-            "chinesetraditional": "cht",
-            "croatian": "hrv",
-            "czech": "cze",
-            "danish": "dan",
-            "dutch": "dut",
-            "english": "eng",
-            "finnish": "fin",
-            "french": "fre",
-            "german": "ger",
-            "greek": "gre",
-            "hungarian": "hun",
-            "italian": "ita",
-            "japanese": "jpn",
-            "korean": "kor",
-            "polish": "pol",
-            "portuguese": "por",
-            "russian": "rus",
-            "slovenian": "slv",
-            "spanish": "spa",
-            "swedish": "swe",
-            "turkish": "tur",
-        }
+        async with self.session.get(f"{self.KAO_API_URL}/ocr/languages") as resp:
+            if resp.status != 200:
+                await ctx.send("Something went wrong when trying to get the languages.")
+                return
+            languages = await resp.json()
 
-        if lang.lower() not in langs.keys():
+        if lang.lower() not in languages:
             await ctx.send(
                 "Sorry, that language is not supported.\n\nSupported languages: {}".format(
-                    ", ".join(langs.keys())
+                    ", ".join(languages)
                 )
             )
             return
 
+        async with self.session.get(link) as resp:
+            if resp.status != 200:
+                await ctx.send("Something went wrong when trying to get the image.")
+                return
+            res = await resp.read()
+
         async with ctx.typing():
             async with self.session.post(
-                "https://api.ocr.space/parse/image",
+                f"{self.KAO_API_URL}/ocr/image",
                 data={
-                    "apikey": "5a64d478-9c89-43d8-88e3-c65de9999580",  # Extracted from the web client
-                    "language": langs[lang.lower()],
-                    "detectOrientation": "true",
-                    "isOverlayRequired": "false",
-                    "scale": "true",
-                    "url": link,
+                    "file": res,
                 },
+                params={"lang": lang.lower()},
             ) as resp:
                 if resp.status != 200:
                     await ctx.send("Something went wrong when trying to get the text.")
                     return
                 data = await resp.json()
 
-        if data["IsErroredOnProcessing"]:
-            await ctx.send("Sorry, the OCR backend isn't working correctly.")
-            return
-
-        results = data["ParsedResults"][0]["ParsedText"]
+        results = data["text"]
         if results != "":
             embed = discord.Embed(
                 title="OCR Results",

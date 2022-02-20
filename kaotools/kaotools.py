@@ -37,6 +37,8 @@ class KaoTools(
     Random bot tools.
     """
 
+    KAO_API_URL = "https://api.kaogurai.xyz/v1"
+
     def __init__(self, bot):
         self.bot = bot
         self.config = Config.get_conf(self, identifier=10023)
