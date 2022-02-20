@@ -96,7 +96,7 @@ class ImageMixin(MixinMeta):
 
         dot_split = link.split(".")[-1]
         filetype = dot_split.split("?")[0]
-        if filetype not in ["jpg", "png", "webp"]:
+        if filetype not in ["jpg", "png", "webp", "gif", "bmp", "tiff"]:
             await ctx.send("Sorry, that format is not supported.")
             return
 
