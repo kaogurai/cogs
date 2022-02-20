@@ -1,21 +1,17 @@
-from abc import ABC
 from urllib.parse import quote
 
 import aiohttp
+import discord
 import lavalink
 from discord.ext import tasks
 from redbot.core import Config, commands
-from redbot.core.utils.chat_formatting import escape
 
+from .abc import CompositeMetaClass
 from .autotts import AutoTTSMixin
 from .channels import TTSChannelMixin
 from .commands import BaseCommandsMixin
 from .joinandleave import JoinAndLeaveMixin
 from .userconfig import UserConfigMixin
-
-
-class CompositeMetaClass(type(commands.Cog), type(ABC)):
-    """Another thing I stole from last.fm for ABC"""
 
 
 class SFX(
@@ -29,7 +25,7 @@ class SFX(
 ):
     """Plays sound effects, text-to-speech, and sounds when you join or leave a voice channel."""
 
-    __version__ = "5.1.2"
+    __version__ = "5.1.3"
 
     TTS_API_URL = "https://api.kaogurai.xyz/v1/tts"
     SFX_API_URL = "https://freesound.org/apiv2"
@@ -61,30 +57,57 @@ class SFX(
         self.autotts = []
 
     def cog_unload(self):
+        """
+        Runs when the cog is unloaded.
+
+        Closes the Aiohttp session, sets back all the player repeat states, and removes the event listener for lavalink.
+        """
         self.bot.loop.create_task(self.session.close())
         self.bot.loop.create_task(self.reset_player_states())
         lavalink.unregister_event_listener(self.ll_check)
 
     async def red_delete_data_for_user(self, **kwargs):
-        return
+        """
+        Clears a user's data when it's requested.
+        """
+        await self.config.user_from_id(kwargs["user_id"]).clear()
 
     def format_help_for_context(self, ctx):
+        """
+        Adds the version to the help command.
+        """
         pre_processed = super().format_help_for_context(ctx)
         return f"{pre_processed}\n\nCog Version: {self.__version__}"
 
-    @tasks.loop(hours=24)
+    @tasks.loop(hours=48)
     async def get_voices(self):
+        """
+        Stores all the available voices in a class attribute.
+
+        We do this so we don't have to make a request every time we want to play a sound.
+
+        It runs every 48 hours since it's uncommon voices will change.
+        """
         async with self.session.get(f"{self.TTS_API_URL}/voices") as req:
             if req.status == 200:
                 self.voices = await req.json()
 
     @tasks.loop(seconds=15)
     async def get_voices_server_down(self):
+        """
+        If the TTS API was down for some reason and we can't get the voices, we'll try again every 15 seconds.
+
+        If there's already voices, we can just ignore this since it'll try again in 48 hours.
+        """
         if not self.voices:
             await self.get_voices()
 
-    # We modify the player repeat state to avoid issues with SFX, so we need to set it back if the SFX hasn't ended
     async def reset_player_states(self):
+        """
+        Sets all the players to their original repeat state.
+
+        This is called when the cog is unloaded so that the rll repeat states matches the Audio config repeat states.
+        """
         for guild_id in self.last_track_info.keys():
             try:
                 player = lavalink.get_player(guild_id)
@@ -93,23 +116,70 @@ class SFX(
             player.repeat = self.repeat_state[guild_id]
 
     async def set_token(self):
+        """
+        Sets the token for the SFX API.
+
+        This is called on bot startup and stored in a class attribute so we don't need to call Red's config API every time we want to play a SFX.
+        """
         token = await self.bot.get_shared_api_tokens("freesound")
         self.id = token.get("id")
         self.key = token.get("key")
 
     @commands.Cog.listener()
     async def on_red_api_tokens_update(self, service_name, api_tokens):
+        """
+        Updates the token when the API tokens are updated.
+
+        This is needed to users don't need to reload the cog for it to update.
+        """
         if service_name == "freesound":
             self.id = api_tokens.get("id")
             self.key = api_tokens.get("key")
 
+    def generate_url(self, voice: str, translate: bool, text: str):
+        """
+        Generates the URL for the TTS using kaogurai's TTS API.
+        """
+        return f"{self.TTS_API_URL}/synthesize?voice={voice}&translate={translate}&text={quote(text)}"
+
     def get_voice(self, voice: str):
+        """
+        Gets the voice from the voices list.
+        """
         for v in self.voices:
             if v["name"] == voice:
                 return v
 
-    def generate_url(self, voice: str, translate: bool, text: str):
-        return f"{self.TTS_API_URL}/synthesize?voice={voice}&translate={translate}&text={quote(text)}"
+    async def play_tts(
+        self,
+        user: discord.Member,
+        voice_channel: discord.VoiceChannel,
+        text_channel: discord.TextChannel,
+        text: str,
+    ):
+        """
+        Validates the user's voice still exists and plays the TTS.
+        """
+        author_data = await self.config.user(user).all()
+        author_voice = author_data["voice"]
+        author_translate = author_data["translate"]
+
+        is_voice = self.get_voice(author_voice)
+        if not is_voice and self.voices:
+            await self.config.user(user).voice.clear()
+            author_voice = await self.config.user(user).voice()
+
+        url = self.generate_url(author_voice, author_translate, text)
+
+        track_info = ("Text to Speech", user)
+
+        await self.play_sound(
+            voice_channel,
+            text_channel,
+            "tts",
+            url,
+            track_info,
+        )
 
     async def play_sound(self, vc, channel, type: str, url: str, track_info: tuple):
         """
@@ -134,7 +204,7 @@ class SFX(
         if not tracks.tracks:
             if channel and type != "autotts":
                 await channel.send("Something went wrong.")
-                return
+            return
 
         track = tracks.tracks[0]
         track_title, track_requester = track_info
@@ -145,7 +215,7 @@ class SFX(
 
         if type == "sfx":
             await channel.send(
-                f"Playing **{escape(track.title[:100], formatting=True)}**..."
+                f"Playing **{track_title}**..."
             )
 
         # No queue or anything, just add and play
@@ -158,7 +228,7 @@ class SFX(
         # There's already an SFX or TTS playing, so we can just skip it
         if (
             vc.guild.id in self.current_sfx.keys()
-            and self.current_sfx[vc.guild.id] != None
+            and self.current_sfx[vc.guild.id]
         ):
             player.queue.insert(0, track)
             await player.skip()

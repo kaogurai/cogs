@@ -1,12 +1,12 @@
+import asyncio
 import random
 from io import BytesIO
+from typing import Optional
 
 import discord
 from redbot.core import commands
-import asyncio
 
 from .abc import MixinMeta
-from typing import Optional
 
 
 class ImageMixin(MixinMeta):

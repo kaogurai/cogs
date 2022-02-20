@@ -84,10 +84,7 @@ class TTSChannelMixin(MixinMeta):
         if not channel_list:
             await ctx.send("This server doesn't have any TTS channels set up.")
         else:
-            text = "".join(
-                "<#" + str(channel) + "> - " + str(channel) + "\n"
-                for channel in channel_list
-            )
+            text = "".join(f"<#{channel}> - {channel} \n" for channel in channel_list)
             pages = [p for p in pagify(text=text, delims="\n")]
             embeds = []
             for index, page in enumerate(pages):
@@ -105,43 +102,29 @@ class TTSChannelMixin(MixinMeta):
             else:
                 await menu(ctx, embeds, DEFAULT_CONTROLS, timeout=60)
 
-    @commands.Cog.listener()
-    async def on_message_without_command(self, message: discord.Message):
+    @commands.Cog.listener(name="on_message_without_command")
+    async def ttschannels_listener(self, message: discord.Message):
         if (
             not message.guild
             or message.author.bot
             or not message.channel.permissions_for(message.guild.me).send_messages
-            or await self.bot.allowed_by_whitelist_blacklist(who=message.author) is False
+            or not await self.bot.allowed_by_whitelist_blacklist(who=message.author)
             or await self.bot.cog_disabled_in_guild(self, message.guild)
             or message.author.id in self.autotts
         ):
             return
-        channel_list = await self.config.guild(message.guild).channels()
 
+        channel_list = await self.config.guild(message.guild).channels()
         if message.channel.id not in channel_list:
             return
 
         if not message.author.voice or not message.author.voice.channel:
             await message.channel.send("You are not connected to a voice channel.")
             return
-
-        author_data = await self.config.user(message.author).all()
-        author_voice = author_data["voice"]
-        author_translate = author_data["translate"]
-
-        is_voice = self.get_voice(author_voice)
-        if not is_voice:
-            await self.config.user(message.author).voice.clear()
-            author_voice = await self.config.user(message.author).voice()
-
-        url = self.generate_url(author_voice, author_translate, message.clean_content)
-
-        track_info = ("Text to Speech", message.author)
-
-        await self.play_sound(
+        
+        await self.play_tts(
+            message.author,
             message.author.voice.channel,
             message.channel,
-            "tts",
-            url,
-            track_info,
+            message.clean_content,
         )

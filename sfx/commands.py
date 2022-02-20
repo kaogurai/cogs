@@ -142,7 +142,7 @@ class BaseCommandsMixin(MixinMeta):
                 data = await resp.json()
                 url = data["previews"]["preview-hq-mp3"]
 
-            name = escape(data["name"].split(f".{data['type']}")[0])
+            name = escape(data["name"].split(f".{data['type']}")[0], formatting=True)[:100]
             track_info = (name, ctx.author)
 
             if file:
