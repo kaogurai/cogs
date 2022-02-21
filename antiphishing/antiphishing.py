@@ -104,7 +104,7 @@ class AntiPhishing(commands.Cog):
 
     def get_links(self, message: str):
         """
-        Get links from the message content
+        Get links from the message content.
         """
         # Remove zero-width spaces
         message = message.replace("\u200b", "")
@@ -373,7 +373,7 @@ class AntiPhishing(commands.Cog):
     @commands.admin_or_permissions(manage_guild=True)
     async def antiphishing(self, ctx):
         """
-        Settings to set the anti-phishing integration.
+        Settings to set up the anti-phishing integration.
         """
 
     @antiphishing.command()
