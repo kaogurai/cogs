@@ -15,7 +15,7 @@ class AntiPhishing(commands.Cog):
     Protects users against phishing attacks.
     """
 
-    __version__ = "1.2.2"
+    __version__ = "1.2.3"
 
     def __init__(self, bot):
         self.bot = bot
@@ -67,7 +67,7 @@ class AntiPhishing(commands.Cog):
                 case_str="Phishing Link Detected - Auto-Banned",
             )
 
-    @tasks.loop(minutes=15)
+    @tasks.loop(minutes=10)
     async def get_phishing_domains(self):
         domains = []
 

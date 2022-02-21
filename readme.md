@@ -13,8 +13,8 @@
 | Name | Version | Description |
 |----------|--------|---------------------|
 | AiTools  | v1.0.0 | Brainshop.ai cog |
-| AntiPhishing  | v1.2.1 | Protect users against phishing scams |
-| AutoAvatar | v1.2.2 | Picks random bot avatar |
+| AntiPhishing  | v1.2.3 | Protect users against phishing scams |
+| AutoAvatar | v1.2.4 | Picks random bot avatar |
 | Notes    | v1.0.0 | Write notes on users for moderators to share |
 | Radio | v1.0.2 | Save radio stations to be easily played |
 | Screenshot | v1.0.0 | Takes a screenshot of the given link |
