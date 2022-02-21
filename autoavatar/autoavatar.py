@@ -314,6 +314,7 @@ class AutoAvatar(commands.Cog):
         await ctx.tick()
 
     @autoavatar.command(name="list")
+    @commands.is_owner()
     async def avatar_list(self, ctx):
         """
         Lists all bot avatars.
@@ -333,12 +334,7 @@ class AutoAvatar(commands.Cog):
         pages = [p for p in pagify(text=origin, delims="\n")]
 
         for page in pages:
-            try:
-                await ctx.author.send(page)
-            except:
-                await ctx.send("I can't DM you.")
-                return
-        await ctx.tick()
+            await ctx.author.send(page)
 
     @commands.command()
     @commands.is_owner()
