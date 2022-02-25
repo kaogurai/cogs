@@ -111,6 +111,10 @@ class ImageMixin(MixinMeta):
                 return
             res = await resp.read()
 
+        if len(res) > 1000000:
+            await ctx.send("That image is too large. Please try a image under 10MB.")
+            return
+
         async with ctx.typing():
             async with self.session.post(
                 f"{self.KAO_API_URL}/ocr/image",
