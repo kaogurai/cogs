@@ -79,7 +79,7 @@ class ImageMixin(MixinMeta):
 
         You can either upload an image or provide a direct link.
 
-        Supported formats: jpg, png, webp, gif, bmp, raw, ico, pdf, tiff
+        Supported formats: jpg, png, webp, gif, bmp, raw, ico
         """
         if not link and not ctx.message.attachments:
             await ctx.send("Please provide an image to convert to text.")
@@ -97,8 +97,6 @@ class ImageMixin(MixinMeta):
             "bmp",
             "raw",
             "ico",
-            "pdf",
-            "tiff",
         ]
 
         if not any(f in link for f in supported_formats):
