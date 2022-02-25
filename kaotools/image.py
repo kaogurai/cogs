@@ -88,36 +88,11 @@ class ImageMixin(MixinMeta):
         if not link:
             link = str(ctx.message.attachments[0].url)
 
-        supported_formats = [
-            "jpg",
-            "jpeg",
-            "png",
-            "webp",
-            "gif",
-            "bmp",
-            "raw",
-            "ico",
-        ]
-
-        if not any(f in link for f in supported_formats):
-            await ctx.send("That format is not supported.")
-            return
-
-        async with self.session.get(link) as resp:
-            if resp.status != 200:
-                await ctx.send("Something went wrong when trying to get the image.")
-                return
-            res = await resp.read()
-
-        if len(res) > 1000000:
-            await ctx.send("That image is too large. Please try a image under 10MB.")
-            return
-
         async with ctx.typing():
-            async with self.session.post(
+            async with self.session.get(
                 f"{self.KAO_API_URL}/ocr/image",
-                data={
-                    "file": res,
+                params={
+                    "url": link,
                 },
             ) as resp:
                 if resp.status != 200:
@@ -125,7 +100,6 @@ class ImageMixin(MixinMeta):
                     return
                 data = await resp.json()
 
-        data = data["responses"][0]
         if not data:
             await ctx.send("No text was found.")
             return
