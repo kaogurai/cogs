@@ -7,39 +7,37 @@ from .abc import MixinMeta
 
 
 class AutoTTSMixin(MixinMeta):
-    @commands.command()
+    @commands.group(invoke_without_command=True)
     @commands.guild_only()
-    async def autotts(self, ctx, guild_setting: bool = None):
+    async def autotts(self, ctx):
         """
         Toggles the AutoTTS feature.
 
-        If you don't provide any arguments, it will toggle the setting for you.
-
-        If you provide a boolean, it will set the setting for the guild to that value. (mod/admin only)
+        If the server subcommand isn't used, it will toggle it for yourself.
         """
         toggle = await self.config.guild(ctx.guild).allow_autotts()
-        if type(guild_setting) is not bool:
-            if ctx.author.id in self.autotts:
-                self.autotts.remove(ctx.author.id)
-                await ctx.send("I will no longer automatically say your messages as TTS.")
-            else:
-                if not toggle:
-                    await ctx.send("AutoTTS is disallowed on this server.")
-                    return
-                self.autotts.append(ctx.author.id)
-                await ctx.send("I will now automatically say your messages as TTS.")
+        if ctx.author.id in self.autotts:
+            self.autotts.remove(ctx.author.id)
+            await ctx.send("I will no longer automatically say your messages as TTS.")
         else:
-            if ctx.author.has_permissions(manage_guild=True):
-                if guild_setting:
-                    await self.config.guild(ctx.guild).allow_autotts.set(True)
-                    await ctx.send("AutoTTS is now allowed for this guild.")
-                else:
-                    await self.config.guild(ctx.guild).allow_autotts.set(False)
-                    await ctx.send("AutoTTS is now disallowed for this guild.")
-            else:
-                await ctx.send(
-                    "You need the `Manage Server` permission to use this command."
-                )
+            if not toggle:
+                await ctx.send("AutoTTS is disallowed on this server.")
+                return
+            self.autotts.append(ctx.author.id)
+            await ctx.send("I will now automatically say your messages as TTS.")
+
+    @autotts.command(name="server")
+    @commands.has_mod_or_permissions(manage_guild=True)
+    @commands.guild_only()
+    async def autotts_server(self, ctx):
+        """Toggles the AutoTTS feature for the server."""
+        toggle = await self.config.guild(ctx.guild).allow_autotts()
+        if toggle:
+            await self.config.guild(ctx.guild).allow_autotts.set(False)
+            await ctx.send("AutoTTS is now disallowed for this server.")
+        else:
+            await self.config.guild(ctx.guild).allow_autotts.set(True)
+            await ctx.send("AutoTTS is now allowed for this server.")
 
     @commands.Cog.listener(name="on_message_without_command")
     async def autotts_listener(self, message: discord.Message):
