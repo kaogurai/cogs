@@ -1,8 +1,0 @@
-{
-    "author": ["alec"],
-    "name": "Screenshot",
-    "install_msg": "**Thanks for installing.**\n This cog only allows the bot owner to take a screenshot for two main reasons:\n 1. A harmful user can easily screenshot a NSFW website in a non-nsfw channel.\n 2. A harmful user could attempt to screenshot an ip grabber, and get the ip of the host machine.",
-    "short": "Takes a Screenshot of a given URL.",
-    "description": "Takes a Screenshot of a given URL",
-    "requirements": ["pyppeteer"]
-}
