@@ -41,7 +41,7 @@ class ImageMixin(MixinMeta):
                     return
                 res = await resp.read()
                 if len(res) < 100:  # File incomplete
-                    await asyncio.sleep(2) # Needs some more time to generate, I guess
+                    await asyncio.sleep(2)  # Needs some more time to generate, I guess
                     async with self.session.get(
                         f"http://talkobamato.me/synth/output/{key}/obama.mp4"
                     ) as resp:
@@ -74,7 +74,7 @@ class ImageMixin(MixinMeta):
         await ctx.send(embed=e)
 
     @commands.command()
-    async def ocr(self, ctx, image_url: Optional[ImageFinder]=None):
+    async def ocr(self, ctx, image_url: Optional[ImageFinder] = None):
         """
         Convert an image to text.
 
@@ -178,4 +178,8 @@ class ImageMixin(MixinMeta):
                 img = await resp.read()
                 img = BytesIO(img)
                 img.seek(0)
-            await ctx.send(file=await self.bot.loop.run_in_executor(None, self.get_color_palette, img))
+            await ctx.send(
+                file=await self.bot.loop.run_in_executor(
+                    None, self.get_color_palette, img
+                )
+            )
