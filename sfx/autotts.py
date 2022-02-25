@@ -27,7 +27,7 @@ class AutoTTSMixin(MixinMeta):
             await ctx.send("I will now automatically say your messages as TTS.")
 
     @autotts.command(name="server")
-    @commands.has_mod_or_permissions(manage_guild=True)
+    @commands.admin_or_permissions(manage_guild=True)
     @commands.guild_only()
     async def autotts_server(self, ctx):
         """Toggles the AutoTTS feature for the server."""
