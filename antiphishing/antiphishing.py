@@ -268,7 +268,7 @@ class AntiPhishing(commands.Cog):
         aliases=["checkforphish", "checkscam", "checkforscam", "checkphishing"]
     )
     @commands.bot_has_permissions(embed_links=True)
-    async def checkphish(self, ctx, url: str=None):
+    async def checkphish(self, ctx, url: str = None):
         """
         Check if a url is a phishing scam.
 
@@ -284,7 +284,7 @@ class AntiPhishing(commands.Cog):
                 await ctx.send_help()
                 return
             url = m.content
-        
+
         url = url.strip("<>")
         urls = self.extract_urls(url)
         if not urls:

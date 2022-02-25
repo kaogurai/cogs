@@ -105,11 +105,7 @@ class MediaMixin(MixinMeta):
                     )
 
     async def get_omdb_info(self, type, query):
-        params = {
-            "apikey": self.omdb_key,
-            "type": type,
-            "t": query
-        }
+        params = {"apikey": self.omdb_key, "type": type, "t": query}
         async with self.session.get("http://www.omdbapi.com/", params=params) as req:
             if req.status != 200:
                 return
@@ -149,8 +145,6 @@ class MediaMixin(MixinMeta):
         embed.add_field(name="Plot", value=data["Plot"], inline=False)
 
         await ctx.send(embed=embed)
-
-        
 
     @commands.command(aliases=["tv", "tvshow", "tvseries", "series"])
     @commands.bot_has_permissions(embed_links=True)
