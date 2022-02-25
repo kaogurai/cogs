@@ -15,7 +15,7 @@ class AntiPhishing(commands.Cog):
     Protects users against phishing attacks.
     """
 
-    __version__ = "1.2.5"
+    __version__ = "1.2.6"
 
     def __init__(self, bot):
         self.bot = bot
@@ -277,13 +277,14 @@ class AntiPhishing(commands.Cog):
         if not url and not ctx.message.reference:
             return await ctx.send_help()
 
-        m = await ctx.channel.fetch_message(ctx.message.reference.message_id)
-        if m:
+        if not url:
+            try:
+                m = await ctx.channel.fetch_message(ctx.message.reference.message_id)
+            except discord.NotFound:
+                await ctx.send_help()
+                return
             url = m.content
-        else:
-            await ctx.send_help()
-            return
-
+        
         url = url.strip("<>")
         urls = self.extract_urls(url)
         if not urls:
