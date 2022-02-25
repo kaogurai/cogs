@@ -8,6 +8,7 @@ from PIL import Image, ImageDraw
 from redbot.core import commands
 
 from .abc import MixinMeta
+from .utils import ImageFinder
 
 
 class ImageMixin(MixinMeta):
@@ -40,7 +41,7 @@ class ImageMixin(MixinMeta):
                     return
                 res = await resp.read()
                 if len(res) < 100:  # File incomplete
-                    await asyncio.sleep(2)
+                    await asyncio.sleep(2) # Needs some more time to generate, I guess
                     async with self.session.get(
                         f"http://talkobamato.me/synth/output/{key}/obama.mp4"
                     ) as resp:
@@ -73,7 +74,7 @@ class ImageMixin(MixinMeta):
         await ctx.send(embed=e)
 
     @commands.command()
-    async def ocr(self, ctx, image_url: Optional[str], lang: str = "eng"):
+    async def ocr(self, ctx, image_url: Optional[ImageFinder]=None):
         """
         Convert an image to text.
 
@@ -81,15 +82,11 @@ class ImageMixin(MixinMeta):
 
         Supported formats: jpg, png, webp, gif, bmp, raw, ico, pdf, tiff
         """
-        if not image_url and not ctx.message.attachments:
+        if not image_url:
             await ctx.send("Please provide an image to convert to text.")
             return
 
-        if ctx.message.attachments:
-            link = ctx.message.attachments[0].url
-            lang = image_url or "eng"
-        else:
-            link = image_url
+        link = str(image_url[0])
 
         dot_split = link.split(".")[-1]
         filetype = dot_split.split("?")[0]
@@ -140,22 +137,7 @@ class ImageMixin(MixinMeta):
         )
         await ctx.send(embed=embed)
 
-    @commands.command(aliases=["pfppalette"])
-    @commands.bot_has_permissions(attach_files=True)
-    async def palette(self, ctx, img: Optional[ImageFinder] = None, sorted=False):
-        """
-        Colour palette of an image
-
-        By default it is sorted by prominence, but you can sort it by rgb by passing true.
-
-        Thanks flare for making this!
-        """
-        if img is None:
-            img = str(ctx.author.avatar_url_as(format="png"))
-        async with ctx.typing():
-            img = await self.get_img(ctx, str(img))
-        if isinstance(img, dict):
-            return await ctx.send(img["error"])
+    def get_color_palette(self, img):
         colors = colorgram.extract(img, 10)
         if sorted:
             colors.sort(key=lambda c: c.rgb)
@@ -172,4 +154,28 @@ class ImageMixin(MixinMeta):
         file.name = f"palette.png"
         file.seek(0)
         image = discord.File(file)
-        await ctx.send(file=image)
+        return image
+
+    @commands.command(aliases=["pfppalette", "pfpalette"])
+    @commands.bot_has_permissions(attach_files=True)
+    async def palette(self, ctx, img: Optional[ImageFinder] = None, sorted=False):
+        """
+        Colour palette of an image
+
+        By default it is sorted by prominence, but you can sort it by rgb by passing true.
+
+        Thanks flare for making this!
+        """
+        if not img:
+            img = str(ctx.author.avatar_url_as(format="png"))
+        else:
+            img = str(img[0])
+        async with ctx.typing():
+            async with self.session.get(img) as resp:
+                if resp.status != 200:
+                    await ctx.send("Something went wrong when trying to get the image.")
+                    return
+                img = await resp.read()
+                img = BytesIO(img)
+                img.seek(0)
+            await ctx.send(file=await self.bot.loop.run_in_executor(None, self.get_color_palette, img))
