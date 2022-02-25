@@ -8,7 +8,6 @@ from PIL import Image, ImageDraw
 from redbot.core import commands
 
 from .abc import MixinMeta
-from .utils import ImageFinder
 
 
 class ImageMixin(MixinMeta):
@@ -74,7 +73,7 @@ class ImageMixin(MixinMeta):
         await ctx.send(embed=e)
 
     @commands.command()
-    async def ocr(self, ctx, image_url: Optional[ImageFinder] = None):
+    async def ocr(self, ctx, link: Optional[str] = None):
         """
         Convert an image to text.
 
@@ -82,15 +81,14 @@ class ImageMixin(MixinMeta):
 
         Supported formats: jpg, png, webp, gif, bmp, raw, ico, pdf, tiff
         """
-        if not image_url:
+        if not link and not ctx.message.attachments:
             await ctx.send("Please provide an image to convert to text.")
             return
 
-        link = str(image_url[0])
+        if not link:
+            link = str(ctx.message.attachments[0].url)
 
-        dot_split = link.split(".")[-1]
-        filetype = dot_split.split("?")[0]
-        if filetype not in [
+        supported_formats = [
             "jpg",
             "jpeg",
             "png",
@@ -101,8 +99,10 @@ class ImageMixin(MixinMeta):
             "ico",
             "pdf",
             "tiff",
-        ]:
-            await ctx.send("Sorry, that format is not supported.")
+        ]
+
+        if not any(f in link for f in supported_formats):
+            await ctx.send("That format is not supported.")
             return
 
         async with self.session.get(link) as resp:
@@ -126,6 +126,10 @@ class ImageMixin(MixinMeta):
         data = data["responses"][0]
         if not data:
             await ctx.send("No text was found.")
+            return
+
+        if "error" in data.keys():
+            await ctx.send(data["error"]["message"])
             return
 
         results = data["fullTextAnnotation"]["text"]
@@ -158,20 +162,22 @@ class ImageMixin(MixinMeta):
 
     @commands.command(aliases=["pfppalette", "pfpalette"])
     @commands.bot_has_permissions(attach_files=True)
-    async def palette(self, ctx, img: Optional[ImageFinder] = None, sorted=False):
+    async def palette(self, ctx, link: Optional[str] = None, sorted=False):
         """
-        Colour palette of an image
+        Get the color palette of an image.
 
         By default it is sorted by prominence, but you can sort it by rgb by passing true.
 
         Thanks flare for making this!
         """
-        if not img:
-            img = str(ctx.author.avatar_url_as(format="png"))
-        else:
-            img = str(img[0])
+        if not link:
+            if not ctx.message.attachments:
+                link = str(ctx.author.avatar_url_as(format="png"))
+            else:
+                link = str(ctx.message.attachments[0].url)
+
         async with ctx.typing():
-            async with self.session.get(img) as resp:
+            async with self.session.get(link) as resp:
                 if resp.status != 200:
                     await ctx.send("Something went wrong when trying to get the image.")
                     return
