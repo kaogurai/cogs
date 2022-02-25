@@ -78,11 +78,7 @@ class ImageMixin(MixinMeta):
 
         You can either upload an image or provide a direct link.
 
-        Supported formats: jpg, png, webp
-
-        You can also specify the language for more accurate results.
-
-        Supported languages: afr, amh, ara, asm, aze, aze_cyrl, bel, ben, bod, bos, bre, bul, cat, ceb, ces, chi_sim, chi_sim_vert, chi_tra, chi_tra_vert, chr, cos, cym, dan, deu, div, dzo, ell, eng, enm, epo, est, eus, fao, fas, fil, fin, fra, frk, frm, fry, gla, gle, glg, grc, guj, hat, heb, hin, hrv, hun, hye, iku, ind, isl, ita, ita_old, jav, jpn, jpn_vert, kan, kat, kat_old, kaz, khm, kir, kmr, kor, kor_vert, lao, lat, lav, lit, ltz, mal, mar, mkd, mlt, mon, mri, msa, mya, nep, nld, nor, oci, ori, osd, pan, pol, por, pus, que, ron, rus, san, sin, slk, slv, snd, spa, spa_old, sqi, srp, srp_latn, sun, swa, swe, syr, tam, tat, tel, tgk, tha, tir, ton, tur, uig, ukr, urd, uzb, uzb_cyrl, vie, yid, yor
+        Supported formats: jpg, png, webp, gif, bmp, raw, ico, pdf, tiff
         """
         if not image_url and not ctx.message.attachments:
             await ctx.send("Please provide an image to convert to text.")
@@ -96,22 +92,19 @@ class ImageMixin(MixinMeta):
 
         dot_split = link.split(".")[-1]
         filetype = dot_split.split("?")[0]
-        if filetype not in ["jpg", "png", "webp", "gif", "bmp", "tiff"]:
+        if filetype not in [
+            "jpg",
+            "jpeg",
+            "png",
+            "webp",
+            "gif",
+            "bmp",
+            "raw",
+            "ico",
+            "pdf",
+            "tiff",
+        ]:
             await ctx.send("Sorry, that format is not supported.")
-            return
-
-        async with self.session.get(f"{self.KAO_API_URL}/ocr/languages") as resp:
-            if resp.status != 200:
-                await ctx.send("Something went wrong when trying to get the languages.")
-                return
-            languages = await resp.json()
-
-        if lang.lower() not in languages:
-            await ctx.send(
-                "Sorry, that language is not supported.\n\nSupported languages: {}".format(
-                    ", ".join(languages)
-                )
-            )
             return
 
         async with self.session.get(link) as resp:
@@ -126,21 +119,22 @@ class ImageMixin(MixinMeta):
                 data={
                     "file": res,
                 },
-                params={"lang": lang.lower()},
             ) as resp:
                 if resp.status != 200:
                     await ctx.send("Something went wrong when trying to get the text.")
                     return
                 data = await resp.json()
 
-        results = data["text"]
-        if results != "":
-            embed = discord.Embed(
-                title="OCR Results",
-                color=await ctx.embed_color(),
-                description=results[:4000],
-                url=link,
-            )
-            await ctx.send(embed=embed)
-        else:
+        data = data["responses"][0]
+        if not data:
             await ctx.send("No text was found.")
+            return
+
+        results = data["fullTextAnnotation"]["text"]
+        embed = discord.Embed(
+            title="OCR Results",
+            color=await ctx.embed_color(),
+            description=results[:4000],
+            url=link,
+        )
+        await ctx.send(embed=embed)
