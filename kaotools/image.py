@@ -1,9 +1,10 @@
 import asyncio
-import random
 from io import BytesIO
 from typing import Optional
 
+import colorgram
 import discord
+from PIL import Image, ImageDraw
 from redbot.core import commands
 
 from .abc import MixinMeta
@@ -138,3 +139,37 @@ class ImageMixin(MixinMeta):
             url=link,
         )
         await ctx.send(embed=embed)
+
+    @commands.command(aliases=["pfppalette"])
+    @commands.bot_has_permissions(attach_files=True)
+    async def palette(self, ctx, img: Optional[ImageFinder] = None, sorted=False):
+        """
+        Colour palette of an image
+
+        By default it is sorted by prominence, but you can sort it by rgb by passing true.
+
+        Thanks flare for making this!
+        """
+        if img is None:
+            img = str(ctx.author.avatar_url_as(format="png"))
+        async with ctx.typing():
+            img = await self.get_img(ctx, str(img))
+        if isinstance(img, dict):
+            return await ctx.send(img["error"])
+        colors = colorgram.extract(img, 10)
+        if sorted:
+            colors.sort(key=lambda c: c.rgb)
+        dimensions = (100 * len(colors), 100)
+        final = Image.new("RGBA", dimensions)
+        a = ImageDraw.Draw(final)
+        start = 0
+        for color in colors:
+            a.rectangle([(start, 0), (start + 100, 100)], fill=color.rgb)
+            start = start + 100
+        final = final.resize((100 * len(colors), 100), resample=Image.ANTIALIAS)
+        file = BytesIO()
+        final.save(file, "png")
+        file.name = f"palette.png"
+        file.seek(0)
+        image = discord.File(file)
+        await ctx.send(file=image)
