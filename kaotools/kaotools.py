@@ -57,34 +57,6 @@ class KaoTools(
     async def red_delete_data_for_user(self, **kwargs):
         return
 
-    async def search_youtube(self, query):
-        """
-        Query lavalink's /loadtracks endpoint for a list of tracks.
-        """
-        cog = self.bot.get_cog("Audio")
-        if not cog:
-            return
-        config = await cog.config.all()
-        if not config["use_external_lavalink"]:
-            password = "youshallnotpass"
-            host = "localhost"
-            port = 2333
-        else:
-            password = config["password"]
-            host = config["host"]
-            port = config["ws_port"]
-        params = {"identifier": "ytsearch:" + query}
-        headers = {"Authorization": password, "Accept": "application/json"}
-        async with self.session.get(
-            f"http://{host}:{port}/loadtracks",
-            params=params,
-            headers=headers,
-        ) as request:
-            if request.status == 200:
-                response = await request.json()
-                with contextlib.suppress(KeyError):
-                    return response["tracks"]
-
     async def invite_url(self, snowflake: int = None):
         scopes = ("bot", "applications.commands")
         permissions = discord.Permissions(397283945463)
@@ -137,33 +109,24 @@ class KaoTools(
         )
         await message.channel.send(embed=embed)
 
-    @commands.command(aliases=["yt"])
+    @commands.command(aliases=["yt", "ytsearch", "youtubesearch"])
     async def youtube(self, ctx, *, video: str):
         """
         Search for a youtube video.
         Inspired by Aikaterna's YouTube cog
         """
-        results = await self.search_youtube(video)
-        if not results:
+        async with self.session.get(f"{self.KAO_API_URL}/youtube/search", params={"q": video}) as r:
+            if r.status != 200:
+                await ctx.send(
+                    "An error occurred while searching for videos."
+                )
+                return
+            data = await r.json()
+        if not data:
             await ctx.send("Nothing found.")
             return
 
-        await ctx.send(results[0]["info"]["uri"])
-
-    @commands.command(aliases=["yts", "ytsearch"])
-    async def youtubesearch(self, ctx, *, video: str):
-        """
-        Search for a youtube video with a menu of results.
-        Inspired by Aikaterna's YouTube cog
-        """
-        results = await self.search_youtube(video)
-        if not results:
-            await ctx.send("Nothing found.")
-            return
-        urls = []
-        for result in results:
-            urls.append(result["info"]["uri"])
-        await menu(ctx, urls, DEFAULT_CONTROLS, timeout=60)
+        await menu(ctx, data, DEFAULT_CONTROLS)
 
     @commands.command()
     @commands.bot_has_permissions(add_reactions=True, use_external_emojis=True)
