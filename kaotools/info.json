@@ -4,6 +4,6 @@
     "install_msg": "**Warning:**\n\nThis cog is meant for kaogurai, and while it is open source, it's not recommended to be used.\n Many things have been hardcoded, and there is a LOT of random, unexpected things that will happen if you install this. Make sure you know what you're doing and you've read every line of code that goes into this, because it won't load on a normal Red.\n\nProceed at your own risk.",
     "short": "A collection of tools made for kaogurai.",
     "description": "A collection of tools made for kaogurai.",
-    "requirements": ["colorgram.py", "pillow", "Unidecode"],
+    "requirements": ["colorgram.py", "pillow", "Unidecode", "apscheduler"],
     "hidden": true
 }

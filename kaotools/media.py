@@ -125,7 +125,9 @@ class MediaMixin(MixinMeta):
             await ctx.send("I couldn't find that movie!")
             return
 
-        embed = discord.Embed(color=await ctx.embed_color(), title=data["Title"], description=data["Plot"])
+        embed = discord.Embed(
+            color=await ctx.embed_color(), title=data["Title"], description=data["Plot"]
+        )
         if data["Website"] != "N/A":
             embed.url = data["Website"]
         if data["Poster"] != "N/A":
@@ -157,7 +159,9 @@ class MediaMixin(MixinMeta):
             await ctx.send("I couldn't find that show!")
             return
 
-        embed = discord.Embed(color=await ctx.embed_color(), title=data["Title"], description=data["Plot"])
+        embed = discord.Embed(
+            color=await ctx.embed_color(), title=data["Title"], description=data["Plot"]
+        )
         if data["Poster"] != "N/A":
             embed.set_thumbnail(url=data["Poster"])
         embed.add_field(name="Year", value=data["Year"])

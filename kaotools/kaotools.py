@@ -4,6 +4,8 @@ import re
 
 import aiohttp
 import discord
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
+from apscheduler.triggers.cron import CronTrigger
 from redbot.core import Config, commands
 from redbot.core.utils.chat_formatting import humanize_list, pagify
 from redbot.core.utils.menus import DEFAULT_CONTROLS, menu
@@ -49,13 +51,25 @@ class KaoTools(
         )
         bot._connection.parsers["INTERACTION_CREATE"] = self.parse_interaction_create
         self.bot.loop.create_task(self.set_token())
+        self.scheduler = AsyncIOScheduler()
+        self.scheduler.add_job(
+            self.change_avatar,
+            CronTrigger.from_crontab("0 */3 * * *", timezone="America/New_York"),
+        )
+        self.scheduler.start()
 
     def cog_unload(self):
         del self.bot._connection.parsers["INTERACTION_CREATE"]
         self.bot.loop.create_task(self.session.close())
+        self.scheduler.shutdown()
 
     async def red_delete_data_for_user(self, **kwargs):
         return
+
+    async def change_avatar(self):
+        cog = self.bot.get_cog("AutoAvatar")
+        if cog:
+            await cog.change_avatar()
 
     async def invite_url(self, snowflake: int = None):
         scopes = ("bot", "applications.commands")

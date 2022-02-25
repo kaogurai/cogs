@@ -24,7 +24,7 @@ class AutoAvatar(commands.Cog):
     Chooses a random avatar to set from a preset list or can scrape we heart it.
     """
 
-    __version__ = "1.2.4"
+    __version__ = "1.2.5"
 
     def __init__(self, bot):
         self.bot = bot
@@ -118,7 +118,8 @@ class AutoAvatar(commands.Cog):
         link = random.choice(links)
         return link
 
-    async def change_avatar(self, ctx):
+    async def change_avatar(self, ctx=None):
+        is_automated = type(ctx) is type(None)
         all_avatars = await self.config.avatars()
         auto_color = await self.config.auto_color()
         we_heart_it = await self.config.weheartit()
@@ -126,14 +127,17 @@ class AutoAvatar(commands.Cog):
         if we_heart_it:
             new_avatar = await self.get_we_heart_it_image()
             if new_avatar == 404:
-                await ctx.send("No images found for your queries.")
+                if not is_automated:
+                    await ctx.send("No images found for your queries.")
                 return
             if not new_avatar:
-                await ctx.send("There seems to be issues with weheartit currently.")
+                if not is_automated:
+                    await ctx.send("There seems to be issues with weheartit currently.")
                 return
         else:
             if not all_avatars:
-                await ctx.send("You haven't added any avatars yet.")
+                if not is_automated:
+                    await ctx.send("You haven't added any avatars yet.")
                 return
 
             new_avatar = random.choice(all_avatars)
@@ -156,21 +160,23 @@ class AutoAvatar(commands.Cog):
             ):
                 if x == 4:
                     if we_heart_it:
-                        await ctx.send(
-                            "There seems to be an issue with weheartit currently."
-                        )
+                        if not is_automated:
+                            await ctx.send(
+                                "There seems to be an issue with weheartit currently."
+                            )
                     else:
-                        await ctx.send(
-                            "There seems to be an issue trying to download an avatar."
-                        )
+                        if not is_automated:
+                            await ctx.send(
+                                "There seems to be an issue trying to download an avatar."
+                            )
                     return
                 continue
 
         if auto_color:
             result = await self.bot.loop.run_in_executor(None, self.get_color, avatar)
             if result:
-                ctx.bot._color = result
-                await ctx.bot._config.color.set(result)
+                self.bot._color = result
+                await self.bot._config.color.set(result)
 
         try:
             await self.bot.user.edit(avatar=avatar)
@@ -181,7 +187,8 @@ class AutoAvatar(commands.Cog):
             await self.config.avatars.set(all_avatars)
             return
 
-        await ctx.tick()
+        if not is_automated:
+            await ctx.tick()
         await self.config.current_avatar.set(new_avatar)
 
         if await self.config.current_channel():
