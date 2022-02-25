@@ -125,10 +125,11 @@ class MediaMixin(MixinMeta):
             await ctx.send("I couldn't find that movie!")
             return
 
-        embed = discord.Embed(color=await ctx.embed_color(), title=data["Title"])
+        embed = discord.Embed(color=await ctx.embed_color(), title=data["Title"], description=data["Plot"])
         if data["Website"] != "N/A":
             embed.url = data["Website"]
-        embed.set_thumbnail(url=data["Poster"])
+        if data["Poster"] != "N/A":
+            embed.set_thumbnail(url=data["Poster"])
         embed.add_field(name="Year", value=data["Year"])
         embed.add_field(name="Rated", value=data["Rated"])
         embed.add_field(name="Runtime", value=data["Runtime"])
@@ -142,7 +143,6 @@ class MediaMixin(MixinMeta):
         embed.add_field(name="IMDB ID", value=data["imdbID"])
         embed.add_field(name="Actors", value=data["Actors"])
         embed.add_field(name="Languages", value=data["Language"])
-        embed.add_field(name="Plot", value=data["Plot"], inline=False)
 
         await ctx.send(embed=embed)
 
@@ -156,10 +156,10 @@ class MediaMixin(MixinMeta):
         if not data:
             await ctx.send("I couldn't find that show!")
             return
-        print(data)
 
-        embed = discord.Embed(color=await ctx.embed_color(), title=data["Title"])
-        embed.set_thumbnail(url=data["Poster"])
+        embed = discord.Embed(color=await ctx.embed_color(), title=data["Title"], description=data["Plot"])
+        if data["Poster"] != "N/A":
+            embed.set_thumbnail(url=data["Poster"])
         embed.add_field(name="Year", value=data["Year"])
         embed.add_field(name="Rated", value=data["Rated"])
         embed.add_field(name="Runtime", value=data["Runtime"])
@@ -173,6 +173,5 @@ class MediaMixin(MixinMeta):
         embed.add_field(name="IMDB ID", value=data["imdbID"])
         embed.add_field(name="Actors", value=data["Actors"])
         embed.add_field(name="Languages", value=data["Language"])
-        embed.add_field(name="Plot", value=data["Plot"], inline=False)
 
         await ctx.send(embed=embed)
