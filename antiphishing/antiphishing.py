@@ -277,7 +277,7 @@ class AntiPhishing(commands.Cog):
         if not url and not ctx.message.reference:
             return await ctx.send_help()
 
-        m = await ctx.channel.fetch_message(ctx.message.reference)
+        m = await ctx.channel.fetch_message(ctx.message.reference.message_id)
         if m:
             url = m.content
         else:
