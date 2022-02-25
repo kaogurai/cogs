@@ -15,7 +15,7 @@ class AntiPhishing(commands.Cog):
     Protects users against phishing attacks.
     """
 
-    __version__ = "1.2.3"
+    __version__ = "1.2.4"
 
     def __init__(self, bot):
         self.bot = bot
@@ -268,10 +268,19 @@ class AntiPhishing(commands.Cog):
         aliases=["checkforphish", "checkscam", "checkforscam", "checkphishing"]
     )
     @commands.bot_has_permissions(embed_links=True)
-    async def checkphish(self, ctx, url: str):
+    async def checkphish(self, ctx, url: str=None):
         """
         Check if a url is a phishing scam.
+
+        You can either provide a url or reply to a message containing a url.
         """
+        if not url and not ctx.message.reference:
+            return await ctx.send_help()
+
+        m = ctx.channel.fetch_message(ctx.message.reference)
+        if m:
+            url = m.content
+
         url = url.strip("<>")
         urls = self.extract_urls(url)
         if not urls:
