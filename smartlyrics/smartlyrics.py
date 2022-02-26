@@ -14,7 +14,7 @@ class SmartLyrics(commands.Cog):
     Gets lyrics for your current song.
     """
 
-    __version__ = "1.2.0"
+    __version__ = "1.2.1"
 
     def __init__(self, bot):
         self.bot = bot
@@ -43,12 +43,13 @@ class SmartLyrics(commands.Cog):
             if resp.status != 200:
                 return 
             data = await resp.json()
-        return (
-            data["lyrics"]["text"],
-            data["track"]["name"],
-            data["artist"]["name"],
-            data["album"]["artwork"],
-        )
+        if data:
+            return (
+                data["lyrics"]["text"],
+                data["track"]["name"],
+                data["artist"]["name"],
+                data["album"]["artwork"],
+            )
 
     # adapted https://github.com/Cog-Creators/Red-DiscordBot/blob/V3/develop/redbot/cogs/mod/names.py#L112-L126
     def get_user_status_song(self, user):
