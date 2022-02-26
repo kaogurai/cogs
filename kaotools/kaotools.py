@@ -130,7 +130,7 @@ class KaoTools(
         Inspired by Aikaterna's YouTube cog
         """
         async with self.session.get(
-            f"{self.KAO_API_URL}/youtube/search", params={"q": video}
+            f"{self.KAO_API_URL}/youtube/search", params={"query": video}
         ) as r:
             if r.status != 200:
                 await ctx.send("An error occurred while searching for videos.")
@@ -139,6 +139,8 @@ class KaoTools(
         if not data:
             await ctx.send("Nothing found.")
             return
+
+        data = [video["url"] for video in data]
 
         await menu(ctx, data, DEFAULT_CONTROLS)
 
