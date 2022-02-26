@@ -17,6 +17,6 @@
 | AutoAvatar | v1.2.5 | Picks random bot avatar |
 | Radio | v1.0.2 | Save radio stations to be easily played |
 | SFX | v5.1.5 | Plays SFX, TTS, and join/leave sounds in voice channels (originally made by baiumbg) |
-| SmartLyrics | v1.1.2 | Get lyrics of your current song from 4 different sources |
+| SmartLyrics | v1.2.0 | Get lyrics of your current song from 4 different sources |
 | Wombo | v1.0.9 | Generate incredible art using AI |
 
