@@ -144,6 +144,27 @@ class KaoTools(
 
         await menu(ctx, data, DEFAULT_CONTROLS)
 
+    @commands.command(aliases=["ytm", "ytmsearch", "youtubemusicsearch"])
+    async def youtubemusic(self, ctx, *, video: str):
+        """
+        Search for a video on youtube music.
+        Inspired by Aikaterna's YouTube cog
+        """
+        async with self.session.get(
+            f"{self.KAO_API_URL}/youtube/musicsearch", params={"query": video}
+        ) as r:
+            if r.status != 200:
+                await ctx.send("An error occurred while searching for videos.")
+                return
+            data = await r.json()
+        if not data:
+            await ctx.send("Nothing found.")
+            return
+
+        data = [video["url"] for video in data]
+
+        await menu(ctx, data, DEFAULT_CONTROLS)
+
     @commands.command()
     @commands.bot_has_permissions(add_reactions=True, use_external_emojis=True)
     async def poll(self, ctx, *, question: str):
