@@ -14,7 +14,7 @@ class SmartLyrics(commands.Cog):
     Gets lyrics for your current song.
     """
 
-    __version__ = "1.2.1"
+    __version__ = "1.2.2"
 
     def __init__(self, bot):
         self.bot = bot
@@ -39,7 +39,9 @@ class SmartLyrics(commands.Cog):
         return f"{pre_processed}\n\nCog Version: {self.__version__}"
 
     async def get_lyrics(self, query):
-        async with self.session.get(LYRICS_API_ENDPOINT, params={"query": query}) as resp:
+        regex_title = self.regex.sub("", query).strip()
+        renamed_title = regex_title.replace("-", "")
+        async with self.session.get(LYRICS_API_ENDPOINT, params={"query": renamed_title}) as resp:
             if resp.status != 200:
                 return 
             data = await resp.json()
@@ -131,14 +133,12 @@ class SmartLyrics(commands.Cog):
                         player = None
                     if player and player.current:
                         title = player.current.title
-                        regex_title = self.regex.sub("", title).strip()
-                        renamed_title = regex_title.replace("-", "")
-                        results = await self.get_lyrics(renamed_title)
+                        results = await self.get_lyrics(title)
                         if results:
                             await self.create_menu(ctx, results, "Voice Channel")
                             return
                         else:
-                            await ctx.send(f"Nothing was found for `{renamed_title}`")
+                            await ctx.send(f"Nothing was found for `{title}`")
                             return
 
             statustext = self.get_user_status_song(ctx.author)
