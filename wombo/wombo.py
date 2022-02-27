@@ -1,6 +1,7 @@
 import asyncio
 import contextlib
-import json
+from redbot.core.utils.predicates import ReactionPredicate
+from redbot.core.utils.menus import start_adding_reactions
 
 import aiohttp
 import discord
@@ -12,7 +13,7 @@ class Wombo(commands.Cog):
     Generate incredible art using AI.
     """
 
-    __version__ = "1.0.9"
+    __version__ = "1.1.0"
 
     def __init__(self, bot):
         self.bot = bot
@@ -56,18 +57,19 @@ class Wombo(commands.Cog):
 
     async def check_nsfw(self, link):
         params = {"url": link}
-        try:
-            async with self.session.get(
-                "http://api.rest7.com/v1/detect_nudity.php", params=params
-            ) as req:
-                if req.status == 200:
-                    resp = await req.text()
-                    resp = json.loads(resp)
-                    if "nudity_percentage" in resp:
-                        return resp["nudity_percentage"] > 0.5
-        except aiohttp.ClientError:
-            pass
-        return False
+        async with self.session.get(
+            "https://api.kaogurai.xyz/v1/nsfwdetection/image", params=params
+        ) as req:
+            if req.status == 200:
+                resp = await req.json()
+                print(resp)
+                if "error" in resp.keys():
+                    return False
+                results = resp["safeSearchAnnotation"]
+                is_nsfw = ["LIKELY", "VERY_LIKELY"]
+                if results["adult"] in is_nsfw or results["racy"] in is_nsfw:
+                    return True
+            return False
 
     async def get_bearer_token(self):
         params = {"key": "AIzaSyDCvp5MTJLUdtBYEKYWXJrlLzu1zuKM6Xw"}
@@ -117,7 +119,7 @@ class Wombo(commands.Cog):
 
             resp = await req.json()
 
-        while True:
+        for x in range(50):
             async with self.session.get(
                 f"https://app.wombo.art/api/tasks/{session_id}", headers=headers
             ) as req:
@@ -180,19 +182,34 @@ class Wombo(commands.Cog):
                 await ctx.send("Failed to generate art. Please try again later.")
                 return
 
+            embed = discord.Embed(title="Here's your art!", color=await ctx.embed_color())
+            embed.set_image(url=link)
+
             if not ctx.channel.is_nsfw():
                 is_nsfw = await self.check_nsfw(link)
                 if is_nsfw:
                     with contextlib.suppress(discord.NotFound):
                         await m.delete()
-                    try:
-                        await m.edit(content="This channel is not NSFW.")
-                    except discord.NotFound:
-                        await ctx.send("This channel is not NSFW.")
-                    return
 
-            embed = discord.Embed(title="Here's your art!", color=await ctx.embed_color())
-            embed.set_image(url=link)
+                    m = await ctx.send(f"{ctx.author.mention}, this image may contain NSFW content. Would you like me to DM you the image?")
+                    start_adding_reactions(m, ReactionPredicate.YES_OR_NO_EMOJIS)
+                    pred = ReactionPredicate.yes_or_no(m, ctx.author)
+                    try:
+                        await ctx.bot.wait_for("reaction_add", check=pred, timeout=60)
+                    except asyncio.TimeoutError:
+                        with contextlib.suppress(discord.NotFound):
+                            await m.delete()
+                        return
+                    if pred.result is True:
+                        with contextlib.suppress(discord.NotFound):
+                            await m.edit(content=f"{ctx.author.mention}, sending image...")
+                        await ctx.author.send(embed=embed)
+                        return
+                    else:
+                        with contextlib.suppress(discord.NotFound):
+                            await m.delete()
+                        return
+
             try:
                 await m.edit(content=None, embed=embed)
             except discord.NotFound:
