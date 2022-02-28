@@ -66,7 +66,7 @@ class Wombo(commands.Cog):
                 if "error" in resp.keys():
                     return False
                 results = resp["safeSearchAnnotation"]
-                is_nsfw = ["LIKELY", "VERY_LIKELY"]
+                is_nsfw = ["POSSIBLE", "LIKELY", "VERY_LIKELY"]
                 if results["adult"] in is_nsfw or results["racy"] in is_nsfw:
                     return True
             return False
