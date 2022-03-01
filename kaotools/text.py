@@ -1,5 +1,5 @@
-import urllib
 import random
+import urllib
 
 import discord
 from redbot.core import commands
@@ -246,8 +246,8 @@ class TextMixin(MixinMeta):
             "When was the last time you farted?",
             "Have you ever fallen for someone your shouldn't have? Who what when where why.",
             "How long have you gone without showering or brushing your teeth?",
-            "Do you floss?"
-	    ]
+            "Do you floss?",
+        ]
         await ctx.send(random.choice(truths))
 
     # Dare Source
@@ -301,8 +301,8 @@ class TextMixin(MixinMeta):
             "Convince a parent that you were caught cheating on a test and they have to pay a $250 fine or you'll be kicked out of school",
             "Do the chicken dance",
             "Call your parents and tell them that you were dared to drive the car and then you crashed it",
-            "Call your parents and tell them that you were dared to do drugs and now you don't know where you are or what happened",		
-            "Try not to smile while all other players try to make your smile by any means necessary.", 
+            "Call your parents and tell them that you were dared to do drugs and now you don't know where you are or what happened",
+            "Try not to smile while all other players try to make your smile by any means necessary.",
             "Touch your nose with your tongue, if you can't, you have to touch someone else's nose with your tongue.",
             "Have another player select a food item from the kitchen for you to eat without using your hands.",
             "Poke someone you don't really know on Facebook",
@@ -361,9 +361,6 @@ class TextMixin(MixinMeta):
             "Do an imitation of Shrek.",
             "Do an imitation of Obama.",
             "Put your arms in your armpits and flap your wings around the house.",
-            "Make rooster noises until someone comes into the room to ask if you're ok."
+            "Make rooster noises until someone comes into the room to ask if you're ok.",
         ]
         await ctx.send(random.choice(dares))
-
-        
-        
