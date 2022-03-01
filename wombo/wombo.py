@@ -191,7 +191,9 @@ class Wombo(commands.Cog):
                     with contextlib.suppress(discord.NotFound):
                         await m.delete()
 
-                    m = await ctx.send(f"{ctx.author.mention}, this image may contain NSFW content. Would you like me to DM you the image?")
+                    m = await ctx.send(
+                        f"{ctx.author.mention}, this image may contain NSFW content. Would you like me to DM you the image?"
+                    )
                     start_adding_reactions(m, ReactionPredicate.YES_OR_NO_EMOJIS)
                     pred = ReactionPredicate.yes_or_no(m, ctx.author)
                     try:
@@ -202,7 +204,9 @@ class Wombo(commands.Cog):
                         return
                     if pred.result is True:
                         with contextlib.suppress(discord.NotFound):
-                            await m.edit(content=f"{ctx.author.mention}, sending image...")
+                            await m.edit(
+                                content=f"{ctx.author.mention}, sending image..."
+                            )
                         await ctx.author.send(embed=embed)
                         return
                     else:

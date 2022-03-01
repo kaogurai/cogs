@@ -52,3 +52,23 @@ class TextMixin(MixinMeta):
             await ctx.send(embed=embeds[0])
         else:
             await menu(ctx, embeds, DEFAULT_CONTROLS)
+
+    @commands.command()
+    async def translate(self, ctx, lang_code: str, *, text: str):
+        """
+        Translate text to a language.
+
+        `lang_code` is the language code for the language you want to translate to.
+        """
+        url = f"{self.KAO_API_URL}/various/translate?result_language_code={lang_code[:5]}&text={urllib.parse.quote(text)}"
+        async with self.session.get(url) as resp:
+            if resp.status != 200:
+                await ctx.send("Something went wrong when trying to translate.")
+                return
+            data = await resp.json()
+        embed = discord.Embed(
+            color=await ctx.embed_color(),
+            title="Translation",
+            description=data["text"][:4000],
+        )
+        await ctx.send(embed=embed)

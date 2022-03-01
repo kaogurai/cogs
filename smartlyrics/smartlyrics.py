@@ -9,6 +9,7 @@ from redbot.core.utils.menus import DEFAULT_CONTROLS, menu
 
 LYRICS_API_ENDPOINT = "https://api.kaogurai.xyz/v1/deezer/lyrics"
 
+
 class SmartLyrics(commands.Cog):
     """
     Gets lyrics for your current song.
@@ -41,9 +42,11 @@ class SmartLyrics(commands.Cog):
     async def get_lyrics(self, query):
         regex_title = self.regex.sub("", query).strip()
         renamed_title = regex_title.replace("-", "")
-        async with self.session.get(LYRICS_API_ENDPOINT, params={"query": renamed_title}) as resp:
+        async with self.session.get(
+            LYRICS_API_ENDPOINT, params={"query": renamed_title}
+        ) as resp:
             if resp.status != 200:
-                return 
+                return
             data = await resp.json()
         if data:
             return (
