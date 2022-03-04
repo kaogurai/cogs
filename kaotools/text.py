@@ -31,17 +31,26 @@ class TextMixin(MixinMeta):
             else:
                 embed.title = result["word"]
             embed.description = result["meanings"][0]["definitions"][0]["definition"]
-            if "example" in result["meanings"][0]["definitions"][0]:
+            if (
+                "example" in result["meanings"][0]["definitions"][0]
+                and result["meanings"][0]["definitions"][0]["example"]
+            ):
                 embed.add_field(
                     name="Example",
                     value=result["meanings"][0]["definitions"][0]["example"],
                 )
-            if "synonyms" in result["meanings"][0]["definitions"][0]:
+            if (
+                "synonyms" in result["meanings"][0]["definitions"][0]
+                and result["meanings"][0]["definitions"][0]["synonyms"]
+            ):
                 embed.add_field(
                     name="Synonyms",
                     value=", ".join(result["meanings"][0]["definitions"][0]["synonyms"]),
                 )
-            if "antonyms" in result["meanings"][0]["definitions"][0]:
+            if (
+                "antonyms" in result["meanings"][0]["definitions"][0]
+                and result["meanings"][0]["definitions"][0]["antonyms"]
+            ):
                 embed.add_field(
                     name="Antonyms",
                     value=", ".join(result["meanings"][0]["definitions"][0]["antonyms"]),
