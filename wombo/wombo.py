@@ -13,7 +13,7 @@ class Wombo(commands.Cog):
     Generate incredible art using AI.
     """
 
-    __version__ = "1.1.0"
+    __version__ = "1.1.1"
 
     def __init__(self, bot):
         self.bot = bot
@@ -207,7 +207,12 @@ class Wombo(commands.Cog):
                             await m.edit(
                                 content=f"{ctx.author.mention}, sending image..."
                             )
-                        await ctx.author.send(embed=embed)
+                        try:
+                            await ctx.author.send(embed=embed)
+                        except discord.Forbidden:
+                            await ctx.send(
+                                "Failed to send image. Please make sure you have DMs enabled."
+                            )
                         return
                     else:
                         with contextlib.suppress(discord.NotFound):
