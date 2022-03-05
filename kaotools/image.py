@@ -153,13 +153,20 @@ class ImageMixin(MixinMeta):
                 link = str(ctx.message.attachments[0].url)
 
         async with ctx.typing():
-            async with self.session.get(link) as resp:
-                if resp.status != 200:
-                    await ctx.send("Something went wrong when trying to get the image.")
-                    return
-                img = await resp.read()
-                img = BytesIO(img)
-                img.seek(0)
+            try:
+                async with self.session.get(link) as resp:
+                    if resp.status != 200:
+                        await ctx.send(
+                            "Something went wrong when trying to get the image."
+                        )
+                        return
+                    img = await resp.read()
+                    img = BytesIO(img)
+                    img.seek(0)
+            except Exception:
+                await ctx.send("Something went wrong when trying to get the image.")
+                return
+
             await ctx.send(
                 file=await self.bot.loop.run_in_executor(
                     None, self.get_color_palette, img
