@@ -76,33 +76,33 @@ class MediaMixin(MixinMeta):
                 except (ValueError, IndexError):
                     await ctx.send("That's not a valid option.")
                     return
-
-                async with self.session.get(audio["url"]) as resp:
-                    if resp.status != 200:
-                        await ctx.send(
-                            "Something went wrong when trying to get the song. Please try again later."
-                        )
-                        return
-                    data = await resp.read()
-
-                if ctx.guild:
-                    limit = ctx.guild.filesize_limit
-                else:
-                    limit = 8000000
-
-                if len(data) > limit:
-                    embed = discord.Embed(
-                        color=await ctx.embed_color(),
-                        description=f"That song is too big to send in this guild. Click [here]({audio['url']}) to download it.",
-                        url=audio["url"],
-                    )
-                    await ctx.send(embed=embed)
-                else:
-                    biof = BytesIO(data)
-                    biof.seek(0)
+            
+            async with self.session.get(audio["url"]) as resp:
+                if resp.status != 200:
                     await ctx.send(
-                        file=discord.File(biof, filename=f"{audio['tit_art']}.mp3")
+                        "Something went wrong when trying to get the song. Please try again later."
                     )
+                    return
+                data = await resp.read()
+
+            if ctx.guild:
+                limit = ctx.guild.filesize_limit
+            else:
+                limit = 8000000
+
+            if len(data) > limit:
+                embed = discord.Embed(
+                    color=await ctx.embed_color(),
+                    description=f"That song is too big to send in this guild. Click [here]({audio['url']}) to download it.",
+                    url=audio["url"],
+                )
+                await ctx.send(embed=embed)
+            else:
+                biof = BytesIO(data)
+                biof.seek(0)
+                await ctx.send(
+                    file=discord.File(biof, filename=f"{audio['tit_art']}.mp3")
+                )
 
     async def get_omdb_info(self, type, query):
         params = {"apikey": self.omdb_key, "type": type, "t": query}
