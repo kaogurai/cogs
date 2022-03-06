@@ -27,7 +27,7 @@ class MediaMixin(MixinMeta):
                     return
                 data = await req.json()
             audios = data["audios"][""]
-            if not audios:
+            if not audios[0]:
                 await ctx.send("I couldn't find that song!")
                 return
 
