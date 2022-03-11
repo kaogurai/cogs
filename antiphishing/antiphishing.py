@@ -15,7 +15,7 @@ class AntiPhishing(commands.Cog):
     Protects users against phishing attacks.
     """
 
-    __version__ = "1.2.6"
+    __version__ = "1.2.7"
 
     def __init__(self, bot):
         self.bot = bot
@@ -142,6 +142,8 @@ class AntiPhishing(commands.Cog):
                     url
                 ]  # If we can't get the real URL, just return the original one
             data = await request.json()
+            if not data:
+                return None, [url]  # This should be a 204 but whatever
             if "responsecode" in data and "rurls" in data:
                 return data["responsecode"], data["rurls"]
             return None, [url]
