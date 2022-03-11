@@ -76,7 +76,7 @@ class MediaMixin(MixinMeta):
                 except (ValueError, IndexError):
                     await ctx.send("That's not a valid option.")
                     return
-            
+
             async with self.session.get(audio["url"]) as resp:
                 if resp.status != 200:
                     await ctx.send(

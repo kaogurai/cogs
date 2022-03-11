@@ -44,10 +44,11 @@ class BaseCommandsMixin(MixinMeta):
             await self.config.user(ctx.author).voice.clear()
             author_voice = await self.config.user(ctx.author).voice()
 
-        url = self.generate_url(author_voice, author_translate, text)
+        url = self.generate_url(
+            author_voice, author_translate, text.replace("--download", "")
+        )
 
         if "--download" in text:
-            text.replace("--download", "")
             if text == "":
                 await ctx.send_help()
                 return
@@ -115,7 +116,7 @@ class BaseCommandsMixin(MixinMeta):
             async with self.session.get(
                 f"{self.SFX_API_URL}/search/text/",
                 params={
-                    "query": sound,
+                    "query": sound.replace("--download", ""),
                     "token": self.key,
                     "filter": "duration:[0.5 TO 15]",
                 },
@@ -154,7 +155,6 @@ class BaseCommandsMixin(MixinMeta):
             track_info = (name, ctx.author)
 
             if "--download" in sound:
-                sound.replace("--download", "")
                 if sound == "":
                     await ctx.send_help()
                     return
