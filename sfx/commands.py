@@ -12,7 +12,7 @@ class BaseCommandsMixin(MixinMeta):
     @commands.command(usage="<text> [--download]")
     @commands.cooldown(rate=1, per=3, type=discord.ext.commands.cooldowns.BucketType.user)
     @commands.guild_only()
-    async def tts(self, ctx, text: str):
+    async def tts(self, ctx, *, text: str):
         """
         Plays the given text as TTS in your current voice channel.
 
@@ -86,7 +86,7 @@ class BaseCommandsMixin(MixinMeta):
     @commands.cooldown(rate=1, per=3, type=discord.ext.commands.cooldowns.BucketType.user)
     @commands.guild_only()
     @commands.check(sfx_check)
-    async def sfx(self, ctx, sound: str):
+    async def sfx(self, ctx, *, sound: str):
         """
         Plays a sound effect in your current voice channel.
 

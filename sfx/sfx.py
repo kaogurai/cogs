@@ -25,7 +25,7 @@ class SFX(
 ):
     """Plays sound effects, text-to-speech, and sounds when you join or leave a voice channel."""
 
-    __version__ = "5.1.9"
+    __version__ = "5.1.10"
 
     TTS_API_URL = "https://api.kaogurai.xyz/v1/tts"
     SFX_API_URL = "https://freesound.org/apiv2"
@@ -140,7 +140,7 @@ class SFX(
         """
         Generates the URL for the TTS using kaogurai's TTS API.
         """
-        return f"{self.TTS_API_URL}/synthesize?voice={voice}&translate={translate}&text={quote(text)}&silence=1000"
+        return f"{self.TTS_API_URL}/synthesize?voice={voice}&translate={translate}&text={quote(text)}&silence=500"
 
     def get_voice(self, voice: str):
         """
