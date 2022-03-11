@@ -9,14 +9,16 @@ from .abc import MixinMeta
 
 
 class BaseCommandsMixin(MixinMeta):
-    @commands.command()
+    @commands.command(usage="<text> [--download]")
     @commands.cooldown(rate=1, per=3, type=discord.ext.commands.cooldowns.BucketType.user)
     @commands.guild_only()
-    async def tts(self, ctx, file: Optional[bool] = False, *, text: str):
+    async def tts(self, ctx, text: str):
         """
         Plays the given text as TTS in your current voice channel.
+
+        If you want to download the audio, use the --download flag.
         """
-        if not file:
+        if "--download" not in text:
             if not ctx.author.voice or not ctx.author.voice.channel:
                 await ctx.send("You are not connected to a voice channel.")
                 return
@@ -44,7 +46,11 @@ class BaseCommandsMixin(MixinMeta):
 
         url = self.generate_url(author_voice, author_translate, text)
 
-        if file:
+        if "--download" in text:
+            text.replace("--download", "")
+            if text == "":
+                await ctx.send_help()
+                return
             if not ctx.channel.permissions_for(ctx.guild.me).attach_files:
                 await ctx.send("I do not have permissions to send files in this channel.")
                 return
@@ -76,18 +82,18 @@ class BaseCommandsMixin(MixinMeta):
             return True
         return False
 
-    @commands.command()
+    @commands.command(usage="<sound> [--download]")
     @commands.cooldown(rate=1, per=3, type=discord.ext.commands.cooldowns.BucketType.user)
     @commands.guild_only()
     @commands.check(sfx_check)
-    async def sfx(self, ctx, file: Optional[bool] = False, *, sound: str):
+    async def sfx(self, ctx, sound: str):
         """
         Plays a sound effect in your current voice channel.
 
         Sounds are found on https://freesound.org
         """
 
-        if not file:
+        if "--download" not in sound:
             if not ctx.author.voice or not ctx.author.voice.channel:
                 await ctx.send("You are not connected to a voice channel.")
                 return
@@ -147,7 +153,11 @@ class BaseCommandsMixin(MixinMeta):
             ]
             track_info = (name, ctx.author)
 
-            if file:
+            if "--download" in sound:
+                sound.replace("--download", "")
+                if sound == "":
+                    await ctx.send_help()
+                    return
                 if not ctx.channel.permissions_for(ctx.guild.me).attach_files:
                     await ctx.send(
                         "I do not have permissions to send files in this channel."
