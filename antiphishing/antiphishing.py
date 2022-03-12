@@ -1,5 +1,6 @@
 import contextlib
-import re
+import regex
+
 from urllib.parse import quote, urlparse
 
 import aiohttp
@@ -9,13 +10,14 @@ import redbot
 from discord.ext import tasks
 from redbot.core import Config, commands, modlog
 
+URL_REGEX_PATTERN = regex.compile(r"^(?:http[s]?:\/\/)?[\w.-]+(?:\.[\w\.-]+)+[\w\-\._~:/?#[\]@!\$&'\(\)\*\+,;=.]+$")
 
 class AntiPhishing(commands.Cog):
     """
     Protects users against phishing attacks.
     """
 
-    __version__ = "1.2.8"
+    __version__ = "1.2.9"
 
     def __init__(self, bot):
         self.bot = bot
@@ -100,10 +102,10 @@ class AntiPhishing(commands.Cog):
         """
         Extract URLs from a message.
         """
-        return re.findall(
-            r"(http[s]?://)?(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+",
-            message,
-        )
+        # Find all regex matches
+        matches = URL_REGEX_PATTERN.findall(message)
+        print(matches)
+        return matches
 
     def get_links(self, message: str):
         """
@@ -125,7 +127,7 @@ class AntiPhishing(commands.Cog):
         """
         Get the real URL of a URL.
         """
-        if not url.startswith("http://") or not url.startswith("https://"):
+        if not url.startswith("http://") and not url.startswith("https://"):
             url = f"https://{url}"
         data = {
             "method": "G",
@@ -133,7 +135,7 @@ class AntiPhishing(commands.Cog):
             "url": url,
             "locationid": "25",
             "headername": "User-Agent",
-            "headervalue": f"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/98.0.4758.80 Safari/537.36 Red-DiscordBot/{redbot.__version__} aiohttp/{aiohttp.__version__} discord.py/{discord.__version__} AntiPhishing/{self.__version__}",
+            "headervalue": f"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/98.0.4758.80 Safari/537.36 kaogurai/AntiPhishing/{self.__version__}",
         }
         # I am very well aware that you could just use aiohttp to do this
         # But, this way it's not sending requests from the bot's IP, since I don't want users to need to set up a proxy server
@@ -152,6 +154,7 @@ class AntiPhishing(commands.Cog):
             return None, [url]
 
     async def handle_phishing(self, message, domain):
+        domain = domain[:250]
         action = await self.config.guild(message.guild).action()
         if not action == "ignore":
             count = await self.config.guild(message.guild).caught()
@@ -302,9 +305,9 @@ class AntiPhishing(commands.Cog):
         domain = urlparse(real_url).netloc
 
         if domain in self.domains:
-            await ctx.send(f"{real_url} is a phishing scam.")
+            await ctx.send(f"{real_url[:1000]} is a phishing scam.")
         else:
-            await ctx.send(f"{real_url} is likely not a phishing scam.")
+            await ctx.send(f"{real_url[:1000]} is likely not a phishing scam.")
 
     @commands.group(aliases=["antiphish"])
     @commands.guild_only()
