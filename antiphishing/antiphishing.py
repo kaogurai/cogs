@@ -15,7 +15,7 @@ class AntiPhishing(commands.Cog):
     Protects users against phishing attacks.
     """
 
-    __version__ = "1.2.7"
+    __version__ = "1.2.8"
 
     def __init__(self, bot):
         self.bot = bot
@@ -74,21 +74,24 @@ class AntiPhishing(commands.Cog):
         async with self.session.get(
             "https://api.hyperphish.com/gimme-domains"
         ) as request:
-            if request.status == 200:
-                data = await request.json()
-                domains.extend(data)
+            if request.status != 200:
+                return
+            data = await request.json()
+            domains.extend(data)
 
         async with self.session.get("https://phish.sinking.yachts/v2/all") as request:
-            if request.status == 200:
-                data = await request.json()
-                domains.extend(data)
+            if request.status != 200:
+                return
+            data = await request.json()
+            domains.extend(data)
 
         async with self.session.get(
             "https://bad-domains.walshy.dev/domains.json"
         ) as request:
-            if request.status == 200:
-                data = await request.json()
-                domains.extend(data)
+            if request.status != 200:
+                return
+            data = await request.json()
+            domains.extend(data)
 
         deduped = list(set(domains))
         self.domains = deduped
@@ -98,7 +101,7 @@ class AntiPhishing(commands.Cog):
         Extract URLs from a message.
         """
         return re.findall(
-            r"(?:[A-z0-9](?:[A-z0-9-]{0,61}[A-z0-9])?\.)+[A-z0-9][A-z0-9-]{0,61}[A-z0-9]",
+            r"(http[s]?://)?(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+",
             message,
         )
 
@@ -299,89 +302,9 @@ class AntiPhishing(commands.Cog):
         domain = urlparse(real_url).netloc
 
         if domain in self.domains:
-            async with self.session.get(
-                f"http://ip-api.com/json/{quote(domain)}"
-            ) as request:
-                if request.status != 200:
-                    await ctx.send("Be careful, that URL is a phishing scam.")
-                    return
-
-                ip_data = await request.json()
-                if ip_data["status"] == "fail":
-                    await ctx.send("Be careful, that URL is a phishing scam.")
-                    return
-
-            embed = discord.Embed(
-                title="Warning",
-                description=f"That URL is a phishing scam.\n\nDo not click on the link.",
-                color=await self.bot.get_embed_color(ctx.guild),
-            )
-            embed.add_field(
-                name="Country", value=f"{ip_data['country']} ({ip_data['countryCode']})"
-            )
-            embed.add_field(
-                name="Region", value=f"{ip_data['regionName']} ({ip_data['region']})"
-            )
-            embed.add_field(name="City", value=f"{ip_data['city']}")
-            embed.add_field(name="ISP", value=f"{ip_data['isp']}")
-            embed.add_field(name="ASN", value=f"{ip_data['as']}")
-            embed.add_field(name="Latitude", value=f"{ip_data['lat']}")
-            embed.add_field(name="Longitude", value=f"{ip_data['lon']}")
-            embed.add_field(name="IP Address", value=f"{ip_data['query']}")
-            if status:
-                embed.add_field(name="Status Code", value=f"{status}")
-
-            if len(redirects) > 1:
-                redirects_msg = ""
-                for x, redirect in enumerate(redirects):
-                    redirects_msg += f"{x+1}. {redirect}\n"
-                embed.add_field(
-                    name="Redirects", value=redirects_msg[:1000], inline=False
-                )
-
+            await ctx.send(f"{real_url} is a phishing scam.")
         else:
-
-            async with self.session.get(
-                f"http://ip-api.com/json/{quote(domain)}"
-            ) as request:
-                if request.status != 200:
-                    await ctx.send("No need to worry, that URL is not a phishing scam.")
-                    return
-
-                ip_data = await request.json()
-
-                if ip_data["status"] == "fail":
-                    await ctx.send("No need to worry, that URL is not a phishing scam.")
-                    return
-
-            embed = discord.Embed(
-                title="URL Safe",
-                description=f"That URL is a not phishing scam.",
-                color=await self.bot.get_embed_color(ctx.guild),
-            )
-            embed.add_field(
-                name="Country", value=f"{ip_data['country']} ({ip_data['countryCode']})"
-            )
-            embed.add_field(
-                name="Region", value=f"{ip_data['regionName']} ({ip_data['region']})"
-            )
-            embed.add_field(name="City", value=f"{ip_data['city']}")
-            embed.add_field(name="ISP", value=f"{ip_data['isp']}")
-            embed.add_field(name="ASN", value=f"{ip_data['as']}")
-            embed.add_field(name="Latitude", value=f"{ip_data['lat']}")
-            embed.add_field(name="Longitude", value=f"{ip_data['lon']}")
-            embed.add_field(name="IP Address", value=f"{ip_data['query']}")
-            if status:
-                embed.add_field(name="Status Code", value=f"{status}")
-            if len(redirects) > 1:
-                redirects_msg = ""
-                for x, redirect in enumerate(redirects):
-                    redirects_msg += f"{x+1}. {redirect}\n"
-                embed.add_field(
-                    name="Redirects", value=redirects_msg[:1000], inline=False
-                )
-
-        await ctx.send(embed=embed)
+            await ctx.send(f"{real_url} is likely not a phishing scam.")
 
     @commands.group(aliases=["antiphish"])
     @commands.guild_only()
