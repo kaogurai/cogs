@@ -17,7 +17,7 @@ class AntiPhishing(commands.Cog):
     Protects users against phishing attacks.
     """
 
-    __version__ = "1.2.9"
+    __version__ = "1.2.10"
 
     def __init__(self, bot):
         self.bot = bot
@@ -104,7 +104,6 @@ class AntiPhishing(commands.Cog):
         """
         # Find all regex matches
         matches = URL_REGEX_PATTERN.findall(message)
-        print(matches)
         return matches
 
     def get_links(self, message: str):
