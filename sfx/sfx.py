@@ -6,6 +6,11 @@ import lavalink
 from discord.ext import tasks
 from redbot.core import Config, commands
 
+try:
+    from lavalink import NodeNotFound as NoLavalinkNode
+except ImportError:
+    NoLavalinkNode = IndexError
+
 from .abc import CompositeMetaClass
 from .autotts import AutoTTSMixin
 from .channels import TTSChannelMixin
@@ -25,7 +30,7 @@ class SFX(
 ):
     """Plays sound effects, text-to-speech, and sounds when you join or leave a voice channel."""
 
-    __version__ = "5.1.11"
+    __version__ = "5.1.12"
 
     TTS_API_URL = "https://api.kaogurai.xyz/v1/tts"
     SFX_API_URL = "https://freesound.org/apiv2"
@@ -155,6 +160,7 @@ class SFX(
         user: discord.Member,
         voice_channel: discord.VoiceChannel,
         text_channel: discord.TextChannel,
+        type: str,
         text: str,
     ):
         """
@@ -176,7 +182,7 @@ class SFX(
         await self.play_sound(
             voice_channel,
             text_channel,
-            "tts",
+            type,
             url,
             track_info,
         )
@@ -188,12 +194,18 @@ class SFX(
         Parameters:
         vc: The voice channel to play the audio in.
         channel: The text channel to send messages in. Can be None.
-        type: The type of SFX to play. (joinleave, tts, sfx, autotts)
+        type: The type of SFX to play. (joinleave, tts, sfx, autotts, ttschannel)
         url: The URL to play.
         track_info: Tuple of track name and author (discord.py object).
         """
         try:
             player = lavalink.get_player(vc.guild.id)
+        except NoLavalinkNode:  # Lavalink hasn't been initialised yet
+            if channel and type != "autotts":
+                await channel.send(
+                    "Either the Audio cog is not loaded or lavalink has not been initialized yet. If this continues to happen, please contact the bot owner."
+                )
+                return
         except KeyError:
             player = await lavalink.connect(vc)
 

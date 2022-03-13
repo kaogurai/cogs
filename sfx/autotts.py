@@ -57,6 +57,7 @@ class AutoTTSMixin(MixinMeta):
             message.author,
             message.author.voice.channel,
             message.channel,
+            "autotts",
             message.clean_content,
         )
 

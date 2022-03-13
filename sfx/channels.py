@@ -126,5 +126,6 @@ class TTSChannelMixin(MixinMeta):
             message.author,
             message.author.voice.channel,
             message.channel,
+            "ttschannel",
             message.clean_content,
         )

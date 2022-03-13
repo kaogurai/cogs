@@ -1,16 +1,18 @@
 import contextlib
-import regex
-
 from urllib.parse import quote, urlparse
 
 import aiohttp
 import arrow
 import discord
 import redbot
+import regex
 from discord.ext import tasks
 from redbot.core import Config, commands, modlog
 
-URL_REGEX_PATTERN = regex.compile(r"^(?:http[s]?:\/\/)?[\w.-]+(?:\.[\w\.-]+)+[\w\-\._~:/?#[\]@!\$&'\(\)\*\+,;=.]+$")
+URL_REGEX_PATTERN = regex.compile(
+    r"^(?:http[s]?:\/\/)?[\w.-]+(?:\.[\w\.-]+)+[\w\-\._~:/?#[\]@!\$&'\(\)\*\+,;=.]+$"
+)
+
 
 class AntiPhishing(commands.Cog):
     """
