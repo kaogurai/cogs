@@ -2,6 +2,7 @@ import random
 import urllib
 
 import discord
+import contextlib
 from redbot.core import commands
 from redbot.core.utils.menus import DEFAULT_CONTROLS, menu
 
@@ -373,3 +374,28 @@ class TextMixin(MixinMeta):
             "Make rooster noises until someone comes into the room to ask if you're ok.",
         ]
         await ctx.send(random.choice(dares))
+
+    @commands.command()
+    @commands.guild_only()
+    @commands.bot_has_permissions(manage_roles=True)
+    @commands.admin_or_permissions(mention_everyone=True)
+    async def forcemention(self, ctx, role: discord.Role, *, message: str = None):
+        """Force mention a role with an optional message."""
+        m = f"{role.mention}\n{message}" if message else role.mention
+        if ctx.channel.permissions_for(ctx.me).manage_messages:
+            with contextlib.suppress(discord.NotFound):
+                await ctx.message.delete()
+        if (
+            not role.mentionable
+            and not ctx.channel.permissions_for(ctx.guild.me).mention_everyone
+            and ctx.guild.me.top_role > role
+        ):
+            await role.edit(mentionable=True)
+            await ctx.channel.send(
+                m, allowed_mentions=discord.AllowedMentions(roles=True)
+            )
+            await role.edit(mentionable=False)
+        else:
+            await ctx.channel.send(
+                m, allowed_mentions=discord.AllowedMentions(roles=True)
+            )
