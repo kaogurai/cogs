@@ -381,7 +381,7 @@ class TextMixin(MixinMeta):
     @commands.admin_or_permissions(mention_everyone=True)
     async def forcemention(self, ctx, role: discord.Role, *, message: str = None):
         """Force mention a role with an optional message."""
-        m = f"{role.mention}\n{message}" if message else role.mention
+        m = f"{role.mention}\n{message[:2000]}" if message else role.mention
         if ctx.channel.permissions_for(ctx.me).manage_messages:
             with contextlib.suppress(discord.NotFound):
                 await ctx.message.delete()
