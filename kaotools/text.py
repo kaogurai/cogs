@@ -1,8 +1,8 @@
+import contextlib
 import random
 import urllib
 
 import discord
-import contextlib
 from redbot.core import commands
 from redbot.core.utils.menus import DEFAULT_CONTROLS, menu
 
