@@ -115,18 +115,18 @@ class TTSChannelMixin(MixinMeta):
         ):
             return
 
-        if not message.author.voice.channel.permissions_for(message.author).speak:
-            await message.channel.send(
-                "You don't have permission to speak in this channel."
-            )
-            return
-
         channel_list = await self.config.guild(message.guild).channels()
         if message.channel.id not in channel_list:
             return
 
         if not message.author.voice or not message.author.voice.channel:
             await message.channel.send("You are not connected to a voice channel.")
+            return
+
+        if not message.author.voice.channel.permissions_for(message.author).speak:
+            await message.channel.send(
+                "You don't have permission to speak in this channel."
+            )
             return
 
         await self.play_tts(
