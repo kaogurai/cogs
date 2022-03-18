@@ -50,6 +50,8 @@ class AutoTTSMixin(MixinMeta):
             or not await self.config.guild(message.guild).allow_autotts()
             or not message.author.voice
             or not message.author.voice.channel
+            or not message.author.voice.channel.permissions_for(message.author).speak
+            or not await self.can_tts(message)
         ):
             return
 
@@ -77,7 +79,7 @@ class AutoTTSMixin(MixinMeta):
                 color=await self.bot.get_embed_color(member.guild),
             )
             embed.description = (
-                f"You have left {before.channel.mention} and therefor AutoTTS has been disabled.\n\n"
+                f"You have left {before.channel.mention} and therefore AutoTTS has been disabled.\n\n"
                 f"If you would like to re-enable AutoTTS, please join a voice channel and rerun the autotts command."
             )
             with contextlib.suppress(discord.HTTPException):

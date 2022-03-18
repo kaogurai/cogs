@@ -35,6 +35,12 @@ class BaseCommandsMixin(MixinMeta):
                     )
                     return
 
+            if not ctx.author.voice.channel.permissions_for(ctx.author).speak:
+                await ctx.channel.send(
+                    "You don't have permission to speak in this channel."
+                )
+                return
+
         author_data = await self.config.user(ctx.author).all()
         author_voice = author_data["voice"]
         author_translate = author_data["translate"]
@@ -110,6 +116,12 @@ class BaseCommandsMixin(MixinMeta):
                         "I do not have permissions to connect to and speak in this channel."
                     )
                     return
+
+            if not ctx.author.voice.channel.permissions_for(ctx.author).speak:
+                await ctx.channel.send(
+                    "You don't have permission to speak in this channel."
+                )
+                return
 
         async with ctx.typing():
 
