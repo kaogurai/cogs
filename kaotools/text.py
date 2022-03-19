@@ -71,7 +71,7 @@ class TextMixin(MixinMeta):
 
         `lang_code` is the language code for the language you want to translate to.
         """
-        url = f"{self.KAO_API_URL}/various/translate?result_language_code={lang_code[:5]}&text={urllib.parse.quote(text)}"
+        url = f"{self.KAO_API_URL}/various/translate?result_language_code={lang_code[:10]}&text={urllib.parse.quote(text)}"
         async with self.session.get(url) as resp:
             if resp.status != 200:
                 await ctx.send("Something went wrong when trying to translate.")
