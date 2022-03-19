@@ -28,6 +28,8 @@ class Styles(Enum):
     WUHTERCUHLER = 16
     PROVENANCE = 17
     ROSEGOLD = 18
+    MOONWALKER = 19
+    BLACKLIGHT = 20
 
 
 class Wombo(commands.Cog):
@@ -35,7 +37,7 @@ class Wombo(commands.Cog):
     Generate incredible art using AI.
     """
 
-    __version__ = "1.1.2"
+    __version__ = "1.1.3"
 
     def __init__(self, bot):
         self.bot = bot
@@ -138,7 +140,7 @@ class Wombo(commands.Cog):
         Generate art using AI.
 
         Possible styles:
-        synthwave, ukiyoe, none, steampunk, fantasy, vibrant, hd, pastel, psychic, darkfantasy, mystical, festive, baroque, etching, sdali, wuhtercuhler, provenance, rosegold
+        synthwave, ukiyoe, none, steampunk, fantasy, vibrant, hd, pastel, psychic, darkfantasy, mystical, festive, baroque, etching, sdali, wuhtercuhler, provenance, rosegold, moonwalker, blacklight
         """
         if len(text) > 100:
             await ctx.send("The text needs to be 100 characters or less.")
