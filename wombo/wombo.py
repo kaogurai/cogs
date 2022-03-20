@@ -38,7 +38,7 @@ class Wombo(commands.Cog):
     Generate incredible art using AI.
     """
 
-    __version__ = "1.1.4"
+    __version__ = "1.1.5"
 
     def __init__(self, bot):
         self.bot = bot
@@ -232,7 +232,7 @@ class Wombo(commands.Cog):
                             await m.delete()
                         return
 
-            try:
-                await m.edit(content=None, embed=embed, file=file)
-            except discord.NotFound:
-                await ctx.send(embed=embed, file=file)
+            with contextlib.suppress(discord.NotFound):
+                await m.delete()
+
+            await ctx.send(embed=embed, file=file)
