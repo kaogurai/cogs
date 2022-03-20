@@ -30,7 +30,7 @@ class SFX(
 ):
     """Plays sound effects, text-to-speech, and sounds when you join or leave a voice channel."""
 
-    __version__ = "5.2.1"
+    __version__ = "5.2.2"
 
     TTS_API_URL = "https://api.kaogurai.xyz/v1/tts"
     SFX_API_URL = "https://freesound.org/apiv2"
@@ -157,7 +157,7 @@ class SFX(
 
     async def can_tts(self, message):
         ctx = await self.bot.get_context(message)
-        command = self.bot.get_command("away")
+        command = self.bot.get_command("tts")
 
         try:
             can = await command.can_run(ctx, change_permission_state=False)

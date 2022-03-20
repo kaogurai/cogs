@@ -1,6 +1,7 @@
 import asyncio
 import contextlib
 from enum import Enum
+from io import BytesIO
 
 import aiohttp
 import discord
@@ -37,7 +38,7 @@ class Wombo(commands.Cog):
     Generate incredible art using AI.
     """
 
-    __version__ = "1.1.3"
+    __version__ = "1.1.4"
 
     def __init__(self, bot):
         self.bot = bot
@@ -184,8 +185,18 @@ class Wombo(commands.Cog):
                 await ctx.send("Failed to generate art. Please try again later.")
                 return
 
+            async with self.session.get(link) as req:
+                if req.status != 200:
+                    await ctx.send("Something went wrong when downloading the image.")
+                    return
+                data = await req.read()
+
+            vfile = BytesIO(data)
+            vfile.seek(0)
+            file = discord.File(vfile, filename="result.jpg")
+
             embed = discord.Embed(title="Here's your art!", color=await ctx.embed_color())
-            embed.set_image(url=link)
+            embed.set_image(url="attachment://result.jpg")
 
             if not ctx.channel.is_nsfw():
                 is_nsfw = await self.check_nsfw(link)
@@ -210,7 +221,7 @@ class Wombo(commands.Cog):
                                 content=f"{ctx.author.mention}, sending image..."
                             )
                         try:
-                            await ctx.author.send(embed=embed)
+                            await ctx.author.send(embed=embed, file=file)
                         except discord.Forbidden:
                             await ctx.send(
                                 "Failed to send image. Please make sure you have DMs enabled."
@@ -222,6 +233,6 @@ class Wombo(commands.Cog):
                         return
 
             try:
-                await m.edit(content=None, embed=embed)
+                await m.edit(content=None, embed=embed, file=file)
             except discord.NotFound:
-                await ctx.send(embed=embed)
+                await ctx.send(embed=embed, file=file)
