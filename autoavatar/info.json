@@ -1,8 +1,0 @@
-{
-    "author": ["alec"],
-    "name": "AutoAvatar",
-    "install_msg": "**Thanks for installing!**\n\nDespite the same, keep in mind this cog does not automatically run the `newavatar` command, so you'll need to use a cog like FIFO (https://github.com/bobloy/Fox-V3/tree/master/fifo)",
-    "short": "Chooses a random bot avatar.",
-    "description": "Chooses a random bot avatar from a preset list or can optionally scrape we heart it.",
-    "requirements": ["colorgram.py"]
-}

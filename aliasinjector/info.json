@@ -1,9 +1,0 @@
-{
-    "author": ["alec"],
-    "name": "AliasInjector",
-    "install_msg": "This cog uses a lot of hacky methods and may or may not break your bot. I am not responsible for anything that breaks, nor do I recommend using this.",
-    "short": "Injects aliases into the discord.py command objects.",
-    "description": "Injects aliases into the discord.py command objects.",
-    "tags": ["aliases", "alias"],
-    "hidden": true
-}
