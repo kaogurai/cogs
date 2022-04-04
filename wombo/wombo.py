@@ -1,6 +1,5 @@
 import asyncio
 import contextlib
-from enum import Enum
 from io import BytesIO
 
 import aiohttp
@@ -9,28 +8,28 @@ from redbot.core import commands
 from redbot.core.utils.menus import start_adding_reactions
 from redbot.core.utils.predicates import ReactionPredicate
 
-
-class Styles(Enum):
-    SYNTHWAVE = 1
-    UKIYOE = 2
-    NONE = 3
-    STEAMPUNK = 4
-    FANTASY = 5
-    VIBRANT = 6
-    HD = 7
-    PASTEL = 8
-    PSYCHIC = 9
-    DARKFANTASY = 10
-    MYSTICAL = 11
-    FESTIVE = 12
-    BAROQUE = 13
-    ETCHING = 14
-    SDALI = 15
-    WUHTERCUHLER = 16
-    PROVENANCE = 17
-    ROSEGOLD = 18
-    MOONWALKER = 19
-    BLACKLIGHT = 20
+styles = {
+    "synthwave": 1,
+    "ukiyoe": 2,
+    "none": 3,
+    "steampunk": 4,
+    "fantasy": 5,
+    "vibrant": 6,
+    "hd": 7,
+    "pastel": 8,
+    "psychic": 9,
+    "darkfantasy": 10,
+    "mystical": 11,
+    "festive": 12,
+    "baroque": 13,
+    "etching": 14,
+    "sdali": 15,
+    "wuhtercuhler": 16,
+    "provenance": 17,
+    "rosegold": 18,
+    "moonwalker": 19,
+    "blacklight": 20,
+}
 
 
 class Wombo(commands.Cog):
@@ -38,7 +37,7 @@ class Wombo(commands.Cog):
     Generate incredible art using AI.
     """
 
-    __version__ = "1.1.5"
+    __version__ = "1.1.6"
 
     def __init__(self, bot):
         self.bot = bot
@@ -53,12 +52,6 @@ class Wombo(commands.Cog):
     def format_help_for_context(self, ctx):
         pre_processed = super().format_help_for_context(ctx)
         return f"{pre_processed}\n\nCog Version: {self.__version__}"
-
-    def get_style(self, style):
-        style = style.upper()
-        enum = getattr(Styles, style)
-        if enum:
-            return enum.value
 
     async def check_nsfw(self, link):
         params = {"url": link}
@@ -159,7 +152,7 @@ class Wombo(commands.Cog):
                 await ctx.send("You need to specify text to draw.")
                 return
 
-        style = self.get_style(style)
+        style = styles(style.lower())
         if not style:
             await ctx.send("Invalid style.")
             return
@@ -198,7 +191,7 @@ class Wombo(commands.Cog):
             embed = discord.Embed(title="Here's your art!", color=await ctx.embed_color())
             embed.set_image(url="attachment://result.jpg")
 
-            if not ctx.channel.is_nsfw():
+            if ctx.guild and not ctx.channel.is_nsfw():
                 is_nsfw = await self.check_nsfw(link)
                 if is_nsfw:
                     with contextlib.suppress(discord.NotFound):
