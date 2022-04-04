@@ -4,8 +4,8 @@ from .abc import MixinMeta
 
 
 class JoinAndLeaveMixin(MixinMeta):
-    @commands.Cog.listener()
-    async def on_voice_state_update(self, user, before, after):
+    @commands.Cog.listener(name="on_voice_state_update")
+    async def joinleave_voice_listener(self, user, before, after):
         if user.bot:
             return
         if await self.bot.allowed_by_whitelist_blacklist(who=user) is False:

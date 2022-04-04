@@ -103,7 +103,7 @@ class TTSChannelMixin(MixinMeta):
                 await menu(ctx, embeds, DEFAULT_CONTROLS, timeout=60)
 
     @commands.Cog.listener(name="on_message_without_command")
-    async def ttschannels_listener(self, message: discord.Message):
+    async def ttschannels_message_listener(self, message: discord.Message):
         if (
             not message.guild
             or message.author.bot

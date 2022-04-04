@@ -40,7 +40,7 @@ class AutoTTSMixin(MixinMeta):
             await ctx.send("AutoTTS is now allowed for this server.")
 
     @commands.Cog.listener(name="on_message_without_command")
-    async def autotts_listener(self, message: discord.Message):
+    async def autotts_message_listener(self, message: discord.Message):
         if (
             message.author.id not in self.autotts
             or not message.guild
@@ -63,8 +63,8 @@ class AutoTTSMixin(MixinMeta):
             message.clean_content,
         )
 
-    @commands.Cog.listener()
-    async def on_voice_state_update(self, member, before, after):
+    @commands.Cog.listener(name="on_voice_state_update")
+    async def autotts_voice_listener(self, member, before, after):
         if (
             member.bot
             or not await self.bot.allowed_by_whitelist_blacklist(who=member)
