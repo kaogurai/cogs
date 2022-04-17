@@ -12,7 +12,6 @@
 
 | Name | Version | Description |
 |----------|--------|---------------------|
-| AiTools  | v1.0.0 | Interfaces with the brainshop.ai API |
 | AntiPhishing  | v1.2.10 | Protects users against phishing scams |
 | Radio | v1.0.2 | Save radio stations to be easily played |
 | SFX | v5.2.3 | Plays SFX, TTS, and join/leave sounds in voice channels (originally made by baiumbg) |
