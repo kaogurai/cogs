@@ -30,7 +30,7 @@ class SFX(
 ):
     """Plays sound effects, text-to-speech, and sounds when you join or leave a voice channel."""
 
-    __version__ = "5.2.3"
+    __version__ = "5.2.4"
 
     TTS_API_URL = "https://api.kaogurai.xyz/v1/tts"
     SFX_API_URL = "https://freesound.org/apiv2"
@@ -116,7 +116,7 @@ class SFX(
         for guild_id in self.last_track_info.keys():
             try:
                 player = lavalink.get_player(guild_id)
-            except KeyError:
+            except NoLavalinkNode: # Lavalink is probably shutting down
                 continue
             player.repeat = self.repeat_state[guild_id]
 
