@@ -30,7 +30,7 @@ class SFX(
 ):
     """Plays sound effects, text-to-speech, and sounds when you join or leave a voice channel."""
 
-    __version__ = "5.2.4"
+    __version__ = "5.2.5"
 
     TTS_API_URL = "https://api.kaogurai.xyz/v1/tts"
     SFX_API_URL = "https://freesound.org/apiv2"
@@ -55,6 +55,7 @@ class SFX(
         lavalink.register_event_listener(self.ll_check)
         self.bot.loop.create_task(self.set_token())
         self.bot.loop.create_task(self.maybe_get_voices())
+        self.bot.loop.create_task(self.get_voices())
         self.last_track_info = {}
         self.current_sfx = {}
         self.repeat_state = {}

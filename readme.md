@@ -14,5 +14,5 @@
 |----------|--------|---------------------|
 | AntiPhishing  | v1.2.10 | Protects users against phishing scams |
 | Radio | v1.0.2 | Save radio stations to be easily played |
-| SFX | v5.2.4 | Plays SFX, TTS, and join/leave sounds in voice channels (originally made by baiumbg) |
+| SFX | v5.2.5 | Plays SFX, TTS, and join/leave sounds in voice channels (originally made by baiumbg) |
 | SmartLyrics | v1.2.2 | Get lyrics using kaogurai's api |
