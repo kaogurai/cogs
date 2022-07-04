@@ -119,7 +119,7 @@ class JoinAndLeaveMixin(MixinMeta):
         """
         pass
 
-    @joinandleave_guild.command()
+    @joinandleave_guild.command(name="setjoin")
     async def joinandleave_guild_setjoin(self, ctx, url: str = None):
         """
         Set the join sound for this server.
@@ -144,7 +144,7 @@ class JoinAndLeaveMixin(MixinMeta):
             "I've set the sound that will be played upon everyone joining a voice channel."
         )
 
-    @joinandleave_guild.command()
+    @joinandleave_guild.command(name="setleave")
     async def joinandleave_guild_setleave(self, ctx, url: str = None):
         """
         Set the leave sound for this server.
@@ -170,7 +170,7 @@ class JoinAndLeaveMixin(MixinMeta):
         )
 
 
-    @joinandleave_guild.command()
+    @joinandleave_guild.command(name="toggle")
     async def joinandleave_guild_toggle(self, ctx):
         """
         Toggle join and leave sounds being played in voice channels in this server.
