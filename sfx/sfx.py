@@ -30,7 +30,7 @@ class SFX(
 ):
     """Plays sound effects, text-to-speech, and sounds when you join or leave a voice channel."""
 
-    __version__ = "5.2.6"
+    __version__ = "5.2.7"
 
     TTS_API_URL = "https://api.kaogurai.xyz/v1/tts"
     SFX_API_URL = "https://freesound.org/apiv2"

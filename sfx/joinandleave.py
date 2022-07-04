@@ -110,7 +110,7 @@ class JoinAndLeaveMixin(MixinMeta):
         """Settings for join and leave sounds."""
         pass
 
-    @commands.group(name="guild")
+    @joinandleave.group(name="guild")
     @commands.guild_only()
     @commands.admin_or_permissions(manage_guild=True)
     async def joinandleave_guild(self, ctx):
