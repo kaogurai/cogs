@@ -30,7 +30,7 @@ class SFX(
 ):
     """Plays sound effects, text-to-speech, and sounds when you join or leave a voice channel."""
 
-    __version__ = "5.2.5"
+    __version__ = "5.2.6"
 
     TTS_API_URL = "https://api.kaogurai.xyz/v1/tts"
     SFX_API_URL = "https://freesound.org/apiv2"
@@ -49,6 +49,8 @@ class SFX(
             "channels": [],
             "allow_join_and_leave": True,
             "allow_autotts": True,
+            "join_sound": "",
+            "leave_sound": "",
         }
         self.config.register_user(**user_config)
         self.config.register_guild(**guild_config)

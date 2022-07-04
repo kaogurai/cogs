@@ -17,6 +17,49 @@ class JoinAndLeaveMixin(MixinMeta):
         if not guild_config["allow_join_and_leave"]:
             return
 
+        if guild_config["join_sound"] and before.channel is None and after.channel:
+
+            current_perms = after.channel.permissions_for(user.guild.me)
+            if not current_perms.speak or not current_perms.connect:
+                return
+
+            if user.guild.me and user.guild.me.voice:
+                if after.channel != user.guild.me.voice.channel:
+                    return
+
+            track_info = ("Join Sound", user)
+
+            await self.play_sound(
+                after.channel,
+                None,
+                "joinleave",
+                guild_config["join_sound"],
+                track_info,
+            )
+            return
+
+        # User leaves voice channel entirely
+        if guild_config["leave_sound"] and before.channel and after.channel is None:
+
+            current_perms = before.channel.permissions_for(user.guild.me)
+            if not current_perms.speak or not current_perms.connect:
+                return
+
+            if user.guild.me and user.guild.me.voice:
+                if before.channel != user.guild.me.voice.channel:
+                    return
+
+            track_info = ("Leave Sound", user)
+            await self.play_sound(
+                before.channel,
+                None,
+                "joinleave",
+                guild_config["leave_sound"],
+                track_info,
+            )
+            return
+
+
         user_config = await self.config.user(user).all()
 
         # User joins voice channel
@@ -67,10 +110,68 @@ class JoinAndLeaveMixin(MixinMeta):
         """Settings for join and leave sounds."""
         pass
 
-    @joinandleave.command()
+    @commands.group(name="guild")
     @commands.guild_only()
     @commands.admin_or_permissions(manage_guild=True)
-    async def toggle(self, ctx):
+    async def joinandleave_guild(self, ctx):
+        """
+        Commands for configuring join and leave sounds for this server.
+        """
+        pass
+
+    @joinandleave_guild.command()
+    async def joinandleave_guild_setjoin(self, ctx, url: str = None):
+        """
+        Set the join sound for this server.
+
+        If this is set, the bot will play this sound when a user joins a voice channel and user's set join sounds will NOT play.
+
+        If you don't provide a URL, it will clear the sound and now play user's set join sounds, assuming `joinandleave guild toggle` is on.
+        """
+        if not url:
+            attachments = ctx.message.attachments
+            if not attachments:
+                await self.config.guild(ctx.guild).join_sound.clear()
+                return await ctx.send("I've reset this guild's join sound.")
+            url = attachments[0].url
+
+        if not url.endswith((".mp3", ".wav")):
+            await ctx.send("You need to provide a .mp3 or .wav file.")
+            return
+
+        await self.config.guild(ctx.guild).join_sound.set(url)
+        await ctx.send(
+            "I've set the sound that will be played upon everyone joining a voice channel."
+        )
+
+    @joinandleave_guild.command()
+    async def joinandleave_guild_setleave(self, ctx, url: str = None):
+        """
+        Set the leave sound for this server.
+
+        If this is set, the bot will play this sound when a user leave a voice channel and user's set leave sounds will NOT play.
+
+        If you don't provide a URL, it will clear the sound and now play user's set leave sounds, assuming `joinandleave guild toggle` is on.
+        """
+        if not url:
+            attachments = ctx.message.attachments
+            if not attachments:
+                await self.config.guild(ctx.guild).leave_sound.clear()
+                return await ctx.send("I've reset this guild's leave sound.")
+            url = attachments[0].url
+
+        if not url.endswith((".mp3", ".wav")):
+            await ctx.send("You need to provide a .mp3 or .wav file.")
+            return
+
+        await self.config.guild(ctx.guild).leave_sound.set(url)
+        await ctx.send(
+            "I've set the sound that will be played upon everyone leaving a voice channel."
+        )
+
+
+    @joinandleave_guild.command()
+    async def joinandleave_guild_toggle(self, ctx):
         """
         Toggle join and leave sounds being played in voice channels in this server.
         """
