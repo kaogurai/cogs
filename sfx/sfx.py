@@ -30,7 +30,7 @@ class SFX(
 ):
     """Plays sound effects, text-to-speech, and sounds when you join or leave a voice channel."""
 
-    __version__ = "5.2.8"
+    __version__ = "5.2.9"
 
     TTS_API_URL = "https://api.kaogurai.xyz/v1/tts"
     SFX_API_URL = "https://freesound.org/apiv2"
@@ -227,7 +227,7 @@ class SFX(
         player.repeat = False
 
         tracks = await player.load_tracks(query=url)
-        if not tracks.tracks:
+        if not tracks or not tracks.tracks:
             if channel and type != "autotts":
                 await channel.send("Something went wrong.")
             return
