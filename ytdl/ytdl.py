@@ -1,4 +1,5 @@
 import asyncio
+import contextlib
 import io
 from typing import Coroutine, Optional, Tuple
 from urllib.parse import urlparse
@@ -17,7 +18,7 @@ class YTDL(commands.Cog):
     Downloads YouTube videos.
     """
 
-    __version__ = "1.0.2"
+    __version__ = "1.0.3"
 
     def __init__(self, bot: Red):
         self.bot = bot
@@ -49,7 +50,8 @@ class YTDL(commands.Cog):
             "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.149 Safari/537.36"
         }
         async with self.session.get(
-            f"https://{INVIDIOUS_DOMAIN}/api/v1/videos/{video_id}", headers=headers
+            f"https://{INVIDIOUS_DOMAIN}/api/v1/videos/{video_id}?local=true",
+            headers=headers,
         ) as response:
             if response.status == 200:
                 return await response.json()
@@ -180,22 +182,32 @@ class YTDL(commands.Cog):
                 except IndexError:
                     return
 
-                await ctx.send(f"Downloading option `{choice + 1}`...")
+                if int(video["clen"]) > limit:
+                    embed = discord.Embed(
+                        title="File too large",
+                        description=f"The file you requested is too large to download. Please click [here]({video['url']}) to download it manually.",
+                        color=await ctx.embed_color(),
+                        url=video["url"],
+                    )
+                    await ctx.send(embed=embed)
+                    return
+
+                embed = discord.Embed(
+                    title=f"Downloading option {choice + 1}...",
+                    color=await ctx.embed_color(),
+                    description="This usually will take a long time. Please be patient.",
+                    url=video["url"],
+                )
+                m = await ctx.send(embed=embed)
 
                 async with self.session.get(
-                    video["url"], allow_redirects=True
+                    video["url"], allow_redirects=True, timeout=300
                 ) as response:
                     if response.status == 200:
                         data = await response.read()
-                        if len(data) > limit:
-                            embed = discord.Embed(
-                                title="File too large",
-                                description=f"The file you requested is too large to download. Please click [here]({video['url']}) to download it manually.",
-                                color=await ctx.embed_color(),
-                                url=video["url"],
-                            )
-                            await ctx.send(embed=embed)
-                            return
+
+                        with contextlib.suppress(discord.NotFound):
+                            await m.delete()
 
                         await ctx.send(
                             file=discord.File(
@@ -204,10 +216,13 @@ class YTDL(commands.Cog):
                             )
                         )
                     else:
-                        embed=discord.Embed(
+                        embed = discord.Embed(
                             title="Error",
                             description=f"Something went wrong. Please click [here]({video['url']}) to download it manually.",
                             color=await ctx.embed_color(),
                             url=video["url"],
                         )
-                        await ctx.send(embed=embed)
+                        try:
+                            await m.edit(embed=embed)
+                        except discord.NotFound:
+                            await ctx.send(embed=embed)
