@@ -18,7 +18,7 @@ class YTDL(commands.Cog):
     Downloads YouTube videos.
     """
 
-    __version__ = "1.0.3"
+    __version__ = "1.0.4"
 
     def __init__(self, bot: Red):
         self.bot = bot
@@ -205,6 +205,19 @@ class YTDL(commands.Cog):
                 ) as response:
                     if response.status == 200:
                         data = await response.read()
+
+                        if len(data) > limit:
+                            embed = discord.Embed(
+                                title="File too large",
+                                description=f"The file you requested is too large to download. Please click [here]({video['url']}) to download it manually.",
+                                color=await ctx.embed_color(),
+                                url=video["url"],
+                            )
+                            try:
+                                await m.edit(embed=embed)
+                            except discord.NotFound:
+                                await ctx.send(embed=embed)
+                            return
 
                         with contextlib.suppress(discord.NotFound):
                             await m.delete()
