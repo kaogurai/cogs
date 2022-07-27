@@ -203,3 +203,11 @@ class YTDL(commands.Cog):
                                 filename=f"file.{video['container']}",
                             )
                         )
+                    else:
+                        embed=discord.Embed(
+                            title="Error",
+                            description=f"Something went wrong. Please click [here]({video['url']}) to download it manually.",
+                            color=await ctx.embed_color(),
+                            url=video["url"],
+                        )
+                        await ctx.send(embed=embed)
