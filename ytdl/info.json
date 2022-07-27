@@ -1,0 +1,8 @@
+{
+    "author": ["ryan"],
+    "name": "YTDL",
+    "install_msg": "Thanks for installing!",
+    "short": "Downloads YouTube videos.",
+    "description": "Downloads YouTube videos.",
+    "tags": ["youtube", "videos"]
+}

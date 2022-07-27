@@ -59,7 +59,6 @@ class JoinAndLeaveMixin(MixinMeta):
             )
             return
 
-
         user_config = await self.config.user(user).all()
 
         # User joins voice channel
@@ -168,7 +167,6 @@ class JoinAndLeaveMixin(MixinMeta):
         await ctx.send(
             "I've set the sound that will be played upon everyone leaving a voice channel."
         )
-
 
     @joinandleave_guild.command(name="toggle")
     async def joinandleave_guild_toggle(self, ctx):

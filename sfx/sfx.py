@@ -119,7 +119,7 @@ class SFX(
         for guild_id in self.last_track_info.keys():
             try:
                 player = lavalink.get_player(guild_id)
-            except NoLavalinkNode: # Lavalink is probably shutting down
+            except NoLavalinkNode:  # Lavalink is probably shutting down
                 continue
             player.repeat = self.repeat_state[guild_id]
 
