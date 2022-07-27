@@ -9,7 +9,7 @@ import regex
 from redbot.core import commands
 from redbot.core.bot import Red
 
-INVIDIOUS_DOMAIN = "vid.puffyan.us"
+INVIDIOUS_DOMAIN = "inv.riverside.rocks"
 
 
 class YTDL(commands.Cog):
@@ -17,7 +17,7 @@ class YTDL(commands.Cog):
     Downloads YouTube videos.
     """
 
-    __version__ = "1.0.0"
+    __version__ = "1.0.1"
 
     def __init__(self, bot: Red):
         self.bot = bot

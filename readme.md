@@ -16,4 +16,4 @@
 | Radio | v1.0.2 | Save radio stations to be easily played |
 | SFX | v5.2.9 | Plays SFX, TTS, and join/leave sounds in voice channels (originally made by baiumbg) |
 | SmartLyrics | v1.2.2 | Get lyrics using kaogurai's api |
-| YTDL | v1.0.0 | Download YouTube videos |
+| YTDL | v1.0.1 | Download YouTube videos |
