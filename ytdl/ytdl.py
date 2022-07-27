@@ -17,7 +17,7 @@ class YTDL(commands.Cog):
     Downloads YouTube videos.
     """
 
-    __version__ = "1.0.1"
+    __version__ = "1.0.2"
 
     def __init__(self, bot: Red):
         self.bot = bot
@@ -179,6 +179,8 @@ class YTDL(commands.Cog):
                     video = urls[choice]
                 except IndexError:
                     return
+
+                await ctx.send(f"Downloading option `{choice + 1}`...")
 
                 async with self.session.get(
                     video["url"], allow_redirects=True
