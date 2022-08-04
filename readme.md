@@ -19,6 +19,6 @@
 | GuildManager | v1.0.0 | Automatically leaves guilds that are not approved by the bot owner. |
 | Radio | v1.0.3 | Saves radio URLs for easy access. |
 | SFX | v5.2.10 | Allow users to play TTS, SFX, and Join/Leave sounds (originally made by baiumbg.) |
-| SmartLyrics | v1.2.3 | Gets lyrics for your current song. |
+| SmartLyrics | v1.2.4 | Gets lyrics for your current song. |
 | Tio | v1.0.0 | Runs arbitrary code using tio.run. |
 | YTDL | v1.0.5 | Download YouTube videos |

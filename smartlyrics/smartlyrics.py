@@ -1,3 +1,4 @@
+import asyncio
 import re
 from typing import Optional, Tuple, Union
 
@@ -16,7 +17,7 @@ class SmartLyrics(commands.Cog):
     Gets lyrics for your current song.
     """
 
-    __version__ = "1.2.3"
+    __version__ = "1.2.4"
 
     def __init__(self, bot: Red):
         self.bot = bot
@@ -99,7 +100,7 @@ class SmartLyrics(commands.Cog):
             embeds.append(embed)
 
         if len(embed_content) != 1:
-            await menu(ctx, embeds, controls=DEFAULT_CONTROLS, timeout=120)
+            asyncio.create_task(menu(ctx, embeds, controls=DEFAULT_CONTROLS, timeout=120))
         else:
             await ctx.send(embed=embeds[0])
 
