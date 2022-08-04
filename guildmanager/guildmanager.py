@@ -13,7 +13,7 @@ class GuildManager(commands.Cog):
     Allows you to whitelist servers that you want to use the bot in.
     """
 
-    __version__ = "1.0.0"
+    __version__ = "1.0.1"
 
     def __init__(self, bot: Red):
         self.bot = bot
@@ -188,7 +188,7 @@ class GuildManager(commands.Cog):
             m += f"{guild_name} - {guild_id}\n"
 
         m += "\n**Other Guilds:**\n"
-        for guild_id in special_whitelist:
+        for guild_id in whitelist:
             guild = self.bot.get_guild(guild_id)
             guild_name = guild.name if guild else "Unknown Guild"
             m += f"{guild_name} - {guild_id}\n"
