@@ -12,9 +12,9 @@
 
 | Name | Version | Description |
 |----------|--------|---------------------|
-| AIArt | v1.0.0 | Generate incredible art using AI. |
+| AIArt | v1.0.1 | Generate incredible art using AI. |
 | AntiPhishing | v1.2.11 | Fight back against phishing attacks. |
-| AutoAvatar | v1.0.1 | utomatically changes the bot avatar. |
+| AutoAvatar | v1.0.0 | utomatically changes the bot avatar. |
 | ChatBot | v1.0.0 | Talk to a ChatBot! |
 | GuildManager | v1.0.0 | Automatically leaves guilds that are not approved by the bot owner. |
 | Radio | v1.0.3 | Saves radio URLs for easy access. |
