@@ -14,7 +14,7 @@ class AIArt(WomboCommand, commands.Cog, metaclass=CompositeMetaClass):
     Generate incredible art using AI.
     """
 
-    __version__ = "1.0.0"
+    __version__ = "1.0.1"
 
     def __init__(self, bot: Red):
         self.bot = bot
@@ -40,8 +40,7 @@ class AIArt(WomboCommand, commands.Cog, metaclass=CompositeMetaClass):
         """
         async with self.session.post(
             "https://api.kaogurai.xyz/v1/nsfwdetection/image",
-            data={"file": data},
-            proxy="http://localhost:9090",
+            data={"file": data}
         ) as req:
             if req.status == 200:
                 resp = await req.json()
