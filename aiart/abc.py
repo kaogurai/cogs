@@ -5,14 +5,10 @@ from redbot.core.bot import Red
 
 
 class MixinMeta(ABC):
-    """
-    Typehinting stuff.
-    """
-
-    def __init__(self, *args):
+    def __init__(self, *args) -> None:
         self.config: Config
         self.bot: Red
 
 
 class CompositeMetaClass(type(commands.Cog), type(ABC)):
-    """More typehinting stuff."""
+    ...

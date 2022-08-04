@@ -1,0 +1,8 @@
+{
+    "author": ["ryan"],
+    "description": "A bunch of random tools for kaogurai.",
+    "install_msg": "**You should probably uninstall this.**\n\nIt may break your bot, as this is designed exclusively for kaogurai.\n\nIf there is a feature from here you would like, just let me know and I can make it into a seperate cog.",
+    "name": "KaoTools",
+    "requirements": ["pillow"],
+    "short": "A bunch of random tools for kaogurai."
+}

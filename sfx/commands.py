@@ -1,8 +1,8 @@
 import io
-from typing import Optional
 
 import discord
 from redbot.core import commands
+from redbot.core.commands import Context
 from redbot.core.utils.chat_formatting import escape
 
 from .abc import MixinMeta
@@ -12,7 +12,7 @@ class BaseCommandsMixin(MixinMeta):
     @commands.command(usage="<text> [--download]")
     @commands.cooldown(rate=1, per=3, type=discord.ext.commands.cooldowns.BucketType.user)
     @commands.guild_only()
-    async def tts(self, ctx, *, text: str):
+    async def tts(self, ctx: Context, *, text: str):
         """
         Plays the given text as TTS in your current voice channel.
 
@@ -93,7 +93,7 @@ class BaseCommandsMixin(MixinMeta):
     @commands.cooldown(rate=1, per=3, type=discord.ext.commands.cooldowns.BucketType.user)
     @commands.guild_only()
     @commands.check(sfx_check)
-    async def sfx(self, ctx, *, sound: str):
+    async def sfx(self, ctx: Context, *, sound: str):
         """
         Plays a sound effect in your current voice channel.
 

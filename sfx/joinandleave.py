@@ -1,11 +1,20 @@
+from typing import Optional
+
+import discord
 from redbot.core import commands
+from redbot.core.commands import Context
 
 from .abc import MixinMeta
 
 
 class JoinAndLeaveMixin(MixinMeta):
     @commands.Cog.listener(name="on_voice_state_update")
-    async def joinleave_voice_listener(self, user, before, after):
+    async def joinleave_voice_listener(
+        self,
+        user: discord.Member,
+        before: Optional[discord.VoiceChannel],
+        after: Optional[discord.VoiceChannel],
+    ):
         if user.bot:
             return
         if await self.bot.allowed_by_whitelist_blacklist(who=user) is False:
@@ -105,21 +114,21 @@ class JoinAndLeaveMixin(MixinMeta):
             return
 
     @commands.group()
-    async def joinandleave(self, ctx):
+    async def joinandleave(self, ctx: Context):
         """Settings for join and leave sounds."""
         pass
 
     @joinandleave.group(name="guild")
     @commands.guild_only()
     @commands.admin_or_permissions(manage_guild=True)
-    async def joinandleave_guild(self, ctx):
+    async def joinandleave_guild(self, ctx: Context):
         """
         Commands for configuring join and leave sounds for this server.
         """
         pass
 
     @joinandleave_guild.command(name="setjoin")
-    async def joinandleave_guild_setjoin(self, ctx, url: str = None):
+    async def joinandleave_guild_setjoin(self, ctx, url: Optional[str] = None):
         """
         Set the join sound for this server.
 
@@ -144,7 +153,7 @@ class JoinAndLeaveMixin(MixinMeta):
         )
 
     @joinandleave_guild.command(name="setleave")
-    async def joinandleave_guild_setleave(self, ctx, url: str = None):
+    async def joinandleave_guild_setleave(self, ctx: Context, url: Optional[str] = None):
         """
         Set the leave sound for this server.
 
@@ -169,7 +178,7 @@ class JoinAndLeaveMixin(MixinMeta):
         )
 
     @joinandleave_guild.command(name="toggle")
-    async def joinandleave_guild_toggle(self, ctx):
+    async def joinandleave_guild_toggle(self, ctx: Context):
         """
         Toggle join and leave sounds being played in voice channels in this server.
         """
@@ -182,7 +191,7 @@ class JoinAndLeaveMixin(MixinMeta):
         )
 
     @joinandleave.command()
-    async def setjoin(self, ctx, url: str = None):
+    async def setjoin(self, ctx: Context, url: Optional[str] = None):
         """
         Set the sound that plays when you join a voice channel.
 
@@ -205,7 +214,7 @@ class JoinAndLeaveMixin(MixinMeta):
         )
 
     @joinandleave.command()
-    async def setleave(self, ctx, url: str = None):
+    async def setleave(self, ctx: Context, url: Optional[str] = None):
         """
         Set the sound that plays when you leave a voice channel.
 

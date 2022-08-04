@@ -1,0 +1,8 @@
+{
+    "author": ["ryan"],
+    "description": "Generate incredible art using AI.",
+    "install_msg": "Thanks for installing!",
+    "name": "AIArt",
+    "requirements": ["pillow"],
+    "short": "Generate incredible art using AI."
+}

@@ -1,10 +1,8 @@
-from redbot.core.bot import Red
-
-from .ytdl import YTDL
+from .aliasinjector import AliasInjector
 
 
-async def setup(bot: Red):
-    cog = YTDL(bot)
+async def setup(bot):
+    cog = AliasInjector(bot)
     bot.add_cog(cog)
 
 

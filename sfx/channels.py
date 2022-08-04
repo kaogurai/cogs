@@ -2,6 +2,7 @@ import asyncio
 
 import discord
 from redbot.core import commands
+from redbot.core.commands import Context
 from redbot.core.utils.chat_formatting import pagify
 from redbot.core.utils.menus import DEFAULT_CONTROLS, menu
 from redbot.core.utils.predicates import MessagePredicate
@@ -13,14 +14,14 @@ class TTSChannelMixin(MixinMeta):
     @commands.group()
     @commands.guild_only()
     @commands.admin_or_permissions(manage_guild=True)
-    async def ttschannel(self, ctx):
+    async def ttschannel(self, ctx: Context):
         """
         Configures automatic TTS channels.
         """
         pass
 
     @ttschannel.command()
-    async def add(self, ctx, channel: discord.TextChannel):
+    async def add(self, ctx: Context, channel: discord.TextChannel):
         """
         Adds a channel for automatic TTS.
         """
@@ -35,7 +36,7 @@ class TTSChannelMixin(MixinMeta):
             )
 
     @ttschannel.command(aliases=["delete", "del"])
-    async def remove(self, ctx, channel: discord.TextChannel):
+    async def remove(self, ctx: Context, channel: discord.TextChannel):
         """
         Removes a channel for automatic TTS.
         """
@@ -50,7 +51,7 @@ class TTSChannelMixin(MixinMeta):
             )
 
     @ttschannel.command()
-    async def clear(self, ctx):
+    async def clear(self, ctx: Context):
         """
         Removes all the channels for automatic TTS.
         """
@@ -76,7 +77,7 @@ class TTSChannelMixin(MixinMeta):
                 await ctx.send("Okay, I won't clear any TTS channels.")
 
     @ttschannel.command()
-    async def list(self, ctx):
+    async def list(self, ctx: Context):
         """
         Shows all the channels for automatic TTS.
         """

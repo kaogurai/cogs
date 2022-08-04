@@ -1,7 +1,9 @@
 import contextlib
+from typing import Optional
 
 import discord
 from redbot.core import commands
+from redbot.core.commands import Context
 
 from .abc import MixinMeta
 
@@ -9,7 +11,7 @@ from .abc import MixinMeta
 class AutoTTSMixin(MixinMeta):
     @commands.group(invoke_without_command=True)
     @commands.guild_only()
-    async def autotts(self, ctx):
+    async def autotts(self, ctx: Context):
         """
         Toggles the AutoTTS feature.
 
@@ -29,7 +31,7 @@ class AutoTTSMixin(MixinMeta):
     @autotts.command(name="server")
     @commands.admin_or_permissions(manage_guild=True)
     @commands.guild_only()
-    async def autotts_server(self, ctx):
+    async def autotts_server(self, ctx: Context):
         """Toggles the AutoTTS feature for the server."""
         toggle = await self.config.guild(ctx.guild).allow_autotts()
         if toggle:
@@ -64,7 +66,12 @@ class AutoTTSMixin(MixinMeta):
         )
 
     @commands.Cog.listener(name="on_voice_state_update")
-    async def autotts_voice_listener(self, member, before, after):
+    async def autotts_voice_listener(
+        self,
+        member: discord.Member,
+        before: Optional[discord.VoiceChannel],
+        after: Optional[discord.VoiceChannel],
+    ):
         if (
             member.bot
             or not await self.bot.allowed_by_whitelist_blacklist(who=member)

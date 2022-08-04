@@ -1,10 +1,10 @@
 from redbot.core.bot import Red
 
-from .smartlyrics import SmartLyrics
+from .guildmanager import GuildManager
 
 
 async def setup(bot: Red):
-    cog = SmartLyrics(bot)
+    cog = GuildManager(bot)
     bot.add_cog(cog)
 
 

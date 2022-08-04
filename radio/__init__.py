@@ -1,7 +1,9 @@
+from redbot.core.bot import Red
+
 from .radio import Radio
 
 
-async def setup(bot):
+async def setup(bot: Red):
     cog = Radio(bot)
     bot.add_cog(cog)
 

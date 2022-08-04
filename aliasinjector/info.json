@@ -1,0 +1,8 @@
+{
+    "author": ["ryan"],
+    "description": "Injects aliases into the command objects.",
+    "hidden": true,
+    "install_msg": "**Warning**\n\nBe careful, this might fuck up your bot.",
+    "name": "AliasInjector",
+    "short": "Injects aliases into the command objects."
+}

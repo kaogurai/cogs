@@ -1,15 +1,17 @@
 import contextlib
-from urllib.parse import quote, urlparse
+import datetime
+import re
+from typing import List
+from urllib.parse import urlparse
 
 import aiohttp
-import arrow
 import discord
-import redbot
-import regex
 from discord.ext import tasks
 from redbot.core import Config, commands, modlog
+from redbot.core.bot import Red
+from redbot.core.commands import Context
 
-URL_REGEX_PATTERN = regex.compile(
+URL_REGEX_PATTERN = re.compile(
     r"^(?:http[s]?:\/\/)?[\w.-]+(?:\.[\w\.-]+)+[\w\-\._~:/?#[\]@!\$&'\(\)\*\+,;=.]+$"
 )
 
@@ -19,9 +21,9 @@ class AntiPhishing(commands.Cog):
     Protects users against phishing attacks.
     """
 
-    __version__ = "1.2.10"
+    __version__ = "1.2.11"
 
-    def __init__(self, bot):
+    def __init__(self, bot: Red):
         self.bot = bot
         self.config = Config.get_conf(self, identifier=73835)
         self.config.register_guild(action="ignore", caught=0)
@@ -36,11 +38,11 @@ class AntiPhishing(commands.Cog):
     async def red_delete_data_for_user(self, **kwargs):
         return
 
-    def format_help_for_context(self, ctx):
+    def format_help_for_context(self, ctx: Context) -> str:
         pre_processed = super().format_help_for_context(ctx)
         return f"{pre_processed}\n\nCog Version: {self.__version__}"
 
-    async def register_casetypes(self):
+    async def register_casetypes(self) -> None:
         with contextlib.suppress(RuntimeError):
             # notify setting
             await modlog.register_casetype(
@@ -72,7 +74,7 @@ class AntiPhishing(commands.Cog):
             )
 
     @tasks.loop(minutes=10)
-    async def get_phishing_domains(self):
+    async def get_phishing_domains(self) -> None:
         domains = []
 
         async with self.session.get(
@@ -100,7 +102,7 @@ class AntiPhishing(commands.Cog):
         deduped = list(set(domains))
         self.domains = deduped
 
-    def extract_urls(self, message: str):
+    def extract_urls(self, message: str) -> List[str]:
         """
         Extract URLs from a message.
         """
@@ -108,7 +110,7 @@ class AntiPhishing(commands.Cog):
         matches = URL_REGEX_PATTERN.findall(message)
         return matches
 
-    def get_links(self, message: str):
+    def get_links(self, message: str) -> List[str]:
         """
         Get links from the message content.
         """
@@ -124,37 +126,7 @@ class AntiPhishing(commands.Cog):
                 return
             return list(set(links))
 
-    async def get_redirects(self, url: str):
-        """
-        Get the real URL of a URL.
-        """
-        if not url.startswith("http://") and not url.startswith("https://"):
-            url = f"https://{url}"
-        data = {
-            "method": "G",
-            "redirection": "true",
-            "url": url,
-            "locationid": "25",
-            "headername": "User-Agent",
-            "headervalue": f"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/98.0.4758.80 Safari/537.36 kaogurai/AntiPhishing/{self.__version__}",
-        }
-        # I am very well aware that you could just use aiohttp to do this
-        # But, this way it's not sending requests from the bot's IP, since I don't want users to need to set up a proxy server
-        async with self.session.post(
-            "https://www.site24x7.com/tools/restapi-tester", data=data
-        ) as request:
-            if request.status != 200:
-                return None, [
-                    url
-                ]  # If we can't get the real URL, just return the original one
-            data = await request.json()
-            if not data:
-                return None, [url]  # This should be a 204 but whatever
-            if "responsecode" in data and "rurls" in data:
-                return data["responsecode"], data["rurls"]
-            return None, [url]
-
-    async def handle_phishing(self, message, domain):
+    async def handle_phishing(self, message: discord.Message, domain: str) -> None:
         domain = domain[:250]
         action = await self.config.guild(message.guild).action()
         if not action == "ignore":
@@ -176,7 +148,7 @@ class AntiPhishing(commands.Cog):
                 await modlog.create_case(
                     guild=message.guild,
                     bot=self.bot,
-                    created_at=arrow.utcnow(),
+                    created_at=datetime.utcnow(),
                     action_type="phish_found",
                     user=message.author,
                     moderator=message.guild.me,
@@ -190,7 +162,7 @@ class AntiPhishing(commands.Cog):
                 await modlog.create_case(
                     guild=message.guild,
                     bot=self.bot,
-                    created_at=arrow.utcnow(),
+                    created_at=datetime.utcnow(),
                     action_type="phish_deleted",
                     user=message.author,
                     moderator=message.guild.me,
@@ -214,7 +186,7 @@ class AntiPhishing(commands.Cog):
                 await modlog.create_case(
                     guild=message.guild,
                     bot=self.bot,
-                    created_at=arrow.utcnow(),
+                    created_at=datetime.utcnow(),
                     action_type="phish_kicked",
                     user=message.author,
                     moderator=message.guild.me,
@@ -238,7 +210,7 @@ class AntiPhishing(commands.Cog):
                 await modlog.create_case(
                     guild=message.guild,
                     bot=self.bot,
-                    created_at=arrow.utcnow(),
+                    created_at=datetime.utcnow(),
                     action_type="phish_banned",
                     user=message.author,
                     moderator=message.guild.me,
@@ -260,14 +232,7 @@ class AntiPhishing(commands.Cog):
         if not links:
             return
 
-        domains = []
-
-        for link in links:
-            _, redirects = await self.get_redirects(link)
-            link = redirects[-1]
-            domains.append(link)
-
-        for domain in domains:
+        for url in links:
             domain = urlparse(domain).netloc
             if domain in self.domains:
                 await self.handle_phishing(message, domain)
@@ -277,7 +242,7 @@ class AntiPhishing(commands.Cog):
         aliases=["checkforphish", "checkscam", "checkforscam", "checkphishing"]
     )
     @commands.bot_has_permissions(embed_links=True)
-    async def checkphish(self, ctx, url: str = None):
+    async def checkphish(self, ctx: Context, url: str = None):
         """
         Check if a url is a phishing scam.
 
@@ -313,13 +278,13 @@ class AntiPhishing(commands.Cog):
     @commands.group(aliases=["antiphish"])
     @commands.guild_only()
     @commands.admin_or_permissions(manage_guild=True)
-    async def antiphishing(self, ctx):
+    async def antiphishing(self, ctx: Context):
         """
         Settings to set up the anti-phishing integration.
         """
 
     @antiphishing.command()
-    async def action(self, ctx, action: str):
+    async def action(self, ctx: Context, action: str):
         """
         Choose the action that occurs when a user sends a phishing scam.
 
@@ -340,7 +305,7 @@ class AntiPhishing(commands.Cog):
         await ctx.send(f"Set the action to `{action}`.")
 
     @antiphishing.command()
-    async def stats(self, ctx):
+    async def stats(self, ctx: Context):
         """
         Shows the current stats for the anti-phishing integration.
         """

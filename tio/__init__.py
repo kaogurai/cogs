@@ -1,11 +1,10 @@
 from redbot.core.bot import Red
 
-from .smartlyrics import SmartLyrics
+from .tio import Tio
 
 
-async def setup(bot: Red):
-    cog = SmartLyrics(bot)
-    bot.add_cog(cog)
+def setup(bot: Red):
+    bot.add_cog(Tio(bot))
 
 
 __red_end_user_data_statement__ = "This cog does not store any end user data."

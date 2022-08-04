@@ -1,5 +1,8 @@
+from typing import Any, List, Optional
+
 import discord
 from redbot.core import commands
+from redbot.core.commands import Context
 from redbot.core.utils import AsyncIter
 from redbot.core.utils.menus import DEFAULT_CONTROLS, menu
 
@@ -7,16 +10,17 @@ from .abc import MixinMeta
 
 
 class UserConfigMixin(MixinMeta):
-    def divide_chunks(self, l, n):
-        for i in range(0, len(l), n):
-            yield l[i : i + n]
+    def divide_chunks(self, list: List[Any], n: int):
+        """
+        Divides a list into chunks of size n.
+        """
+        for i in range(0, len(list), n):
+            yield list[i : i + n]
 
     @commands.command(aliases=["voicelist", "voicelists"])
-    async def listvoices(self, ctx):
+    async def listvoices(self, ctx: Context):
         """
         Lists all of the TTS voices.
-
-        Not all voices will have examples due to needing to send API requests to generate audio.
         """
         pages = []
         divided = self.divide_chunks(self.voices, 12)
@@ -55,14 +59,14 @@ class UserConfigMixin(MixinMeta):
             await menu(ctx, pages, DEFAULT_CONTROLS, timeout=60)
 
     @commands.group()
-    async def mytts(self, ctx):
+    async def mytts(self, ctx: Context):
         """
         Manages your TTS settings.
         """
         pass
 
     @mytts.command()
-    async def voice(self, ctx, voice: str = None):
+    async def voice(self, ctx: Context, voice: Optional[str] = None):
         """
         Changes your TTS voice.
         Type `[p]listvoices` to view all possible voices.
@@ -85,7 +89,7 @@ class UserConfigMixin(MixinMeta):
             )
 
     @mytts.command()
-    async def translate(self, ctx):
+    async def translate(self, ctx: Context):
         """
         Toggles your TTS translation.
         """

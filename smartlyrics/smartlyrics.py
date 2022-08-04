@@ -1,13 +1,14 @@
 import re
+from typing import Optional, Tuple, Union
 
 import aiohttp
 import discord
 import lavalink
 from redbot.core import commands
+from redbot.core.bot import Red
+from redbot.core.commands import Context
 from redbot.core.utils.chat_formatting import pagify
 from redbot.core.utils.menus import DEFAULT_CONTROLS, menu
-
-LYRICS_API_ENDPOINT = "https://api.kaogurai.xyz/v1/deezer/lyrics"
 
 
 class SmartLyrics(commands.Cog):
@@ -15,9 +16,9 @@ class SmartLyrics(commands.Cog):
     Gets lyrics for your current song.
     """
 
-    __version__ = "1.2.2"
+    __version__ = "1.2.3"
 
-    def __init__(self, bot):
+    def __init__(self, bot: Red):
         self.bot = bot
         self.session = aiohttp.ClientSession()
         self.regex = re.compile(
@@ -35,15 +36,15 @@ class SmartLyrics(commands.Cog):
     async def red_delete_data_for_user(self, **kwargs):
         return
 
-    def format_help_for_context(self, ctx):
+    def format_help_for_context(self, ctx: Context):
         pre_processed = super().format_help_for_context(ctx)
         return f"{pre_processed}\n\nCog Version: {self.__version__}"
 
-    async def get_lyrics(self, query):
+    async def get_lyrics(self, query: str):
         regex_title = self.regex.sub("", query).strip()
         renamed_title = regex_title.replace("-", "")
         async with self.session.get(
-            LYRICS_API_ENDPOINT, params={"query": renamed_title}
+            "https://api.kaogurai.xyz/v1/deezer/lyrics", params={"query": renamed_title}
         ) as resp:
             if resp.status != 200:
                 return
@@ -57,7 +58,7 @@ class SmartLyrics(commands.Cog):
             )
 
     # adapted https://github.com/Cog-Creators/Red-DiscordBot/blob/V3/develop/redbot/cogs/mod/names.py#L112-L126
-    def get_user_status_song(self, user):
+    def get_user_status_song(self, user: Union[discord.Member, discord.User]):
         listening_statuses = [
             s for s in user.activities if s.type == discord.ActivityType.listening
         ]
@@ -73,7 +74,9 @@ class SmartLyrics(commands.Cog):
                 )
                 return text
 
-    async def create_menu(self, ctx, results, source=None):
+    async def create_menu(
+        self, ctx: Context, results: Tuple[str], source: Optional[str] = None
+    ):
         embeds = []
         embed_content = [p for p in pagify(results[0], page_length=750)]
         for index, page in enumerate(embed_content):
@@ -103,7 +106,7 @@ class SmartLyrics(commands.Cog):
     @commands.bot_has_permissions(embed_links=True)
     @commands.guild_only()
     @commands.command(aliases=["l", "ly"])
-    async def lyrics(self, ctx, *, query: str = None):
+    async def lyrics(self, ctx: Context, *, query: Optional[str] = None):
         """
         Gets the lyrics for your current song.
 

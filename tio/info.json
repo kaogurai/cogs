@@ -1,0 +1,8 @@
+{
+    "author": ["ryan"],
+    "description": "Runs arbitrary code using tio.run.",
+    "install_msg": "Thanks for installing!",
+    "name": "Tio",
+    "requirements": ["thefuzz"],
+    "short": "Runs arbitrary code using tio.run."
+}

@@ -12,8 +12,13 @@
 
 | Name | Version | Description |
 |----------|--------|---------------------|
-| AntiPhishing  | v1.2.10 | Protects users against phishing scams |
-| Radio | v1.0.2 | Save radio stations to be easily played |
-| SFX | v5.2.9 | Plays SFX, TTS, and join/leave sounds in voice channels (originally made by baiumbg) |
-| SmartLyrics | v1.2.2 | Get lyrics using kaogurai's api |
+| AIArt | v1.0.0 | Generate incredible art using AI. |
+| AntiPhishing | v1.2.11 | Fight back against phishing attacks. |
+| AutoAvatar | v1.0.0 | utomatically changes the bot avatar. |
+| ChatBot | v1.0.0 | Talk to a ChatBot! |
+| GuildManager | v1.0.0 | Automatically leaves guilds that are not approved by the bot owner. |
+| Radio | v1.0.3 | Saves radio URLs for easy access. |
+| SFX | v5.2.10 | Allow users to play TTS, SFX, and Join/Leave sounds (originally made by baiumbg.) |
+| SmartLyrics | v1.2.3 | Gets lyrics for your current song. |
+| Tio | v1.0.0 | Runs arbitrary code using tio.run. |
 | YTDL | v1.0.5 | Download YouTube videos |

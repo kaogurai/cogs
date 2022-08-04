@@ -1,14 +1,15 @@
 import asyncio
 import contextlib
 import io
+import re
 from typing import Coroutine, Optional, Tuple
 from urllib.parse import urlparse
 
 import aiohttp
 import discord
-import regex
 from redbot.core import commands
 from redbot.core.bot import Red
+from redbot.core.commands import Context
 
 INVIDIOUS_DOMAIN = "inv.riverside.rocks"
 
@@ -18,19 +19,19 @@ class YTDL(commands.Cog):
     Downloads YouTube videos.
     """
 
-    __version__ = "1.0.5"
+    __version__ = "1.0.6"
 
     def __init__(self, bot: Red):
         self.bot = bot
         self.session = aiohttp.ClientSession()
-        self.youtube_regex = regex.compile(
+        self.youtube_regex = re.compile(
             r"(https?://)?(www\.)?(youtube|youtu|youtube-nocookie)\.(com|be)/(watch\?v=|embed/|v/|.+\?v=)?(?P<id>[A-Za-z0-9\-=_]{11})"
         )
 
     async def red_delete_data_for_user(self, **kwargs):
         return
 
-    def format_help_for_context(self, ctx: commands.Context):
+    def format_help_for_context(self, ctx: Context):
         pre_processed = super().format_help_for_context(ctx)
         return f"{pre_processed}\n\nCog Version: {self.__version__}"
 
@@ -97,7 +98,7 @@ class YTDL(commands.Cog):
 
     @commands.command(aliases=["youtubedownload"])
     @commands.bot_has_permissions(embed_links=True)
-    async def ytdl(self, ctx, url: str):
+    async def ytdl(self, ctx: Context, url: str):
         """
         Download a video from YouTube.
         """
@@ -181,7 +182,7 @@ class YTDL(commands.Cog):
                     video = urls[choice]
                 except IndexError:
                     return
-                
+
                 if "clen" in video.keys() and int(video["clen"]) > limit:
                     embed = discord.Embed(
                         title="File too large",

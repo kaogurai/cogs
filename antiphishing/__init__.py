@@ -1,7 +1,9 @@
+from redbot.core.bot import Red
+
 from .antiphishing import AntiPhishing
 
 
-async def setup(bot):
+async def setup(bot: Red):
     cog = AntiPhishing(bot)
     bot.add_cog(cog)
 

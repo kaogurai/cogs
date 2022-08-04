@@ -1,7 +1,9 @@
+from redbot.core.bot import Red
+
 from .sfx import SFX
 
 
-async def setup(bot):
+async def setup(bot: Red):
     cog = SFX(bot)
     bot.add_cog(cog)
 

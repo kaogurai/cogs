@@ -1,7 +1,10 @@
 from copy import copy
+from typing import Optional
 
 import discord
 from redbot.core import Config, commands
+from redbot.core.bot import Red
+from redbot.core.commands import Context
 from redbot.core.utils.chat_formatting import humanize_list, pagify
 from redbot.core.utils.menus import DEFAULT_CONTROLS, menu
 
@@ -11,9 +14,9 @@ class Radio(commands.Cog):
     Saves radio stations for easy access.
     """
 
-    __version__ = "1.0.2"
+    __version__ = "1.0.3"
 
-    def __init__(self, bot):
+    def __init__(self, bot: Red):
         self.bot = bot
         self.config = Config.get_conf(self, identifier=69420)
         self.config.register_global(stations={})
@@ -21,11 +24,11 @@ class Radio(commands.Cog):
     async def red_delete_data_for_user(self, **kwargs):
         return
 
-    def format_help_for_context(self, ctx):
+    def format_help_for_context(self, ctx: Context):
         pre_processed = super().format_help_for_context(ctx)
         return f"{pre_processed}\n\nCog Version: {self.__version__}"
 
-    def play_station(self, ctx, name):
+    def play_station(self, ctx: Context, name: str):
         """
         Plays a radio station.
         """
@@ -34,7 +37,7 @@ class Radio(commands.Cog):
         self.bot.dispatch("message", msg)
 
     @commands.command()
-    async def radio(self, ctx, station: str = None):
+    async def radio(self, ctx: Context, station: Optional[str] = None):
         """
         Play a radio station.
 
@@ -89,13 +92,13 @@ class Radio(commands.Cog):
 
     @commands.group()
     @commands.is_owner()
-    async def radioset(self, ctx):
+    async def radioset(self, ctx: Context):
         """
         Commands to add/remove radio stations.
         """
 
     @radioset.command()
-    async def add(self, ctx, name: str, url: str):
+    async def add(self, ctx: Context, name: str, url: str):
         """
         Add a radio station.
 
@@ -113,7 +116,7 @@ class Radio(commands.Cog):
         await ctx.send("Station added.")
 
     @radioset.command()
-    async def remove(self, ctx, name: str):
+    async def remove(self, ctx: Context, name: str):
         """
         Remove a radio station.
 

@@ -1,10 +1,10 @@
 from redbot.core.bot import Red
 
-from .smartlyrics import SmartLyrics
+from .aiart import AIArt
 
 
 async def setup(bot: Red):
-    cog = SmartLyrics(bot)
+    cog = AIArt(bot)
     bot.add_cog(cog)
 
 

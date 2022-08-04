@@ -1,3 +1,4 @@
+from typing import Optional
 from urllib.parse import quote
 
 import aiohttp
@@ -5,6 +6,8 @@ import discord
 import lavalink
 from discord.ext import tasks
 from redbot.core import Config, commands
+from redbot.core.bot import Red
+from redbot.core.commands import Context
 
 try:
     from lavalink import NodeNotFound as NoLavalinkNode
@@ -30,12 +33,12 @@ class SFX(
 ):
     """Plays sound effects, text-to-speech, and sounds when you join or leave a voice channel."""
 
-    __version__ = "5.2.9"
+    __version__ = "5.2.10"
 
     TTS_API_URL = "https://api.kaogurai.xyz/v1/tts"
     SFX_API_URL = "https://freesound.org/apiv2"
 
-    def __init__(self, bot):
+    def __init__(self, bot: Red):
         self.bot = bot
         self.config = Config.get_conf(self, identifier=134621854878007296)
         self.session = aiohttp.ClientSession()
@@ -80,7 +83,7 @@ class SFX(
         """
         await self.config.user_from_id(kwargs["user_id"]).clear()
 
-    def format_help_for_context(self, ctx):
+    def format_help_for_context(self, ctx: Context) -> str:
         """
         Adds the version to the help command.
         """
@@ -88,7 +91,7 @@ class SFX(
         return f"{pre_processed}\n\nCog Version: {self.__version__}"
 
     @tasks.loop(hours=48)
-    async def get_voices(self):
+    async def get_voices(self) -> None:
         """
         Stores all the available voices in a class attribute.
 
@@ -101,7 +104,7 @@ class SFX(
                 self.voices = await req.json()
 
     @tasks.loop(seconds=5)
-    async def maybe_get_voices(self):
+    async def maybe_get_voices(self) -> None:
         """
         If the TTS API was down for some reason and we can't get the voices, we'll try again every 15 seconds.
 
@@ -110,7 +113,7 @@ class SFX(
         if not self.voices:
             await self.get_voices()
 
-    async def reset_player_states(self):
+    async def reset_player_states(self) -> None:
         """
         Sets all the players to their original repeat state.
 
@@ -123,7 +126,7 @@ class SFX(
                 continue
             player.repeat = self.repeat_state[guild_id]
 
-    async def set_token(self):
+    async def set_token(self) -> None:
         """
         Sets the token for the SFX API.
 
@@ -134,7 +137,7 @@ class SFX(
         self.key = token.get("key")
 
     @commands.Cog.listener()
-    async def on_red_api_tokens_update(self, service_name, api_tokens):
+    async def on_red_api_tokens_update(self, service_name: str, api_tokens: dict):
         """
         Updates the token when the API tokens are updated.
 
@@ -144,13 +147,13 @@ class SFX(
             self.id = api_tokens.get("id")
             self.key = api_tokens.get("key")
 
-    def generate_url(self, voice: str, translate: bool, text: str):
+    def generate_url(self, voice: str, translate: bool, text: str) -> str:
         """
         Generates the URL for the TTS using kaogurai's TTS API.
         """
         return f"{self.TTS_API_URL}/synthesize?voice={voice}&translate={translate}&text={quote(text)}&silence=500"
 
-    def get_voice(self, voice: str):
+    def get_voice(self, voice: str) -> dict:
         """
         Gets the voice from the voices list.
         """
@@ -158,7 +161,7 @@ class SFX(
             if v["name"] == voice:
                 return v
 
-    async def can_tts(self, message):
+    async def can_tts(self, message: discord.Message):
         ctx = await self.bot.get_context(message)
         command = self.bot.get_command("tts")
 
@@ -176,7 +179,7 @@ class SFX(
         text_channel: discord.TextChannel,
         type: str,
         text: str,
-    ):
+    ) -> None:
         """
         Validates the user's voice still exists and plays the TTS.
         """
@@ -201,7 +204,14 @@ class SFX(
             track_info,
         )
 
-    async def play_sound(self, vc, channel, type: str, url: str, track_info: tuple):
+    async def play_sound(
+        self,
+        vc: discord.VoiceChannel,
+        channel: Optional[discord.TextChannel],
+        type: str,
+        url: str,
+        track_info: tuple,
+    ) -> None:
         """
         Plays an audio file in a voice channel.
 
@@ -264,7 +274,7 @@ class SFX(
         player.queue.insert(1, player.current)
         await player.skip()
 
-    async def ll_check(self, player, event, reason):
+    async def ll_check(self, player, event, reason) -> None:
         guild_current_sfx = self.current_sfx.get(player.guild.id, None)
         guild_last_track_info = self.last_track_info.get(player.guild.id, None)
 
