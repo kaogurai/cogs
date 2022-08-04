@@ -1,0 +1,7 @@
+{
+    "author": ["ryan"],
+    "description": "Automatically leaves guilds that are not approved by the bot owner.",
+    "install_msg": "Thanks for installing!",
+    "name": "GuildManager",
+    "short": "Automatically leaves guilds that are not approved by the bot owner."
+}
