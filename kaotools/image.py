@@ -142,9 +142,7 @@ class ImageMixin(MixinMeta):
 
     @commands.command(aliases=["pfppalette", "pfpalette"])
     @commands.bot_has_permissions(attach_files=True)
-    async def palette(
-        self, ctx: Context, link: Optional[str] = None, sorted=False
-    ):
+    async def palette(self, ctx: Context, link: Optional[str] = None, sorted=False):
         """
         Get the color palette of an image.
 

@@ -12,7 +12,7 @@
 
 | Name | Version | Description |
 |----------|--------|---------------------|
-| AIArt | v1.0.1 | Generate incredible art using AI. |
+| AIArt | v1.1.0 | Generate incredible art using AI. |
 | AntiPhishing | v1.2.11 | Fight back against phishing attacks. |
 | AutoAvatar | v1.0.0 | utomatically changes the bot avatar. |
 | ChatBot | v1.0.0 | Talk to a ChatBot! |

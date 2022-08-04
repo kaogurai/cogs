@@ -6,15 +6,16 @@ from redbot.core.bot import Red
 from redbot.core.commands import Context
 
 from .abc import CompositeMetaClass
+from .craiyon import CraiyonCommand
 from .wombo import WomboCommand
 
 
-class AIArt(WomboCommand, commands.Cog, metaclass=CompositeMetaClass):
+class AIArt(CraiyonCommand, WomboCommand, commands.Cog, metaclass=CompositeMetaClass):
     """
     Generate incredible art using AI.
     """
 
-    __version__ = "1.0.1"
+    __version__ = "1.1.0"
 
     def __init__(self, bot: Red):
         self.bot = bot
@@ -39,8 +40,7 @@ class AIArt(WomboCommand, commands.Cog, metaclass=CompositeMetaClass):
             bool - Whether the image is NSFW or not.
         """
         async with self.session.post(
-            "https://api.kaogurai.xyz/v1/nsfwdetection/image",
-            data={"file": data}
+            "https://api.kaogurai.xyz/v1/nsfwdetection/image", data={"file": data}
         ) as req:
             if req.status == 200:
                 resp = await req.json()
