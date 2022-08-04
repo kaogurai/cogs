@@ -7,15 +7,22 @@ from redbot.core.commands import Context
 
 from .abc import CompositeMetaClass
 from .craiyon import CraiyonCommand
+from .pixelz import PixelzCommand
 from .wombo import WomboCommand
 
 
-class AIArt(CraiyonCommand, WomboCommand, commands.Cog, metaclass=CompositeMetaClass):
+class AIArt(
+    CraiyonCommand,
+    PixelzCommand,
+    WomboCommand,
+    commands.Cog,
+    metaclass=CompositeMetaClass,
+):
     """
     Generate incredible art using AI.
     """
 
-    __version__ = "1.1.0"
+    __version__ = "1.2.0"
 
     def __init__(self, bot: Red):
         self.bot = bot
