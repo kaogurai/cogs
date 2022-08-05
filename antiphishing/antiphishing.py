@@ -21,7 +21,7 @@ class AntiPhishing(commands.Cog):
     Protects users against phishing attacks.
     """
 
-    __version__ = "1.2.11"
+    __version__ = "1.2.12"
 
     def __init__(self, bot: Red):
         self.bot = bot
@@ -77,27 +77,21 @@ class AntiPhishing(commands.Cog):
     async def get_phishing_domains(self) -> None:
         domains = []
 
-        async with self.session.get(
-            "https://api.hyperphish.com/gimme-domains"
-        ) as request:
-            if request.status != 200:
-                return
-            data = await request.json()
-            domains.extend(data)
+        headers = {
+            "X-Identity": f"Red-DiscordBot, AntiPhishing v{self.__version__} (https://github.com/kaogurai/cogs)",
+        }
 
-        async with self.session.get("https://phish.sinking.yachts/v2/all") as request:
-            if request.status != 200:
-                return
-            data = await request.json()
-            domains.extend(data)
+        async with self.session.get("https://phish.sinking.yachts/v2/all", headers=headers) as request:
+            if request.status == 200:
+                data = await request.json()
+                domains.extend(data)
 
         async with self.session.get(
             "https://bad-domains.walshy.dev/domains.json"
         ) as request:
-            if request.status != 200:
-                return
-            data = await request.json()
-            domains.extend(data)
+            if request.status == 200:
+                data = await request.json()
+                domains.extend(data)
 
         deduped = list(set(domains))
         self.domains = deduped
@@ -233,7 +227,7 @@ class AntiPhishing(commands.Cog):
             return
 
         for url in links:
-            domain = urlparse(domain).netloc
+            domain = urlparse(url).netloc
             if domain in self.domains:
                 await self.handle_phishing(message, domain)
                 return
