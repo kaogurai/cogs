@@ -57,7 +57,7 @@ class BlenderBotSession:
 
     async def recieve_message(self) -> None:
 
-        async with self.ctx.typing:
+        async with self.ctx.typing():
             resp = await self.ws_session.receive_json()
 
         try:
