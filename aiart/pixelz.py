@@ -73,8 +73,6 @@ class PixelzArguments(Converter):
         if values["artist"]:
             values["artist"] = " ".join(values["artist"])
 
-        if 
-
         if values["filter"]:
             values["filter"] = " ".join(values["filter"])
 
@@ -93,9 +91,7 @@ class PixelzCommand(MixinMeta):
         """
         Generate art using Pixelz.
         """
-        if len(text) > 239:
-            await ctx.send("The prompt must be 239 characters or less.")
-            return
+
 
         async with ctx.typing():
 
@@ -106,7 +102,7 @@ class PixelzCommand(MixinMeta):
             data = {
                 "prompts": [
                     {
-                        "prompt": text,
+                        "prompt": arguments["prompt"],
                         "weight": 1,
                         "public": True,
                     }
