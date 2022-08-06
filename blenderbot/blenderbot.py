@@ -1,15 +1,9 @@
 import asyncio
-import contextlib
-from typing import Optional, Union
 
 import aiohttp
-import discord
-from redbot.core import Config, commands
+from redbot.core import commands
 from redbot.core.bot import Red
 from redbot.core.commands import Context
-from redbot.core.utils.chat_formatting import pagify
-from redbot.core.utils.menus import DEFAULT_CONTROLS, menu, start_adding_reactions
-from redbot.core.utils.predicates import ReactionPredicate
 
 from .session import BlenderBotSession
 
@@ -19,7 +13,7 @@ class BlenderBot(commands.Cog):
     Discord version of blenderbot.ai.
     """
 
-    __version__ = "1.0.0"
+    __version__ = "1.0.1"
 
     def __init__(self, bot: Red):
         self.bot = bot
