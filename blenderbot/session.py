@@ -26,7 +26,7 @@ class BlenderBotSession:
             return m.author == self.author and m.channel == self.channel
 
         try:
-            message = await self.bot.wait_for("message", timeout=30, check=check)
+            message = await self.bot.wait_for("message", timeout=60, check=check)
         except asyncio.TimeoutError:
             try:
                 await self.channel.send("Session closed.")
