@@ -81,7 +81,9 @@ class AntiPhishing(commands.Cog):
             "X-Identity": f"Red-DiscordBot, AntiPhishing v{self.__version__} (https://github.com/kaogurai/cogs)",
         }
 
-        async with self.session.get("https://phish.sinking.yachts/v2/all", headers=headers) as request:
+        async with self.session.get(
+            "https://phish.sinking.yachts/v2/all", headers=headers
+        ) as request:
             if request.status == 200:
                 data = await request.json()
                 domains.extend(data)

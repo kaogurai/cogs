@@ -28,14 +28,14 @@ class BlenderBotSession:
         try:
             message = await self.bot.wait_for("message", timeout=60, check=check)
         except asyncio.TimeoutError:
-            try:
-                await self.channel.send("Session closed.")
-            except discord.HTTPException:
-                pass
             await self.close_session()
             return
 
-        await self.send_message(message.content)
+        if "close session" in message.clean_content.lower():
+            await self.close_session()
+            return
+
+        await self.send_message(message.clean_content)
         await self.recieve_message()
 
     async def start_session(self) -> None:
@@ -51,6 +51,9 @@ class BlenderBotSession:
                 "time_zone": "America/New_York",
                 "time_zone_UTC_offset": 240,
             }
+        )
+        await session.send_json(
+            {"saveDialogHist":False}
         )
         await self.ws_session.receive_json()  # Just wait, this is the initial response
         await self.recieve_message()
@@ -69,6 +72,12 @@ class BlenderBotSession:
 
     async def close_session(self) -> None:
         await self.ws_session.close()
+        embed = discord.Embed(
+            title="Closing BlenderBot session...",
+            color=await self.ctx.embed_colour(),
+            description=f"This session has been closed. You can start a new session by typing `{self.ctx.clean_prefix}blenderbot`."
+        )
+        await self.ctx.send(embed=embed)
 
     async def send_message(self, message: str) -> None:
         await self.ws_session.send_json(

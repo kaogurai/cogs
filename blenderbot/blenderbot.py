@@ -1,4 +1,4 @@
-import asyncio
+import discord
 
 import aiohttp
 from redbot.core import commands
@@ -13,7 +13,7 @@ class BlenderBot(commands.Cog):
     Discord version of blenderbot.ai.
     """
 
-    __version__ = "1.0.1"
+    __version__ = "1.0.2"
 
     def __init__(self, bot: Red):
         self.bot = bot
@@ -30,12 +30,33 @@ class BlenderBot(commands.Cog):
         return f"{pre_processed}\n\nCog Version: {self.__version__}"
 
     @commands.command()
+    @commands.max_concurrency(1, commands.BucketType.user)
     async def blenderbot(self, ctx: Context):
         """
         Start a BlenderBot session.
-
-        The session will be closed if you don't send a message in 30 seconds.
         """
-        await ctx.send("Starting session...")
+        embed = discord.Embed(
+            title="Starting BlenderBot session...",
+            color=await ctx.embed_colour()
+        )
+        embed.add_field(
+            name="Warning",
+            value=(
+                "This is a Meta (Facebook) research project, so be careful when sharing any data. "
+                "If you share any personal data, there is no way of deleting it.\n\n"
+                "**Do not share:**\n"
+                "- Names\n"
+                "- Emails\n"
+                "- Birthdays\n"
+                "- Addresses\n"
+                "- Phone numbers\n"
+            )
+        )
+        embed.add_field(
+            name="Closing Sesssion",
+            value="Type `close session` to close the session. Unused sessions will be closed after 1 minute."
+        )
+        await ctx.send(embed=embed)
+
         session = BlenderBotSession(self.session, ctx)
-        asyncio.create_task(session.start_session())
+        await session.start_session()

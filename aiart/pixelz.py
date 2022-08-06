@@ -1,3 +1,4 @@
+import argparse
 import asyncio
 import random
 import string
@@ -6,9 +7,79 @@ from io import BytesIO
 import discord
 from PIL import Image
 from redbot.core import commands
-from redbot.core.commands import Context
+from redbot.core.commands import BadArgument, Context, Converter
 
 from .abc import MixinMeta
+
+PIXELZ_FILTERS = ["Oil Painting", "Watercolour", "Cosmic", "Fantasy", "Cyberpunk", "Cubist"]
+PIXELZ_ARTISTS = ["Van Gogh", "Salvador Dali", "Pablo Picasso", "Banksy", "Henri Matisse", "Michelangelo", "Andy Warhol", "Rembrandt", "Vermeer", "Jean-Antoine Watteau", "Eugene Delacroix", "Claude Monet", "Georges Seurat", "Edvard Munch", "Egon Schiele", "Gustav Klimt", "Rene Magritte", "Georgia O'Keeffe", "Edward Hopper", "Frida Kahlo", "Jackson Pollock", "Yayoi Kusama"]
+
+# A lot of the code for parsing the arguments is taken from flare's giveaways cog
+# https://github.com/flaree/flare-cogs/blob/master/giveaways/converter.py
+
+
+class NoExitParser(argparse.ArgumentParser):
+    def error(self, message: str) -> None:
+        raise BadArgument()
+
+
+class PixelzArguments(Converter):
+
+    def get_parser(self) -> NoExitParser:
+        parser = NoExitParser(add_help=False)
+        parser.add_argument("prompt", type=str, nargs="*")
+        parser.add_argument(
+            "--algorithm", type=str, default="artistic", nargs="?"
+        )
+        parser.add_argument(
+            "--aspect",
+            "--aspect-ratio",
+            type=str,
+            default="square",
+            nargs="?",
+        )
+        parser.add_argument("--filter", type=str, default=None, nargs="*")
+        parser.add_argument("--artist", type=str, default=None, nargs="*")
+        parser.add_argument(
+            "--symmetric", type=bool, default=False, nargs="?"
+        )
+        return parser
+
+
+    async def convert(self, ctx: Context, argument: str) -> str:
+        argument = argument.replace("—", "--")  # For iOS's weird smart punctuation
+
+        parser = self.get_parser()
+
+        try:
+            values = vars(parser.parse_args(argument.split(" ")))
+        except Exception:
+            raise BadArgument(
+                self.get_help_text()
+            )
+
+        if not values["prompt"]:
+            raise BadArgument(
+                self.get_help_text()
+            )
+
+        values["prompt"] = " ".join(values["prompt"])
+
+        if len(values["prompt"]) > 239:
+            raise BadArgument(
+                "Prompt is too long. Please keep it under 240 characters."
+            )
+
+        if values["artist"]:
+            values["artist"] = " ".join(values["artist"])
+
+        if 
+
+        if values["filter"]:
+            values["filter"] = " ".join(values["filter"])
+
+        return values
+        
 
 
 class PixelzCommand(MixinMeta):
@@ -18,7 +89,7 @@ class PixelzCommand(MixinMeta):
 
     @commands.command()
     @commands.bot_has_permissions(embed_links=True)
-    async def pixelz(self, ctx: Context, *, text: str):
+    async def pixelz(self, ctx: Context, *, arguments: PixelzArguments):
         """
         Generate art using Pixelz.
         """
@@ -41,7 +112,8 @@ class PixelzCommand(MixinMeta):
                     }
                 ],
                 "public": True,
-                "style": "dalle",
+                "style": "guided",
+                "quality": "normal",
                 "user_id": user_id,
             }
 
@@ -59,7 +131,7 @@ class PixelzCommand(MixinMeta):
 
             image_id = json["process"]["generated_image_id"]
 
-            for x in range(100):
+            for x in range(60):
                 if x == 99:
                     await ctx.send("Failed to generate art. Please try again later.")
                     return
@@ -69,12 +141,12 @@ class PixelzCommand(MixinMeta):
                     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.149 Safari/537.36",
                 }
                 async with self.session.get(
-                    f"https://storage.googleapis.com/pixelz-images/{user_id}/{image_id}/5.png",
+                    f"https://storage.googleapis.com/pixelz-images/{user_id}/{image_id}/output_c.jpg",
                     headers=headers,
                 ) as req:
                     if req.status == 200:
                         break
-                await asyncio.sleep(3)
+                await asyncio.sleep(10)
 
             async def get_image(index: int):
                 headers = {
