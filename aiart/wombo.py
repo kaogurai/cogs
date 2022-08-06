@@ -253,4 +253,4 @@ class WomboCommand(MixinMeta):
             with contextlib.suppress(discord.NotFound):
                 await m.delete()
 
-            await ctx.send(embed=embed, file=file)
+            await ctx.send(embed=embed, file=file, content=ctx.author.mention)

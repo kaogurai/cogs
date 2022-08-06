@@ -52,9 +52,7 @@ class BlenderBotSession:
                 "time_zone_UTC_offset": 240,
             }
         )
-        await session.send_json(
-            {"saveDialogHist":False}
-        )
+        await session.send_json({"saveDialogHist": False})
         await self.ws_session.receive_json()  # Just wait, this is the initial response
         await self.recieve_message()
 
@@ -75,7 +73,7 @@ class BlenderBotSession:
         embed = discord.Embed(
             title="Closing BlenderBot session...",
             color=await self.ctx.embed_colour(),
-            description=f"This session has been closed. You can start a new session by typing `{self.ctx.clean_prefix}blenderbot`."
+            description=f"This session has been closed. You can start a new session by typing `{self.ctx.clean_prefix}blenderbot`.",
         )
         await self.ctx.send(embed=embed)
 

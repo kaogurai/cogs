@@ -1,6 +1,5 @@
-import discord
-
 import aiohttp
+import discord
 from redbot.core import commands
 from redbot.core.bot import Red
 from redbot.core.commands import Context
@@ -36,8 +35,7 @@ class BlenderBot(commands.Cog):
         Start a BlenderBot session.
         """
         embed = discord.Embed(
-            title="Starting BlenderBot session...",
-            color=await ctx.embed_colour()
+            title="Starting BlenderBot session...", color=await ctx.embed_colour()
         )
         embed.add_field(
             name="Warning",
@@ -50,11 +48,11 @@ class BlenderBot(commands.Cog):
                 "- Birthdays\n"
                 "- Addresses\n"
                 "- Phone numbers\n"
-            )
+            ),
         )
         embed.add_field(
             name="Closing Sesssion",
-            value="Type `close session` to close the session. Unused sessions will be closed after 1 minute."
+            value="Type `close session` to close the session. Unused sessions will be closed after 1 minute.",
         )
         await ctx.send(embed=embed)
 
