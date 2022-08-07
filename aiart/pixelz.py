@@ -231,7 +231,7 @@ class PixelzCommand(MixinMeta):
                         data = await req.read()
                         break
 
-                await asyncio.sleep(10)
+                await asyncio.sleep(15)
 
             embed = discord.Embed(
                 title="Here's your art!",
