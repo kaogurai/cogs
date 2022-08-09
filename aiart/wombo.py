@@ -95,7 +95,7 @@ class WomboCommand(MixinMeta):
                 return resp["mediastore_uid"]
 
     async def _get_wombo_image_link(
-        self, token: str, session_id: str, style: str, text: str, *, input_image: str
+        self, token: str, session_id: str, style: str, text: str, *, input_image: Optional[str] = None
     ) -> Optional[str]:
         params = {
             "input_spec": {
@@ -136,17 +136,9 @@ class WomboCommand(MixinMeta):
 
             await asyncio.sleep(3)
 
-    @commands.command(usage="<text> [--style <style>]")
+    @commands.command(usage="<text> [--style <style>]", help="Generate art using AI\n\nPossible styles: " + ", ".join(WOMBO_STYLES))
     @commands.bot_has_permissions(embed_links=True)
     async def wombo(self, ctx: Context, *, text: str):
-        """
-        Generate art using AI.
-
-        Possible styles:
-        {styles}
-        """.format(
-            styles=", ".join(WOMBO_STYLES.keys())
-        )
         if len(text) > 100:
             await ctx.send("The text needs to be 100 characters or less.")
             return
