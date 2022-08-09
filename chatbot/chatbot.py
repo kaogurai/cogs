@@ -1,5 +1,6 @@
 import asyncio
 import contextlib
+import json
 from typing import Optional, Union
 
 import aiohttp
@@ -17,7 +18,7 @@ class ChatBot(commands.Cog):
     Cog that that allows users to chat with a chatbot.
     """
 
-    __version__ = "1.0.0"
+    __version__ = "1.0.1"
 
     def __init__(self, bot: Red):
         self.bot = bot
@@ -62,7 +63,10 @@ class ChatBot(commands.Cog):
         async with self.session.get("http://api.brainshop.ai/get", params=params) as resp:
             if resp.status != 200:
                 return
-            resp_data = await resp.json()
+            try:
+                data = await resp.json()
+            except json.decoder.JSONDecodeError:
+                return
             status = resp_data.get("status") or "success"
             if status != "success":
                 return

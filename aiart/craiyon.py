@@ -1,11 +1,14 @@
 import asyncio
 import base64
+import contextlib
 from io import BytesIO
 
 import discord
 from PIL import Image
 from redbot.core import commands
 from redbot.core.commands import Context
+from redbot.core.utils.menus import start_adding_reactions
+from redbot.core.utils.predicates import ReactionPredicate
 
 from .abc import MixinMeta
 
@@ -19,8 +22,9 @@ class CraiyonCommand(MixinMeta):
     @commands.bot_has_permissions(embed_links=True)
     async def craiyon(self, ctx: Context, *, text: str):
         """
-        Generate art using Craiyon (dalle-mini/mega)
+        Generate art using Craiyon. (dalle-mini/mega)
         """
+        m = await ctx.reply("Generating art... This may take a while.")
         async with ctx.typing():
             json = {
                 "prompt": text,
@@ -31,9 +35,14 @@ class CraiyonCommand(MixinMeta):
                 if req.status == 200:
                     json = await req.json()
                     if "images" not in json.keys():
-                        await ctx.send("Failed to generate art. Please try again later.")
+                        with contextlib.suppress(discord.NotFound):
+                            await m.delete()
+                        await ctx.reply("Failed to generate art. Please try again later.")
+                        return
                 else:
-                    await ctx.send("Failed to generate art. Please try again later.")
+                    with contextlib.suppress(discord.NotFound):
+                        await m.delete()
+                    await ctx.reply("Failed to generate art. Please try again later.")
                     return
 
             images = json["images"]
@@ -54,19 +63,56 @@ class CraiyonCommand(MixinMeta):
             new_image.save(buffer, format="PNG")
             buffer.seek(0)
 
+            with contextlib.suppress(discord.NotFound):
+                await m.delete()
+
             embed = discord.Embed(
                 title="Here's your art!",
                 description="Type the number next to the image to select it. If you want more than one image, seperate the numbers with a comma.",
                 color=await ctx.embed_color(),
             )
             embed.set_image(url="attachment://craiyon.png")
-            await ctx.send(embed=embed, file=discord.File(buffer, "craiyon.png"))
+            file = discord.File(buffer, "craiyon.png")
+
+            is_nsfw = await self.check_nsfw(buffer.getvalue())
+            if is_nsfw:
+                m = await ctx.reply(
+                    "These images may contain NSFW content. Would you like me to DM them to you?"
+                )
+                start_adding_reactions(m, ReactionPredicate.YES_OR_NO_EMOJIS)
+                pred = ReactionPredicate.yes_or_no(m, ctx.author)
+                try:
+                    await ctx.bot.wait_for("reaction_add", check=pred, timeout=60)
+                except asyncio.TimeoutError:
+                    with contextlib.suppress(discord.NotFound):
+                        await m.delete()
+                    return
+                if pred.result is True:
+                    with contextlib.suppress(discord.NotFound):
+                        await m.edit(content="Sending images...")
+                    try:
+                        await ctx.author.send(embed=embed, file=file)
+                    except discord.Forbidden:
+                        await ctx.reply(
+                            "Failed to send image. Please make sure you have DMs enabled."
+                        )
+
+                else:
+                    with contextlib.suppress(discord.NotFound):
+                        await m.delete()
+                    return
+
+            else:
+                await ctx.reply(embed=embed, file=file)
 
             def check(m):
-                return m.author == ctx.author and m.channel == ctx.channel
+                if is_nsfw:
+                    return m.author == ctx.author and m.channel == ctx.author.dm_channel
+                else:
+                    return m.author == ctx.author and m.channel == ctx.channel
 
             try:
-                msg = await self.bot.wait_for("message", check=check, timeout=30)
+                msg = await self.bot.wait_for("message", check=check, timeout=60)
             except asyncio.TimeoutError:
                 return
 
@@ -80,4 +126,7 @@ class CraiyonCommand(MixinMeta):
                 buffer = BytesIO()
                 image.save(buffer, format="PNG")
                 buffer.seek(0)
-                await ctx.send(file=discord.File(buffer, "craiyon.png"))
+                if is_nsfw:
+                    await ctx.author.send(embed=embed, file=file)
+                else:
+                    await ctx.send(embed=embed, file=file)

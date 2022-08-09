@@ -1,4 +1,3 @@
-import argparse
 import asyncio
 import contextlib
 import random
@@ -10,8 +9,10 @@ from redbot.core import commands
 from redbot.core.commands import BadArgument, Context, Converter
 from redbot.core.utils.menus import start_adding_reactions
 from redbot.core.utils.predicates import ReactionPredicate
+from thefuzz import process
 
 from .abc import MixinMeta
+from .utils import NoExitParser
 
 PIXELZ_FILTERS = [
     "Oil Painting",
@@ -54,13 +55,10 @@ PIXELZ_SYMMETRY = ["none", "vertical", "horizontal", "both"]
 # https://github.com/flaree/flare-cogs/blob/master/giveaways/converter.py
 
 
-class NoExitParser(argparse.ArgumentParser):
-    def error(self, message: str) -> None:
-        raise BadArgument()
-
-
 class PixelzArguments(Converter):
-    def get_parser(self) -> NoExitParser:
+    async def convert(self, ctx: Context, argument: str) -> dict:
+        argument = argument.replace("—", "--")  # For iOS's weird smart punctuation
+
         parser = NoExitParser(add_help=False)
         parser.add_argument("prompt", type=str, nargs="*")
         parser.add_argument("--algorithm", type=str, default="artistic", nargs="?")
@@ -75,17 +73,12 @@ class PixelzArguments(Converter):
         parser.add_argument("--artist", type=str, default=None, nargs="*")
         parser.add_argument("--symmetric", type=str, default="none", nargs="?")
         parser.add_argument("--quality", type=str, default="normal", nargs="?")
-        return parser
-
-    async def convert(self, ctx: Context, argument: str) -> dict:
-        argument = argument.replace("—", "--")  # For iOS's weird smart punctuation
-
-        parser = self.get_parser()
+        parser.add_argument("--image", type=str, default=None, nargs="?")
 
         try:
             values = vars(parser.parse_args(argument.split(" ")))
         except Exception:
-            raise BadArgument(self.get_help_text())
+            raise BadArgument()
 
         if not values["prompt"]:
             raise BadArgument()
@@ -95,35 +88,25 @@ class PixelzArguments(Converter):
         if len(values["prompt"]) > 239:
             raise BadArgument("Prompt is too long. Please keep it under 240 characters.")
 
-        if values["artist"]:
-            values["artist"] = " ".join(values["artist"])
+        if values["artist"] and values["artist"] not in PIXELZ_ARTISTS:
+            values["artist"] = process.extract(
+                " ".join(values["artist"]), PIXELZ_ARTISTS, limit=1
+            )[0][0]
 
-            if values["artist"] not in PIXELZ_ARTISTS:
-                raise BadArgument(
-                    "Artist not found. Please use one of the following: "
-                    + ", ".join(PIXELZ_ARTISTS)
-                )
-
-        if values["filter"]:
-            values["filter"] = " ".join(values["filter"])
-
-            if values["filter"] not in PIXELZ_FILTERS:
-                raise BadArgument(
-                    "Filter not found. Please use one of the following: "
-                    + ", ".join(PIXELZ_FILTERS)
-                )
+        if values["filter"] and values["filter"] not in PIXELZ_FILTERS:
+            values["filter"] = process.extract(
+                " ".join(values["filter"]), PIXELZ_FILTERS, limit=1
+            )[0][0]
 
         if values["quality"] not in PIXELZ_QUALITIES:
-            raise BadArgument(
-                "Quality not found. Please use one of the following: "
-                + ", ".join(PIXELZ_QUALITIES)
-            )
+            values["quality"] = process.extract(
+                values["quality"], PIXELZ_QUALITIES, limit=1
+            )[0][0]
 
         if values["algorithm"] not in PIXELZ_ALGORITHMS:
-            raise BadArgument(
-                "Algorithm not found. Please use one of the following: "
-                + ", ".join(PIXELZ_ALGORITHMS)
-            )
+            values["algorithm"] = process.extract(
+                values["algorithm"], PIXELZ_ALGORITHMS, limit=1
+            )[0][0]
 
         if values["algorithm"] == "artistic":
             values["algorithm"] = "guided"
@@ -132,12 +115,19 @@ class PixelzArguments(Converter):
 
         if values["symmetric"]:
             if values["symmetric"] not in PIXELZ_SYMMETRY:
-                raise BadArgument(
-                    "Symmetric not found. Please use one of the following: "
-                    + ", ".join(PIXELZ_SYMMETRY)
-                )
+                values["symmetric"] = process.extract(
+                    values["symmetric"], PIXELZ_SYMMETRY, limit=1
+                )[0][0]
         else:
             values["symmetric"] = "none"
+
+        if not values["image"] and ctx.message.attachments:
+            values["image"] = ctx.message.attachments[0].url
+
+        if values["aspect"] not in PIXELZ_ASPECTS:
+            values["aspect"] = process.extract(values["aspect"], PIXELZ_ASPECTS, limit=1)[
+                0
+            ][0]
 
         return values
 
@@ -153,7 +143,7 @@ class PixelzCommand(MixinMeta):
         """
         Generate art using Pixelz.
 
-        You can use the following arguments:
+        You can use the following arguments (all optional):
         `--algorithm <algorithm>`: The algorithm to use for the art. Possible values are: `artistic`, `portrait`. Default: `artistic`
 
         `--aspect <aspect>`: The aspect ratio of the art. Possible values are: `square`, `landscape`, `portrait`. Default is `square`.
@@ -165,10 +155,12 @@ class PixelzCommand(MixinMeta):
         `--symmetric <symmetric>`: The symmetry of the art. Possible values are: `vertical`, `horizontal`, `both`. Default is `none`. Default is no symmetry.
 
         `--quality <quality>`: The quality of the art. Possible values are: `normal`, `better`, `best`, `supreme`. Default is `normal`.
+
+        `--image <image_url>`: The image URL to use for the art. If no image is provided, the first image attached to the message will be used.
         """
-
+        print(arguments)
+        m = await ctx.reply("Generating art... This may take a while.")
         async with ctx.typing():
-
             user_id = "".join(
                 random.choice(string.ascii_letters + string.digits) for _ in range(28)
             )
@@ -200,23 +192,33 @@ class PixelzCommand(MixinMeta):
             else:
                 data["guided_symmetry"] = "none"
 
+            if arguments["image"]:
+                data["init_image"] = arguments["image"]
+                data["init_image_prominence"] = "10"
+
             async with self.session.post(
                 "https://api.pixelz.ai/preview", json=data
             ) as req:
                 if req.status != 200:
-                    await ctx.send("Failed to generate art. Please try again later.")
+                    with contextlib.suppress(discord.NotFound):
+                        await m.delete()
+                    await ctx.reply("Failed to generate art. Please try again later.")
                     return
                 json = await req.json()
 
             if json["success"] is False:
-                await ctx.send("Failed to generate art. Please try again later.")
+                with contextlib.suppress(discord.NotFound):
+                    await m.delete()
+                await ctx.reply("Failed to generate art. Please try again later.")
                 return
 
             image_id = json["process"]["generated_image_id"]
 
             for x in range(60):
                 if x == 59:
-                    await ctx.send("Failed to generate art. Please try again later.")
+                    with contextlib.suppress(discord.NotFound):
+                        await m.delete()
+                    await ctx.reply("Failed to generate art. Please try again later.")
                     return
 
                 headers = {
@@ -242,9 +244,11 @@ class PixelzCommand(MixinMeta):
 
             is_nsfw = await self.check_nsfw(data)
             if is_nsfw:
+                with contextlib.suppress(discord.NotFound):
+                    await m.delete()
 
-                m = await ctx.send(
-                    f"{ctx.author.mention}, this image may contain NSFW content. Would you like me to DM you the image?"
+                m = await ctx.reply(
+                    "This image may contain NSFW content. Would you like me to DM you the image?"
                 )
                 start_adding_reactions(m, ReactionPredicate.YES_OR_NO_EMOJIS)
                 pred = ReactionPredicate.yes_or_no(m, ctx.author)
@@ -256,13 +260,13 @@ class PixelzCommand(MixinMeta):
                     return
                 if pred.result is True:
                     with contextlib.suppress(discord.NotFound):
-                        await m.edit(content=f"{ctx.author.mention}, sending image...")
+                        await m.edit(content="Sending image...")
                     try:
                         await ctx.author.send(embed=embed, file=file)
                     except discord.Forbidden:
-                        await ctx.send(
+                        await ctx.reply(
                             "Failed to send image. Please make sure you have DMs enabled."
                         )
                     return
             else:
-                await ctx.send(embed=embed, file=file, content=ctx.author.mention)
+                await ctx.reply(embed=embed, file=file)

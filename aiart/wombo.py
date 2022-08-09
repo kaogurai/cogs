@@ -7,44 +7,80 @@ from typing import Optional
 import discord
 from PIL import Image
 from redbot.core import commands
-from redbot.core.commands import Context
+from redbot.core.commands import BadArgument, Context, Converter
 from redbot.core.utils.menus import start_adding_reactions
 from redbot.core.utils.predicates import ReactionPredicate
+from thefuzz import process
 
 from .abc import MixinMeta
+from .utils import NoExitParser
 
 WOMBO_STYLES = {
-    "realistic": 32,
-    "throwback": 35,
-    "malevolent": 40,
-    "none": 3,
-    "ghibli": 22,
-    "melancholic": 28,
-    "provenance": 17,
-    "arcane": 34,
-    "radioactive": 27,
-    "rosegold": 18,
-    "blacklight": 20,
-    "wuhtercuhler": 16,
-    "sdali": 15,
-    "etching": 14,
-    "baroque": 13,
-    "mystical": 11,
-    "darkfantasy": 10,
-    "hd": 7,
-    "vibrant": 6,
-    "fantasy": 5,
-    "steampunk": 4,
-    "psychic": 9,
-    "psychedelic": 21,
-    "ukiyoe": 2,
-    "synthwave": 1,
+    "Synthwave": 1,
+    "Ukiyoe": 2,
+    "No Style": 3,
+    "Steampunk": 4,
+    "Fantasy Art": 5,
+    "Vibrant": 6,
+    "HD": 7,
+    "Psychic": 9,
+    "Dark Fantasy": 10,
+    "Mystical": 11,
+    "Baroque": 13,
+    "Etching": 14,
+    "S.Dali": 15,
+    "Wuhtercuhler": 16,
+    "Provenance": 17,
+    "Rose Gold": 18,
+    "Blacklight": 20,
+    "Psychedelic": 21,
+    "Ghibli": 22,
+    "Radioactive": 27,
+    "Melancholic": 28,
+    "Realistic": 32,
+    "Arcane": 34,
+    "Throwback": 35,
+    "Malevolent": 40,
 }
+
+
+class WomboConverter(Converter):
+    async def convert(self, ctx: Context, argument: str) -> int:
+        argument = argument.replace("—", "--")  # For iOS's weird smart punctuation
+
+        parser = NoExitParser(add_help=False)
+        parser.add_argument("prompt", type=str, nargs="*")
+        parser.add_argument("--style", type=str, default=["Realistic"], nargs="*")
+        parser.add_argument("--image", type=str, default=None, nargs="?")
+
+        try:
+            values = vars(parser.parse_args(argument.split(" ")))
+        except Exception:
+            raise BadArgument()
+
+        if not values["prompt"]:
+            raise BadArgument()
+
+        values["prompt"] = " ".join(values["prompt"])
+
+        if len(values["prompt"]) > 100:
+            raise BadArgument("The prompt needs to be 100 characters or less.")
+
+        values["style"] = WOMBO_STYLES[
+            process.extract(
+                " ".join(values["style"]), list(WOMBO_STYLES.keys()), limit=1
+            )[0][0]
+        ]
+
+        if not values["image"] and ctx.message.attachments:
+            values["image"] = ctx.message.attachments[0].url
+
+        return values
 
 
 class WomboCommand(MixinMeta):
     """
-    Implements the Internal WOMBO API used in their web client.
+    Implements the Internal WOMBO API used in their iOS app.
     """
 
     async def _get_wombo_bearer_token(self) -> Optional[str]:
@@ -95,7 +131,13 @@ class WomboCommand(MixinMeta):
                 return resp["mediastore_uid"]
 
     async def _get_wombo_image_link(
-        self, token: str, session_id: str, style: str, text: str, *, input_image: Optional[str] = None
+        self,
+        token: str,
+        session_id: str,
+        style: str,
+        text: str,
+        *,
+        input_image: Optional[str] = None,
     ) -> Optional[str]:
         params = {
             "input_spec": {
@@ -127,76 +169,67 @@ class WomboCommand(MixinMeta):
             async with self.session.get(
                 f"https://paint.api.wombo.ai/api/tasks/{session_id}", headers=headers
             ) as req:
-                if req.status not in [200, 304] or resp["state"] == "failed":
+                if req.status not in [200, 304]:
                     return
 
                 resp = await req.json()
+
+                if resp["state"] == "failed":
+                    return
+
                 if resp["result"]:
                     return resp["result"]["final"]
 
             await asyncio.sleep(3)
 
-    @commands.command(usage="<text> [--style <style>]", help="Generate art using Wombo.\n\nPossible styles: " + ", ".join(WOMBO_STYLES))
+    @commands.command(
+        usage="<text> [--style <style>]",
+        help="Generate art using Wombo.\n\nPossible styles: " + ", ".join(WOMBO_STYLES),
+    )
     @commands.bot_has_permissions(embed_links=True)
-    async def wombo(self, ctx: Context, *, text: str):
-        if len(text) > 100:
-            await ctx.send("The text needs to be 100 characters or less.")
-            return
-
-        text = text.replace("—", "--")
-        args = text.split("--style")
-        if len(args) == 1:
-            style = "realistic"
-            text = args[0]
-        else:
-            style = args[1].strip()
-            text = args[0].strip()
-            if text == "":
-                await ctx.send_help()
-                return
-
-        style = WOMBO_STYLES.get(style.lower())
-        if not style:
-            await ctx.send(
-                f"Invalid style. Possible styles: {', '.join(WOMBO_STYLES.keys())}"
-            )
-            return
-
-        m = await ctx.send("Generating art... This may take a while.")
+    async def wombo(self, ctx: Context, *, arguments: WomboConverter):
+        m = await ctx.reply("Generating art... This may take a while.")
         async with ctx.typing():
             token = await self._get_wombo_bearer_token()
             if not token:
                 with contextlib.suppress(discord.NotFound):
                     await m.delete()
-                await ctx.send("Failed to generate art. Please try again later.")
+                await ctx.reply("Failed to generate art. Please try again later.")
                 return
             session_id = await self._create_wombo_session(token)
             if not session_id:
                 with contextlib.suppress(discord.NotFound):
                     await m.delete()
-                await ctx.send("Failed to generate art. Please try again later.")
+                await ctx.reply("Failed to generate art. Please try again later.")
                 return
 
             media_id = None
-            if ctx.message.attachments:
-                data = await ctx.message.attachments[0].read()
-                media_id = await self._get_wombo_media_id(token, data)
+            if arguments["image"]:
+                async with self.session.get(arguments["image"]) as req:
+                    if req.status == 200:
+                        media_id = await self._get_wombo_media_id(token, await req.read())
 
             link = await self._get_wombo_image_link(
-                token, session_id, style, text, input_image=media_id
+                token,
+                session_id,
+                arguments["style"],
+                arguments["prompt"],
+                input_image=media_id,
             )
 
             if not link:
                 with contextlib.suppress(discord.NotFound):
                     await m.delete()
-                await ctx.send(
+                await ctx.reply(
                     "Failed to generate art. Please try again later. Usually this is caused by triggering Wombo's NSFW filter."
                 )
                 return
 
             async with self.session.get(link) as req:
+                with contextlib.suppress(discord.NotFound):
+                    await m.delete()
                 if req.status != 200:
-                    await ctx.send(f"Something went wrong when downloading the image.")
+                    await ctx.reply(f"Something went wrong when downloading the image.")
                     return
                 data = await req.read()
 
@@ -214,8 +247,8 @@ class WomboCommand(MixinMeta):
                     with contextlib.suppress(discord.NotFound):
                         await m.delete()
 
-                    m = await ctx.send(
-                        f"{ctx.author.mention}, this image may contain NSFW content. Would you like me to DM you the image?"
+                    m = await ctx.reply(
+                        f"This image may contain NSFW content. Would you like me to DM you the image?"
                     )
                     start_adding_reactions(m, ReactionPredicate.YES_OR_NO_EMOJIS)
                     pred = ReactionPredicate.yes_or_no(m, ctx.author)
@@ -227,13 +260,11 @@ class WomboCommand(MixinMeta):
                         return
                     if pred.result is True:
                         with contextlib.suppress(discord.NotFound):
-                            await m.edit(
-                                content=f"{ctx.author.mention}, sending image..."
-                            )
+                            await m.edit(content=f"Sending image...")
                         try:
                             await ctx.author.send(embed=embed, file=file)
                         except discord.Forbidden:
-                            await ctx.send(
+                            await ctx.reply(
                                 "Failed to send image. Please make sure you have DMs enabled."
                             )
                         return
@@ -245,4 +276,4 @@ class WomboCommand(MixinMeta):
             with contextlib.suppress(discord.NotFound):
                 await m.delete()
 
-            await ctx.send(embed=embed, file=file, content=ctx.author.mention)
+            await ctx.reply(embed=embed, file=file)
