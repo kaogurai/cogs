@@ -182,12 +182,16 @@ class WomboCommand(MixinMeta):
 
             await asyncio.sleep(3)
 
-    @commands.command(
-        usage="<text> [--style <style>]",
-        help="Generate art using Wombo.\n\nPossible styles: " + ", ".join(WOMBO_STYLES),
-    )
+    @commands.command()
     @commands.bot_has_permissions(embed_links=True)
     async def wombo(self, ctx: Context, *, arguments: WomboConverter):
+        """
+        Generate art using Wombo.
+
+        You can use the following arguments (all are optional):
+        `--style`: The style of art to generate. Possible values are: `Realistic`, `Baroque`, `Etching`, `S.Dali`, `Wuhtercuhler`, `Provenance`, `Rose Gold`, `Blacklight`, `Psychedelic`, `Ghibli`, `Radioactive`, `Melancholic`, `Realistic`, `Arcane`, `Throwback`, `Malevolent`. Default is `Realistic`.
+        `--image`: The image to use as input. If not provided, the first image attached to the message will be used.
+        """
         m = await ctx.reply("Generating art... This may take a while.")
         async with ctx.typing():
             token = await self._get_wombo_bearer_token()
