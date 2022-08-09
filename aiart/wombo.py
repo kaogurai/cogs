@@ -136,7 +136,7 @@ class WomboCommand(MixinMeta):
 
             await asyncio.sleep(3)
 
-    @commands.command(usage="<text> [--style <style>]", help="Generate art using AI\n\nPossible styles: " + ", ".join(WOMBO_STYLES))
+    @commands.command(usage="<text> [--style <style>]", help="Generate art using Wombo.\n\nPossible styles: " + ", ".join(WOMBO_STYLES))
     @commands.bot_has_permissions(embed_links=True)
     async def wombo(self, ctx: Context, *, text: str):
         if len(text) > 100:
