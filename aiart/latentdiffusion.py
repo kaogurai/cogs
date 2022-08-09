@@ -23,7 +23,7 @@ class LatentDiffusionCommand(MixinMeta):
     @commands.bot_has_permissions(embed_links=True)
     async def latentdiffusion(self, ctx: Context, *, text: str):
         """
-        Generate art using Latent Diffusion
+        Generate art using Latent Diffusion.
         """
         if len(text) > 250:
             await ctx.reply("The text needs to be 250 characters or less.")
