@@ -9,11 +9,13 @@ from .abc import CompositeMetaClass
 from .craiyon import CraiyonCommand
 from .pixelz import PixelzCommand
 from .wombo import WomboCommand
+from .latentdiffusion import LatentDiffusionCommand
 
 
 class AIArt(
     CraiyonCommand,
     PixelzCommand,
+    LatentDiffusionCommand,
     WomboCommand,
     commands.Cog,
     metaclass=CompositeMetaClass,
@@ -22,7 +24,7 @@ class AIArt(
     Generate incredible art using AI.
     """
 
-    __version__ = "1.2.3"
+    __version__ = "1.3.0"
 
     def __init__(self, bot: Red):
         self.bot = bot
