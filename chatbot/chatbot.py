@@ -18,7 +18,7 @@ class ChatBot(commands.Cog):
     Cog that that allows users to chat with a chatbot.
     """
 
-    __version__ = "1.0.1"
+    __version__ = "1.0.2"
 
     def __init__(self, bot: Red):
         self.bot = bot
@@ -64,7 +64,7 @@ class ChatBot(commands.Cog):
             if resp.status != 200:
                 return
             try:
-                data = await resp.json()
+                resp_data = await resp.json()
             except json.decoder.JSONDecodeError:
                 return
             status = resp_data.get("status") or "success"
