@@ -28,3 +28,6 @@ Please join the support server [here](https://discord.gg/p6ehU9qhg8) if you have
 | SmartLyrics | v1.2.4 | Gets lyrics for your current song. |
 | Tio | v1.0.0 | Runs arbitrary code using tio.run. |
 | YTDL | v1.0.5 | Download YouTube videos. |
+
+## License
+This repo is licensed under the [MIT license.](https://github.com/kaogurai/cogs/blob/master/LICENSE)
