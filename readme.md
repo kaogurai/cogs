@@ -1,5 +1,9 @@
 # kaogurai's cogs
 
+## Support
+Please join the support server [here](https://discord.gg/p6ehU9qhg8) if you have any questions. If you are sure it is a bug, feel free to make a GitHub issue or send a PR.
+
+## Installation
 ```
 [p]load downloader
 
@@ -10,6 +14,7 @@
 [p]load <cog>
 ```
 
+## Cogs
 | Name | Version | Description |
 |----------|--------|---------------------|
 | AIArt | v1.4.2 | Generate incredible art using AI. |
