@@ -127,6 +127,6 @@ class CraiyonCommand(MixinMeta):
                 image.save(buffer, format="PNG")
                 buffer.seek(0)
                 if is_nsfw:
-                    await ctx.author.send(embed=embed, file=file)
+                    await ctx.author.send(file=discord.File(buffer, "craiyon.png"))
                 else:
-                    await ctx.send(embed=embed, file=file)
+                    await ctx.send(file=discord.File(buffer, "craiyon.png"))
