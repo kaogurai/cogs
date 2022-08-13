@@ -39,7 +39,7 @@ class KaoTools(
     Random tools for kaogurai.
     """
 
-    __version__ = "1.0.0"
+    __version__ = "1.0.1"
 
     KAO_API_URL = "https://api.kaogurai.xyz/v1"
 
@@ -181,11 +181,10 @@ class KaoTools(
         """
         if bot is None:
             t = "I am a private bot."
-            d = f"If you need access to me for some reason, click [here]({SUPPORT_SERVER}) to join my support server."
+            d = f"It is not possible to invite me at this time."
             embed = discord.Embed(
                 color=await ctx.embed_color(),
                 title=t,
-                url=await self.invite_url(),
                 description=d,
             )
             await ctx.send(embed=embed)
