@@ -17,7 +17,7 @@ Please join the support server [here](https://discord.gg/p6ehU9qhg8) if you have
 ## Cogs
 | Name | Version | Description |
 |----------|--------|---------------------|
-| AIArt | v1.4.3 | Generate incredible art using AI. |
+| AIArt | v1.5.0 | Generate incredible art using AI. |
 | AntiPhishing | v1.2.12 | Fight back against phishing attacks. |
 | AutoAvatar | v1.0.0 | Automatically changes the bot avatar. |
 | BlenderBot | v1.0.2 | Discord version of blenderbot.ai. |

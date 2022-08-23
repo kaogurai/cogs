@@ -9,12 +9,14 @@ from .abc import CompositeMetaClass
 from .craiyon import CraiyonCommand
 from .latentdiffusion import LatentDiffusionCommand
 from .pixelz import PixelzCommand
+from .stablediffusion import StableDiffusionCommand
 from .wombo import WomboCommand
 
 
 class AIArt(
     CraiyonCommand,
     PixelzCommand,
+    StableDiffusionCommand,
     LatentDiffusionCommand,
     WomboCommand,
     commands.Cog,
@@ -24,7 +26,7 @@ class AIArt(
     Generate incredible art using AI.
     """
 
-    __version__ = "1.4.3"
+    __version__ = "1.5.0"
 
     def __init__(self, bot: Red):
         self.bot = bot
@@ -69,8 +71,8 @@ class AIArt(
         """
         Draw an image using AI.
 
-        Currently this proxies towards the wombo command.
+        Currently this proxies towards the Stable Diffusion command.
         """
         msg = copy(ctx.message)
-        msg.content = f"{ctx.prefix}wombo {args}"
+        msg.content = f"{ctx.prefix}stablediffusion {args}"
         self.bot.dispatch("message", msg)

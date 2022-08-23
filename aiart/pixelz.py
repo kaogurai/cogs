@@ -158,7 +158,6 @@ class PixelzCommand(MixinMeta):
 
         `--image <image_url>`: The image URL to use for the art. If no image is provided, the first image attached to the message will be used.
         """
-        print(arguments)
         m = await ctx.reply("Generating art... This may take a while.")
         async with ctx.typing():
             user_id = "".join(
