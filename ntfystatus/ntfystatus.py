@@ -12,7 +12,7 @@ class NTFYStatus(commands.Cog):
     Send push notifications using ntfy.sh when a bot goes offline.
     """
 
-    __version__ = "1.0.0"
+    __version__ = "1.0.1"
 
     def __init__(self, bot: Red):
         self.bot = bot
@@ -101,7 +101,7 @@ class NTFYStatus(commands.Cog):
         Commands to configure the bots you get notifications for.
         """
 
-    @ntfy.command()
+    @ntfy.command(name="add")
     async def ntfy_add(self, ctx: Context, channel: str, *, bot: discord.User):
         """
         Add a bot to the list of bots you get notifications for.
@@ -135,7 +135,7 @@ class NTFYStatus(commands.Cog):
         if ctx.guild:
             await ctx.message.delete()
 
-    @ntfy.command()
+    @ntfy.command(name="remove")
     async def ntfy_remove(self, ctx: Context, bot: discord.User):
         """
         Stop getting notifications for a bot.
