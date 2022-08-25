@@ -23,7 +23,7 @@ Please join the support server [here](https://discord.gg/p6ehU9qhg8) if you have
 | BlenderBot | v1.0.2 | Discord version of blenderbot.ai. |
 | ChatBot | v1.0.2 | Talk to a ChatBot! |
 | GuildManager | v1.0.1 | Automatically leaves guilds that are not approved by the bot owner. |
-| NTFYStatus | v1.0.2 | Send push notifications using ntfy.sh when a bot goes offline. |
+| NTFYStatus | v1.0.3 | Send push notifications using ntfy.sh when a bot goes offline. |
 | Radio | v1.0.3 | Saves radio URLs for easy access. |
 | SFX | v5.2.10 | Allow users to play TTS, SFX, and Join/Leave sounds. (originally made by baiumbg) |
 | SmartLyrics | v1.2.4 | Gets lyrics for your current song. |

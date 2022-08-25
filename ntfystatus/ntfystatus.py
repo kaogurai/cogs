@@ -12,7 +12,7 @@ class NTFYStatus(commands.Cog):
     Send push notifications using ntfy.sh when a bot goes offline.
     """
 
-    __version__ = "1.0.2"
+    __version__ = "1.0.3"
 
     def __init__(self, bot: Red):
         self.bot = bot
@@ -20,6 +20,7 @@ class NTFYStatus(commands.Cog):
         self.config = Config.get_conf(self, identifier=5453)
         self.config.register_user(bots=[])
         self.cache = {}
+        self.bot.loop.create_task(self.load_cache())
 
     def cog_unload(self):
         self.bot.loop.create_task(self.session.close())
@@ -32,16 +33,14 @@ class NTFYStatus(commands.Cog):
         return f"{pre_processed}\n\nCog Version: {self.__version__}"
 
     async def load_cache(self) -> None:
-        all_users = await self.config.all_users()
-        self.cache = all_users
+        self.cache = await self.config.all_users()
 
     async def send_notification(self, channel: str, message: str, urgent: bool) -> None:
         headers = {"Title": "Bot status has changed"}
         if urgent:
-            headers["Priority"] = "high"
+            headers["Priority"] = "max"
             headers["Tags"] = "rotating_light"
         else:
-            headers["Priority"] = "none"
             headers["Tags"] = "tada"
         await self.session.post(
             f"https://ntfy.sh/{channel}",
@@ -54,13 +53,10 @@ class NTFYStatus(commands.Cog):
         # Online -> Offline
         if (
             before.status != after.status
-            and after.status in [discord.Status.offline, discord.Status.invisible]
-            and before.status
+            and str(after.status) == "offline"
+            and str(before.status)
             in [
-                discord.Status.online,
-                discord.Status.idle,
-                discord.Status.dnd,
-                discord.Status.do_not_disturb,
+                "online", "idle", "dnd"
             ]
         ):
             for user in self.cache:
@@ -76,14 +72,11 @@ class NTFYStatus(commands.Cog):
         # Offline -> Online
         if (
             before.status != after.status
-            and before.status in [discord.Status.offline, discord.Status.invisible]
-            and after.status
+            and str(after.status)
             in [
-                discord.Status.online,
-                discord.Status.idle,
-                discord.Status.dnd,
-                discord.Status.do_not_disturb,
+                "online", "idle", "dnd"
             ]
+            and str(before.status)  == "offline"
         ):
             for user in self.cache:
                 user_config = self.cache.get(user, {"bots": []})
@@ -96,13 +89,13 @@ class NTFYStatus(commands.Cog):
                         )
 
     @commands.group()
-    async def ntfy(self, ctx: Context):
+    async def ntfystatus(self, ctx: Context):
         """
         Commands to configure the bots you get notifications for.
         """
 
-    @ntfy.command(name="add")
-    async def ntfy_add(self, ctx: Context, channel: str, *, bot: discord.User):
+    @ntfystatus.command(name="add")
+    async def ntfystatus_add(self, ctx: Context, channel: str, *, bot: discord.User):
         """
         Add a bot to the list of bots you get notifications for.
 
@@ -135,8 +128,8 @@ class NTFYStatus(commands.Cog):
         if ctx.guild and ctx.channel.permissions_for(ctx.guild.me).manage_messages:
             await ctx.message.delete()
 
-    @ntfy.command(name="remove")
-    async def ntfy_remove(self, ctx: Context, bot: discord.User):
+    @ntfystatus.command(name="remove")
+    async def ntfystatus_remove(self, ctx: Context, bot: discord.User):
         """
         Stop getting notifications for a bot.
 
@@ -155,8 +148,8 @@ class NTFYStatus(commands.Cog):
 
         await ctx.send("You will no longer get notifications for that bot.")
 
-    @ntfy.command(name="list")
-    async def ntfy_list(self, ctx: Context):
+    @ntfystatus.command(name="list")
+    async def ntfystatus_list(self, ctx: Context):
         """
         List the bots you get notifications for.
 
@@ -168,11 +161,11 @@ class NTFYStatus(commands.Cog):
             return
 
         msg = ""
-        for bot in bots:
-            if not ctx.guild:
+        if ctx.guild:
+            msg = ",".join([f"<@{bot['id']}>" for bot in bots])
+        else:
+            for bot in bots:
                 msg += f"<@{bot['id']}> - `{bot['channel']}`\n"
-            else:
-                msg += f"<@{bot['id']}>\n"
 
         pages = [p for p in pagify(text=msg, delims="\n")]
         embeds = []
