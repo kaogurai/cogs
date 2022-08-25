@@ -12,7 +12,7 @@ class NTFYStatus(commands.Cog):
     Send push notifications using ntfy.sh when a bot goes offline.
     """
 
-    __version__ = "1.0.1"
+    __version__ = "1.0.2"
 
     def __init__(self, bot: Red):
         self.bot = bot
@@ -64,7 +64,7 @@ class NTFYStatus(commands.Cog):
             ]
         ):
             for user in self.cache:
-                user_config = self.cache.get(before.author.id, {"bots": []})
+                user_config = self.cache.get(user, {"bots": []})
                 for bot in user_config["bots"]:
                     if bot["id"] == before.id:
                         await self.send_notification(
@@ -86,7 +86,7 @@ class NTFYStatus(commands.Cog):
             ]
         ):
             for user in self.cache:
-                user_config = self.cache.get(before.author.id, {"bots": []})
+                user_config = self.cache.get(user, {"bots": []})
                 for bot in user_config["bots"]:
                     if bot["id"] == before.id:
                         await self.send_notification(
@@ -132,7 +132,7 @@ class NTFYStatus(commands.Cog):
 
         await ctx.send("You will now get notifications for that bot.")
 
-        if ctx.guild:
+        if ctx.guild and ctx.channel.permissions_for(ctx.guild.me).manage_messages:
             await ctx.message.delete()
 
     @ntfy.command(name="remove")
