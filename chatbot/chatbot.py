@@ -15,7 +15,7 @@ from redbot.core.utils.predicates import ReactionPredicate
 
 class ChatBot(commands.Cog):
     """
-    Cog that that allows users to chat with a chatbot.
+    Talk to a ChatBot!
     """
 
     __version__ = "1.0.2"

@@ -1,0 +1,7 @@
+{
+    "author": ["ryan"],
+    "description": "Send push notifications using ntfy.sh when a bot goes offline.",
+    "install_msg": "Thanks for installing!",
+    "name": "NTFYStatus",
+    "short": "Send push notifications using ntfy.sh when a bot goes offline."
+}

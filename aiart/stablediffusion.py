@@ -138,10 +138,7 @@ class StableDiffusionCommand(MixinMeta):
                 return
 
             try:
-                selected = [
-                    int(i) - 1
-                    for i in msg.content.split(",")
-                ]
+                selected = [int(i) - 1 for i in msg.content.split(",")]
             except:
                 return
 
