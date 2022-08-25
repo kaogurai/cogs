@@ -12,7 +12,7 @@ class NTFYStatus(commands.Cog):
     Send push notifications using ntfy.sh when a bot goes offline.
     """
 
-    __version__ = "1.0.3"
+    __version__ = "1.0.4"
 
     def __init__(self, bot: Red):
         self.bot = bot
@@ -50,14 +50,22 @@ class NTFYStatus(commands.Cog):
 
     @commands.Cog.listener()
     async def on_member_update(self, before: discord.Member, after: discord.Member):
+        if not before.bot:
+            return
+
+        possible_previous_status = before.status
+
         # Online -> Offline
+        for user in self.cache:
+            for bot in self.cache[user]["bots"]:
+                if bot["id"] == after.id:
+                    if bot["status"] is not None:
+                        possible_previous_status = bot["status"]
         if (
-            before.status != after.status
+            before.status == possible_previous_status
+            and before.status != after.status
             and str(after.status) == "offline"
-            and str(before.status)
-            in [
-                "online", "idle", "dnd"
-            ]
+            and str(before.status) in ["online", "idle", "dnd"]
         ):
             for user in self.cache:
                 user_config = self.cache.get(user, {"bots": []})
@@ -68,15 +76,14 @@ class NTFYStatus(commands.Cog):
                             f"Discord Bot {after.name} ({after.id}) is now offline.",
                             True,
                         )
+                        self.cache[user]["bots"][bot]["status"] = after.status
 
         # Offline -> Online
         if (
-            before.status != after.status
-            and str(after.status)
-            in [
-                "online", "idle", "dnd"
-            ]
-            and str(before.status)  == "offline"
+            before.status == possible_previous_status
+            and before.status != after.status
+            and str(after.status) in ["online", "idle", "dnd"]
+            and str(before.status) == "offline"
         ):
             for user in self.cache:
                 user_config = self.cache.get(user, {"bots": []})
@@ -87,6 +94,7 @@ class NTFYStatus(commands.Cog):
                             f"Discord Bot {after.name} ({after.id}) is back online.",
                             False,
                         )
+                        self.cache[user]["bots"][bot]["status"] = after.status
 
     @commands.group()
     async def ntfystatus(self, ctx: Context):
@@ -118,7 +126,7 @@ class NTFYStatus(commands.Cog):
             )
             return
 
-        bots.append({"id": bot.id, "channel": channel})
+        bots.append({"id": bot.id, "channel": channel, "status": None})
         await self.config.user(ctx.author).bots.set(bots)
 
         self.cache[ctx.author.id] = bots
