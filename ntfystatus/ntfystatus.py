@@ -12,7 +12,7 @@ class NTFYStatus(commands.Cog):
     Send push notifications using ntfy.sh when a bot goes offline.
     """
 
-    __version__ = "1.0.4"
+    __version__ = "1.0.5"
 
     def __init__(self, bot: Red):
         self.bot = bot
@@ -61,6 +61,7 @@ class NTFYStatus(commands.Cog):
                 if bot["id"] == after.id:
                     if bot["status"] is not None:
                         possible_previous_status = bot["status"]
+
         if (
             before.status == possible_previous_status
             and before.status != after.status
@@ -71,12 +72,12 @@ class NTFYStatus(commands.Cog):
                 user_config = self.cache.get(user, {"bots": []})
                 for bot in user_config["bots"]:
                     if bot["id"] == before.id:
+                        bot["status"] = after.status
                         await self.send_notification(
                             bot["channel"],
                             f"Discord Bot {after.name} ({after.id}) is now offline.",
                             True,
                         )
-                        self.cache[user]["bots"][bot]["status"] = after.status
 
         # Offline -> Online
         if (
@@ -89,12 +90,12 @@ class NTFYStatus(commands.Cog):
                 user_config = self.cache.get(user, {"bots": []})
                 for bot in user_config["bots"]:
                     if bot["id"] == before.id:
+                        bot["status"] = after.status
                         await self.send_notification(
                             bot["channel"],
                             f"Discord Bot {after.name} ({after.id}) is back online.",
                             False,
                         )
-                        self.cache[user]["bots"][bot]["status"] = after.status
 
     @commands.group()
     async def ntfystatus(self, ctx: Context):
