@@ -43,6 +43,8 @@ WOMBO_STYLES = {
     "Malevolent": 40,
 }
 
+# A lot of the code for parsing the arguments is inspired by flare's giveaways cog
+
 
 class WomboConverter(Converter):
     async def convert(self, ctx: Context, argument: str) -> int:

@@ -46,12 +46,11 @@ PIXELZ_ARTISTS = [
     "Jackson Pollock",
     "Yayoi Kusama",
 ]
-PIXELZ_QUALITIES = ["normal", "better", "best", "supreme"]
 PIXELZ_ASPECTS = ["square", "landscape", "portrait"]
 PIXELZ_ALGORITHMS = ["artistic", "portrait"]
 PIXELZ_SYMMETRY = ["none", "vertical", "horizontal", "both"]
 
-# A lot of the code for parsing the arguments is taken from flare's giveaways cog
+# A lot of the code for parsing the arguments is inspired by flare's giveaways cog
 # https://github.com/flaree/flare-cogs/blob/master/giveaways/converter.py
 
 
@@ -72,7 +71,6 @@ class PixelzArguments(Converter):
         parser.add_argument("--filter", type=str, default=None, nargs="*")
         parser.add_argument("--artist", type=str, default=None, nargs="*")
         parser.add_argument("--symmetric", type=str, default="none", nargs="?")
-        parser.add_argument("--quality", type=str, default="normal", nargs="?")
         parser.add_argument("--image", type=str, default=None, nargs="?")
 
         try:
@@ -96,11 +94,6 @@ class PixelzArguments(Converter):
         if values["filter"] and values["filter"] not in PIXELZ_FILTERS:
             values["filter"] = process.extract(
                 " ".join(values["filter"]), PIXELZ_FILTERS, limit=1
-            )[0][0]
-
-        if values["quality"] not in PIXELZ_QUALITIES:
-            values["quality"] = process.extract(
-                values["quality"], PIXELZ_QUALITIES, limit=1
             )[0][0]
 
         if values["algorithm"] not in PIXELZ_ALGORITHMS:
@@ -154,8 +147,6 @@ class PixelzCommand(MixinMeta):
 
         `--symmetric <symmetric>`: The symmetry of the art. Possible values are: `vertical`, `horizontal`, `both`. Default is `none`. Default is no symmetry.
 
-        `--quality <quality>`: The quality of the art. Possible values are: `normal`, `better`, `best`, `supreme`. Default is `normal`.
-
         `--image <image_url>`: The image URL to use for the art. If no image is provided, the first image attached to the message will be used.
         """
         m = await ctx.reply("Generating art... This may take a while.")
@@ -174,7 +165,7 @@ class PixelzCommand(MixinMeta):
                 ],
                 "public": True,
                 "style": arguments["algorithm"],
-                "quality": arguments["quality"],
+                "quality": "supreme",
                 "user_id": user_id,
                 "aspect": arguments["aspect"],
                 "guided_symmetry": arguments["symmetric"],
