@@ -194,12 +194,16 @@ class StableDiffusionCommand(MixinMeta):
                 return
 
             try:
-                selected = [int(i) - 1 for i in msg.content.split(",")]
-                for x in selected:
-                    if x not in [0, 1, 2, 3, 4, 5]:
-                        return
+                selected = [int(i) for i in msg.content.split(",")]
             except:
                 return
+
+            for i in selected:
+                if i not in [1, 2, 3, 4, 5, 6]:
+                    await ctx.reply("Invalid image number. Valid numbers are 1-6.")
+                    return
+
+            selected = [i - 1 for i in selected]
 
             for image in selected:
                 if args["upscale"]:
