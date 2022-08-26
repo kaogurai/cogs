@@ -76,7 +76,7 @@ class StableDiffusionCommand(MixinMeta):
 
         `--image <image_url>`: The image URL to use for the art. If no image is provided, the first image attached to the message will be used.
 
-
+        - `--upscale`: Upscale the images once requested. Keep in mind this means once you send the images you want, it will take a while to send the art. (normal is 512x512, upscale is 2048x2048)
         """
         m = await ctx.reply("Generating art... This may take a while.")
         async with ctx.typing():
