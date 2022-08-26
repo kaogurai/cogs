@@ -2,6 +2,7 @@ import asyncio
 import random
 import string
 import uuid
+from typing import Optional
 
 import aiohttp
 import discord
@@ -26,7 +27,7 @@ class BlenderBotSession:
             return m.author == self.author and m.channel == self.channel
 
         try:
-            message = await self.bot.wait_for("message", timeout=60, check=check)
+            message = await self.bot.wait_for("message", timeout=300, check=check)
         except asyncio.TimeoutError:
             await self.close_session()
             return
@@ -36,7 +37,7 @@ class BlenderBotSession:
             return
 
         await self.send_message(message.clean_content)
-        await self.recieve_message()
+        await self.recieve_message(message)
 
     async def start_session(self) -> None:
         session = await self.session.ws_connect("wss://blenderbot.ai/chat_conn")
@@ -56,12 +57,14 @@ class BlenderBotSession:
         await self.ws_session.receive_json()  # Just wait, this is the initial response
         await self.recieve_message()
 
-    async def recieve_message(self) -> None:
+    async def recieve_message(self, message: Optional[discord.Message] = None) -> None:
 
         async with self.ctx.typing():
             resp = await self.ws_session.receive_json()
 
         try:
+            await self.channel.send(resp["text"], reference=message)
+        except discord.NotFound:
             await self.channel.send(resp["text"])
         except discord.HTTPException:
             await self.close_session()

@@ -12,7 +12,7 @@ class BlenderBot(commands.Cog):
     Discord version of blenderbot.ai.
     """
 
-    __version__ = "1.0.2"
+    __version__ = "1.0.3"
 
     def __init__(self, bot: Red):
         self.bot = bot
@@ -41,18 +41,12 @@ class BlenderBot(commands.Cog):
             name="Warning",
             value=(
                 "This is a Meta (Facebook) research project, so be careful when sharing any data. "
-                "If you share any personal data, there is no way of deleting it.\n\n"
-                "**Do not share:**\n"
-                "- Names\n"
-                "- Emails\n"
-                "- Birthdays\n"
-                "- Addresses\n"
-                "- Phone numbers\n"
+                "THe option to share data is disable, but you should always be careful anyway."
             ),
         )
         embed.add_field(
             name="Closing Sesssion",
-            value="Type `close session` to close the session. Unused sessions will be closed after 1 minute.",
+            value="Type `close session` to close the session. Unused sessions will be closed after 5 minutes.",
         )
         await ctx.send(embed=embed)
 

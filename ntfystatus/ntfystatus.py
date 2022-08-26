@@ -12,7 +12,7 @@ class NTFYStatus(commands.Cog):
     Send push notifications using ntfy.sh when a bot goes offline.
     """
 
-    __version__ = "1.0.5"
+    __version__ = "1.0.6"
 
     def __init__(self, bot: Red):
         self.bot = bot
@@ -75,7 +75,7 @@ class NTFYStatus(commands.Cog):
                         bot["status"] = after.status
                         await self.send_notification(
                             bot["channel"],
-                            f"Discord Bot {after.name} ({after.id}) is now offline.",
+                            f"{after.name}#{after.discriminator} is now offline.",
                             True,
                         )
 
@@ -93,11 +93,11 @@ class NTFYStatus(commands.Cog):
                         bot["status"] = after.status
                         await self.send_notification(
                             bot["channel"],
-                            f"Discord Bot {after.name} ({after.id}) is back online.",
+                            f"{after.name}#{after.discriminator} is back online.",
                             False,
                         )
 
-    @commands.group()
+    @commands.group(aliases=["ntfy"])
     async def ntfystatus(self, ctx: Context):
         """
         Commands to configure the bots you get notifications for.
