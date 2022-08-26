@@ -12,7 +12,7 @@ class BlenderBot(commands.Cog):
     Discord version of blenderbot.ai.
     """
 
-    __version__ = "1.0.3"
+    __version__ = "1.0.4"
 
     def __init__(self, bot: Red):
         self.bot = bot
@@ -41,7 +41,7 @@ class BlenderBot(commands.Cog):
             name="Warning",
             value=(
                 "This is a Meta (Facebook) research project, so be careful when sharing any data. "
-                "THe option to share data is disable, but you should always be careful anyway."
+                "The option to share data is disabled, but you should always be careful anyway."
             ),
         )
         embed.add_field(

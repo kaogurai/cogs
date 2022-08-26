@@ -20,7 +20,7 @@ Please join the support server [here](https://discord.gg/p6ehU9qhg8) if you have
 | AIArt | v1.5.0 | Generate incredible art using AI. |
 | AntiPhishing | v1.2.12 | Fight back against phishing attacks. |
 | AutoAvatar | v1.0.0 | Automatically changes the bot avatar. |
-| BlenderBot | v1.0.3 | Discord version of blenderbot.ai. |
+| BlenderBot | v1.0.4 | Discord version of blenderbot.ai. |
 | ChatBot | v1.0.2 | Talk to a ChatBot! |
 | GuildManager | v1.0.1 | Automatically leaves guilds that are not approved by the bot owner. |
 | NTFYStatus | v1.0.6 | Send push notifications using ntfy.sh when a bot goes offline. |
