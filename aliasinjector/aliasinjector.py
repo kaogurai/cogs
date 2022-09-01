@@ -3,7 +3,7 @@ import asyncio
 import discord
 from redbot.core import Config, commands
 from redbot.core.bot import Red
-from redbot.core.commands import Context
+from redbot.core.commands import Context, BadArgument, Command
 from redbot.core.utils.chat_formatting import humanize_list, pagify
 from redbot.core.utils.menus import DEFAULT_CONTROLS, menu
 from redbot.core.utils.predicates import MessagePredicate
@@ -14,7 +14,7 @@ class AliasInjector(commands.Cog):
     Injects aliases into the discord.py command objects.
     """
 
-    __version__ = "1.0.0"
+    __version__ = "2.0.0"
 
     def __init__(self, bot: Red):
         self.bot = bot
@@ -31,33 +31,64 @@ class AliasInjector(commands.Cog):
 
     async def reload_aliases(self) -> None:
         aliases = await self.config.aliases()
-        for command in aliases.keys():
-            command_obj = self.bot.get_command(command)
-            if not command_obj:
-                continue
-            new = aliases[command]
-            for alias in new:
-                if alias not in command_obj.aliases:
-                    self.bot.remove_command(command_obj.qualified_name)
-                    command_obj.aliases.append(alias)
-                    self.bot.add_command(command_obj)
+
+        for commands, alias in aliases.items():
+            for command in commands:
+                command_obj = self.bot.get_command(command)
+                if command_obj is None:
+                    continue
+                if not self.bot.get_command(alias):
+                    self.inject_alias(alias, command_obj)
+
 
     async def remove_aliases(self) -> None:
         aliases = await self.config.aliases()
-        for command in aliases.keys():
-            a = aliases[command]
-            command_obj = self.bot.get_command(command)
-            if command_obj:
-                try:
-                    self.bot.remove_command(command_obj.qualified_name)
-                except ValueError:
+
+        for commands, alias in aliases.items():
+            for command in commands:
+                command_obj = self.bot.get_command(command)
+                if command_obj is None:
                     continue
-                for alias in a:
-                    command_obj.aliases.remove(alias)
-                self.bot.add_command(command_obj)
+                self.remove_alias(alias, command_obj)
 
     def cog_unload(self):
         self.bot.loop.create_task(self.remove_aliases())
+
+    def inject_alias(self, alias: str, command_obj: Command) -> None:
+        if " " not in alias:
+            command_obj.aliases.append(alias)
+            self.bot.all_commands[alias] = command_obj
+        else:
+            command_tree = alias.split(" ")
+            new_alias = command_tree.pop()
+
+            c = None
+            for cmd in command_tree:
+                if cmd == command_tree[0]:
+                    c = self.bot.all_commands[cmd]
+                else:
+                    c = c.all_commands[cmd]
+
+            c.all_commands[new_alias] = command_obj
+            command_obj.aliases.append(new_alias)
+
+    def remove_alias(self, alias: str, command_obj: Command) -> None:
+        if " " not in alias:
+            command_obj.aliases.remove(alias)
+            del self.bot.all_commands[alias]
+        else:
+            command_tree = alias.split(" ")
+            new_alias = command_tree.pop()
+
+            c = None
+            for cmd in command_tree:
+                if cmd == command_tree[0]:
+                    c = self.bot.all_commands[cmd]
+                else:
+                    c = c.all_commands[cmd]
+
+            del c.all_commands[new_alias]
+            command_obj.aliases.remove(new_alias)
 
     @commands.Cog.listener()
     async def on_cog_add(self, cog: commands.Cog):
@@ -72,57 +103,74 @@ class AliasInjector(commands.Cog):
         """
         pass
 
-    @aliasinjector.command()
-    async def add(self, ctx: Context, alias: str, *, command_name: str):
+    @aliasinjector.command(usage="<command> | <alias>")
+    async def add(self, ctx: Context, *, args: str):
         """
         Adds an alias to a command.
+
+        If you want to be able to run `[p]resetqueue` by trigging the `[p]queue clear` command, you'd run `[p]aliasinjector add queue clear | resetqueue`, but if you wanted to be able to run `[p]queue reset`, you'd run  `[p]aliasinjector add queue clear | queue reset`.
         """
-        if len(alias) > 60:
-            await ctx.send("Alias must be 60 characters or less.")
+        split = args.split("|")
+        if len(split) != 2:
+           raise BadArgument()
+
+        command = split[0].strip()
+        alias = split[1].strip()
+
+        command_obj = self.bot.get_command(command)
+        if not command_obj:
+            await ctx.send(f"{command} is not a valid command.")
             return
 
-        command = self.bot.get_command(command_name)
-        if not command:
-            await ctx.send("That command doesn't exist.")
+        if self.bot.get_command(alias):
+            await ctx.send(f"{alias} is already an alias for {command}.")
             return
 
-        if alias in command.aliases:
-            await ctx.send("That alias already exists.")
+        if " " in alias and len(alias.split(" ")) > len(command.split(" ")):
+            await ctx.send("You can only add aliases that are the same length as the command they are aliasing.")
             return
 
-        a = await self.config.aliases()
-        aliases = a.get(command_name, [])
-        aliases.append(alias)
-        a[command_name] = aliases
-        await self.config.aliases.set(a)
-        await self.reload_aliases()
-        await ctx.send(f"Added alias `{alias}` to `{command_name}`.")
+        self.inject_alias(alias, command_obj)
 
-    @aliasinjector.command()
-    async def remove(self, ctx: Context, alias: str, *, command_name: str):
+        aliases = await self.config.aliases()
+        if command not in aliases.keys():
+            aliases[command] = [alias]
+        else:
+            aliases[command].append(alias)
+        await self.config.aliases.set(aliases)
+        await ctx.send(f"Added `{alias}` as an alias for `{command}`")
+
+
+    @aliasinjector.command(usage="<command> | <alias>")
+    async def remove(self, ctx: Context, *, args: str):
         """
         Removes an alias from a command.
+
+        If you want to remove `[p]resetqueue` which triggers the  `[p]queue clear` command, you'd run `[p]aliasinjector remove queue clear | resetqueue`, but if you wanted to be able to remove `[p]queue reset`, you'd run  `[p]aliasinjector add queue clear | queue reset`.
         """
-        command = self.bot.get_command(command_name)
-        if not command:
-            await ctx.send("That command doesn't exist.")
+        split = args.split("|")
+        if len(split) != 2:
+           raise BadArgument()
+
+        command = split[0].strip()
+        alias = split[1].strip()
+
+        command_obj = self.bot.get_command(command)
+        if not command_obj:
+            await ctx.send(f"{command} is not a valid command.")
             return
 
-        a = await self.config.aliases()
-        aliases = a.get(command_name, [])
-        if alias not in aliases:
-            await ctx.send("That alias doesn't exist.")
+        if not self.bot.get_command(alias):
+            await ctx.send(f"{alias} is not an alias for {command}.")
             return
 
-        if command:
-            self.bot.remove_command(command_name)
-            command.aliases.remove(alias)
-            self.bot.add_command(command)
+        self.remove_alias(alias, command_obj)
 
-        aliases.remove(alias)
-        a[command_name] = aliases
-        await self.config.aliases.set(a)
-        await ctx.send(f"Removed alias `{alias}` from `{command_name}`.")
+        aliases = await self.config.aliases()
+        aliases[command].remove(alias)
+        await self.config.aliases.set(aliases)
+        await ctx.send(f"Remove `{alias}` as an alias for `{command}`")
+        
 
     @aliasinjector.command()
     async def clear(self, ctx: Context):
@@ -147,15 +195,8 @@ class AliasInjector(commands.Cog):
             return
 
         if predictate.result:
-            for command in a.keys():
-                monkeypatched_ones = a[command]
-                command_obj = self.bot.get_command(command)
-                if command_obj:
-                    self.bot.remove_command(command_obj.qualified_name)
-                    for alias in monkeypatched_ones:
-                        command_obj.aliases.remove(alias)
-                    self.bot.add_command(command_obj)
             await self.config.aliases.clear()
+            await self.remove_aliases()
             await ctx.send("Cleared all aliases.")
         else:
             await ctx.send("Ok, I won't clear any aliases.")
