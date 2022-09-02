@@ -11,16 +11,16 @@ from redbot.core.utils.predicates import MessagePredicate
 
 class AliasInjector(commands.Cog):
     """
-    Injects aliases into the discord.py command objects.
+    Uses sketchy methods to inject real aliases.
     """
 
-    __version__ = "2.0.0"
+    __version__ = "2.0.1"
 
     def __init__(self, bot: Red):
         self.bot = bot
         self.config = Config.get_conf(self, identifier=11133329439)
         self.config.register_global(aliases={})
-        self.bot.loop.create_task(self.reload_aliases())
+        self.bot.loop.create_task(self.load_aliases())
 
     async def red_delete_data_for_user(self, **kwargs):
         return
@@ -29,26 +29,23 @@ class AliasInjector(commands.Cog):
         pre_processed = super().format_help_for_context(ctx)
         return f"{pre_processed}\n\nCog Version: {self.__version__}"
 
-    async def reload_aliases(self) -> None:
+    async def load_aliases(self) -> None:
         aliases = await self.config.aliases()
 
-        for commands, alias in aliases.items():
-            for command in commands:
+        for command, aliases in aliases.items():
+            for alias in aliases:
                 command_obj = self.bot.get_command(command)
                 if command_obj is None:
                     continue
                 if not self.bot.get_command(alias):
                     self.inject_alias(alias, command_obj)
 
-
     async def remove_aliases(self) -> None:
         aliases = await self.config.aliases()
 
-        for commands, alias in aliases.items():
-            for command in commands:
+        for command, aliases in aliases.items():
+            for alias in aliases:
                 command_obj = self.bot.get_command(command)
-                if command_obj is None:
-                    continue
                 self.remove_alias(alias, command_obj)
 
     def cog_unload(self):
@@ -74,26 +71,29 @@ class AliasInjector(commands.Cog):
 
     def remove_alias(self, alias: str, command_obj: Command) -> None:
         if " " not in alias:
-            command_obj.aliases.remove(alias)
+            if command_obj:
+                command_obj.aliases.remove(alias)
             del self.bot.all_commands[alias]
         else:
-            command_tree = alias.split(" ")
-            new_alias = command_tree.pop()
+            if command_obj:
+                command_tree = alias.split(" ")
+                new_alias = command_tree.pop()
 
-            c = None
-            for cmd in command_tree:
-                if cmd == command_tree[0]:
-                    c = self.bot.all_commands[cmd]
-                else:
-                    c = c.all_commands[cmd]
+                c = None
+                for cmd in command_tree:
+                    if cmd == command_tree[0]:
+                        c = self.bot.all_commands[cmd]
+                    else:
+                        c = c.all_commands[cmd]
 
-            del c.all_commands[new_alias]
-            command_obj.aliases.remove(new_alias)
+                del c.all_commands[new_alias]
+                command_obj.aliases.remove(new_alias)
 
     @commands.Cog.listener()
     async def on_cog_add(self, cog: commands.Cog):
         if cog.__class__.__name__ != self.__class__.__name__:
-            await self.reload_aliases()
+            await self.remove_aliases()
+            await self.load_aliases()
 
     @commands.group()
     @commands.is_owner()
