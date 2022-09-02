@@ -11,7 +11,7 @@ from redbot.core.utils.predicates import MessagePredicate
 
 class AliasInjector(commands.Cog):
     """
-    Uses sketchy methods to inject real aliases.
+    Injects aliases into the command objects.
     """
 
     __version__ = "2.0.2"
