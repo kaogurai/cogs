@@ -14,7 +14,7 @@ class AliasInjector(commands.Cog):
     Uses sketchy methods to inject real aliases.
     """
 
-    __version__ = "2.0.1"
+    __version__ = "2.0.2"
 
     def __init__(self, bot: Red):
         self.bot = bot
@@ -169,7 +169,7 @@ class AliasInjector(commands.Cog):
         aliases = await self.config.aliases()
         aliases[command].remove(alias)
         await self.config.aliases.set(aliases)
-        await ctx.send(f"Remove `{alias}` as an alias for `{command}`")
+        await ctx.send(f"Removed `{alias}` as an alias for `{command}`")
         
 
     @aliasinjector.command()
