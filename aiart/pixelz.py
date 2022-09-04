@@ -243,7 +243,7 @@ class PixelzCommand(MixinMeta):
                 start_adding_reactions(m, ReactionPredicate.YES_OR_NO_EMOJIS)
                 pred = ReactionPredicate.yes_or_no(m, ctx.author)
                 try:
-                    await ctx.bot.wait_for("reaction_add", check=pred, timeout=60)
+                    await ctx.bot.wait_for("reaction_add", check=pred, timeout=300)
                 except asyncio.TimeoutError:
                     with contextlib.suppress(discord.NotFound):
                         await m.delete()
