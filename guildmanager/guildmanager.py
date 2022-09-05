@@ -13,7 +13,7 @@ class GuildManager(commands.Cog):
     Allows you to whitelist servers that you want to use the bot in.
     """
 
-    __version__ = "1.0.1"
+    __version__ = "1.0.2"
 
     def __init__(self, bot: Red):
         self.bot = bot
@@ -110,7 +110,7 @@ class GuildManager(commands.Cog):
             await ctx.send("The guild manager is now disabled.")
         else:
             await self.config.toggle.set(True)
-            await ctx.send("The guild manager is now enabled.")
+            await ctx.send(f"The guild manager is now enabled. I will leave any servers that aren't whitelisted on cog load, cog unload, and the invokation of the `{ctx.clean_prefix}guildmanager whitelist` command. Please either disable the guild manager or whitelist the servers you want to use the bot in now.")
 
     @guildmanager.command(name="enforce")
     async def guildmanager_enforce(self, ctx: Context):
@@ -195,12 +195,14 @@ class GuildManager(commands.Cog):
 
         pages = [p for p in pagify(m, page_length=1024)]
 
-        for page in pages:
+        for i, page in enumerate(pages):
             embed = discord.Embed(
                 title="Whitelisted Guilds",
                 description=page,
                 color=await self.bot.get_embed_colour(ctx.channel),
             )
+            if len(pages) > 1:
+                embed.set_footer(text=f"Page {i + 1}/{len(pages)}")
             embeds.append(embed)
 
         if len(embeds) > 1:
