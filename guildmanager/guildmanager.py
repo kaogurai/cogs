@@ -13,7 +13,7 @@ class GuildManager(commands.Cog):
     Allows you to whitelist servers that you want to use the bot in.
     """
 
-    __version__ = "1.0.2"
+    __version__ = "1.0.3"
 
     def __init__(self, bot: Red):
         self.bot = bot
@@ -44,7 +44,7 @@ class GuildManager(commands.Cog):
         for guild in self.bot.guilds:
             if not guild:
                 continue  # In case the guild hasn't loaded yet, idk
-            if guild.id in await self.config.whitelist():
+            if guild.id in await self.config.whitelist() or guild.id in await self.config.special_whitelist():
                 continue
 
             if (
@@ -70,7 +70,7 @@ class GuildManager(commands.Cog):
     async def on_guild_join(self, guild: discord.Guild):
         if not guild:
             return
-        if guild.id in await self.config.whitelist():
+        if guild.id in await self.config.whitelist() or guild.id in await self.config.special_whitelist():
             return
 
         if (
