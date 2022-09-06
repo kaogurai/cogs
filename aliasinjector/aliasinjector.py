@@ -3,7 +3,7 @@ import asyncio
 import discord
 from redbot.core import Config, commands
 from redbot.core.bot import Red
-from redbot.core.commands import Context, BadArgument, Command
+from redbot.core.commands import BadArgument, Command, Context
 from redbot.core.utils.chat_formatting import humanize_list, pagify
 from redbot.core.utils.menus import DEFAULT_CONTROLS, menu
 from redbot.core.utils.predicates import MessagePredicate
@@ -112,7 +112,7 @@ class AliasInjector(commands.Cog):
         """
         split = args.split("|")
         if len(split) != 2:
-           raise BadArgument()
+            raise BadArgument()
 
         command = split[0].strip()
         alias = split[1].strip()
@@ -127,7 +127,9 @@ class AliasInjector(commands.Cog):
             return
 
         if " " in alias and len(alias.split(" ")) > len(command.split(" ")):
-            await ctx.send("You can only add aliases that are the same length as the command they are aliasing.")
+            await ctx.send(
+                "You can only add aliases that are the same length as the command they are aliasing."
+            )
             return
 
         self.inject_alias(alias, command_obj)
@@ -140,7 +142,6 @@ class AliasInjector(commands.Cog):
         await self.config.aliases.set(aliases)
         await ctx.send(f"Added `{alias}` as an alias for `{command}`")
 
-
     @aliasinjector.command(usage="<command> | <alias>")
     async def remove(self, ctx: Context, *, args: str):
         """
@@ -150,7 +151,7 @@ class AliasInjector(commands.Cog):
         """
         split = args.split("|")
         if len(split) != 2:
-           raise BadArgument()
+            raise BadArgument()
 
         command = split[0].strip()
         alias = split[1].strip()
@@ -170,7 +171,6 @@ class AliasInjector(commands.Cog):
         aliases[command].remove(alias)
         await self.config.aliases.set(aliases)
         await ctx.send(f"Removed `{alias}` as an alias for `{command}`")
-        
 
     @aliasinjector.command()
     async def clear(self, ctx: Context):

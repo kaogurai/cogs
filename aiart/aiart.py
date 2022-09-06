@@ -6,6 +6,7 @@ from redbot.core.bot import Red
 from redbot.core.commands import Context
 
 from .abc import CompositeMetaClass
+from .clip import CLIPCommand
 from .craiyon import CraiyonCommand
 from .latentdiffusion import LatentDiffusionCommand
 from .pixelz import PixelzCommand
@@ -14,6 +15,7 @@ from .wombo import WomboCommand
 
 
 class AIArt(
+    CLIPCommand,
     CraiyonCommand,
     PixelzCommand,
     StableDiffusionCommand,
@@ -26,7 +28,7 @@ class AIArt(
     Generate incredible art using AI.
     """
 
-    __version__ = "1.5.4"
+    __version__ = "1.6.0"
 
     def __init__(self, bot: Red):
         self.bot = bot

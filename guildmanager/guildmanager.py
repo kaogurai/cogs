@@ -44,7 +44,10 @@ class GuildManager(commands.Cog):
         for guild in self.bot.guilds:
             if not guild:
                 continue  # In case the guild hasn't loaded yet, idk
-            if guild.id in await self.config.whitelist() or guild.id in await self.config.special_whitelist():
+            if (
+                guild.id in await self.config.whitelist()
+                or guild.id in await self.config.special_whitelist()
+            ):
                 continue
 
             if (
@@ -70,7 +73,10 @@ class GuildManager(commands.Cog):
     async def on_guild_join(self, guild: discord.Guild):
         if not guild:
             return
-        if guild.id in await self.config.whitelist() or guild.id in await self.config.special_whitelist():
+        if (
+            guild.id in await self.config.whitelist()
+            or guild.id in await self.config.special_whitelist()
+        ):
             return
 
         if (
@@ -110,7 +116,9 @@ class GuildManager(commands.Cog):
             await ctx.send("The guild manager is now disabled.")
         else:
             await self.config.toggle.set(True)
-            await ctx.send(f"The guild manager is now enabled. I will leave any servers that aren't whitelisted on cog load, cog unload, and the invokation of the `{ctx.clean_prefix}guildmanager whitelist` command. Please either disable the guild manager or whitelist the servers you want to use the bot in now.")
+            await ctx.send(
+                f"The guild manager is now enabled. I will leave any servers that aren't whitelisted on cog load, cog unload, and the invokation of the `{ctx.clean_prefix}guildmanager whitelist` command. Please either disable the guild manager or whitelist the servers you want to use the bot in now."
+            )
 
     @guildmanager.command(name="enforce")
     async def guildmanager_enforce(self, ctx: Context):
