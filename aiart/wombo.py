@@ -41,6 +41,10 @@ WOMBO_STYLES = {
     "Arcane": 34,
     "Throwback": 35,
     "Malevolent": 40,
+    "Comic": 45,
+    "Line-Art": 47,
+    "Gouache": 48,
+    "Polygon": 49,
 }
 
 # A lot of the code for parsing the arguments is inspired by flare's giveaways cog
