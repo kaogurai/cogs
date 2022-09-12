@@ -8,44 +8,13 @@ import discord
 from PIL import Image
 from redbot.core import commands
 from redbot.core.commands import BadArgument, Context, Converter
+from redbot.core.utils.chat_formatting import humanize_list
 from redbot.core.utils.menus import start_adding_reactions
 from redbot.core.utils.predicates import ReactionPredicate
 from thefuzz import process
 
 from .abc import MixinMeta
 from .utils import NoExitParser
-
-WOMBO_STYLES = {
-    "Synthwave": 1,
-    "Ukiyoe": 2,
-    "No Style": 3,
-    "Steampunk": 4,
-    "Fantasy Art": 5,
-    "Vibrant": 6,
-    "HD": 7,
-    "Psychic": 9,
-    "Dark Fantasy": 10,
-    "Mystical": 11,
-    "Baroque": 13,
-    "Etching": 14,
-    "S.Dali": 15,
-    "Wuhtercuhler": 16,
-    "Provenance": 17,
-    "Rose Gold": 18,
-    "Blacklight": 20,
-    "Psychedelic": 21,
-    "Ghibli": 22,
-    "Radioactive": 27,
-    "Melancholic": 28,
-    "Realistic": 32,
-    "Arcane": 34,
-    "Throwback": 35,
-    "Malevolent": 40,
-    "Comic": 45,
-    "Line-Art": 47,
-    "Gouache": 48,
-    "Polygon": 49,
-}
 
 # A lot of the code for parsing the arguments is inspired by flare's giveaways cog
 
@@ -56,6 +25,7 @@ class WomboConverter(Converter):
 
         parser = NoExitParser(add_help=False)
         parser.add_argument("prompt", type=str, nargs="*")
+        parser.add_argument("--styles", action="store_true")
         parser.add_argument("--style", type=str, default=["Realistic"], nargs="*")
         parser.add_argument("--image", type=str, default=None, nargs="?")
 
@@ -64,18 +34,27 @@ class WomboConverter(Converter):
         except Exception:
             raise BadArgument()
 
-        if not values["prompt"]:
+        if not values["prompt"] and not values["styles"]:
             raise BadArgument()
 
         values["prompt"] = " ".join(values["prompt"])
 
-        if len(values["prompt"]) > 100:
+        if len(values["prompt"]) > 100 and not values["styles"]:
             raise BadArgument("The prompt needs to be 100 characters or less.")
 
-        values["style"] = WOMBO_STYLES[
-            process.extract(
-                " ".join(values["style"]), list(WOMBO_STYLES.keys()), limit=1
-            )[0][0]
+        styles = await ctx.cog._get_wombo_styles()
+
+        if values["styles"]:
+            embed = discord.Embed(
+                title="Available styles",
+                description=humanize_list(list(styles.keys())),
+                color=await ctx.embed_color(),
+            )
+            await ctx.send(embed=embed)
+            return
+
+        values["style"] = styles[
+            process.extract(" ".join(values["style"]), list(styles.keys()), limit=1)[0][0]
         ]
 
         if not values["image"] and ctx.message.attachments:
@@ -88,6 +67,15 @@ class WomboCommand(MixinMeta):
     """
     Implements the Internal WOMBO API used in their iOS app.
     """
+
+    async def _get_wombo_styles(self) -> dict:
+        async with self.session.get("https://paint.api.wombo.ai/api/styles") as req:
+            if req.status == 200:
+                return {
+                    style["name"]: style["id"]
+                    for style in await req.json()
+                    if not style["is_premium"]
+                }
 
     async def _get_wombo_bearer_token(self) -> Optional[str]:
         params = {"key": "AIzaSyDCvp5MTJLUdtBYEKYWXJrlLzu1zuKM6Xw"}
@@ -195,9 +183,12 @@ class WomboCommand(MixinMeta):
         Generate art using Wombo.
 
         You can use the following arguments (all are optional):
-        `--style`: The style of art to generate. Possible values are: `Synthwave`, `Ukiyoe`, `No Style`, `Steampunk`, `Fantasy Art`, `Vibrant`, `HD`, `Psychic`, `Dark Fantasy`, `Mystical`, `Baroque`, `Etching`, `S.Dali`, `Wuhtercuhler`, `Provenance`, `Rose Gold`, `Blacklight`, `Psychedelic`, `Ghibli`, `Radioactive`, `Melancholic`, `Realistic`, `Arcane`, `Throwback`, `Malevolent`, `Comic`, `Line-Art`, `Gouache`, and `Polygon`. Default is `Realistic`.
+        `--style`: The style of art to generate. Defaults to `Realistic`. Run `[p]wombo --styles` to see a list of styles.
         `--image`: The image to use as input. If not provided, the first image attached to the message will be used.
         """
+        if not arguments:
+            return  # This should mean that the user ran `[p]wombo --styles`
+
         m = await ctx.reply("Generating art... This may take a while.")
         async with ctx.typing():
             token = await self._get_wombo_bearer_token()
