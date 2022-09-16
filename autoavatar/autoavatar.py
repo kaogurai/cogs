@@ -23,7 +23,7 @@ class AutoAvatar(commands.Cog):
     Sets random bot avatars.
     """
 
-    __version__ = "1.0.0"
+    __version__ = "1.0.1"
 
     def __init__(self, bot: Red):
         self.bot = bot
@@ -115,26 +115,15 @@ class AutoAvatar(commands.Cog):
 
     async def change_avatar(self, ctx: Optional[Context] = None):
         is_automated = not ctx
-        all_avatars = await self.config.avatars()
-        we_heart_it = await self.config.weheartit()
-
-        if we_heart_it:
-            new_avatar = await self.get_we_heart_it_image()
-            if new_avatar == 404:
-                if not is_automated:
-                    await ctx.send("No images found for your queries.")
-                return
-            if not new_avatar:
-                if not is_automated:
-                    await ctx.send("There seems to be issues with weheartit currently.")
-                return
-        else:
-            if not all_avatars:
-                if not is_automated:
-                    await ctx.send("You haven't added any avatars yet.")
-                return
-
-            new_avatar = random.choice(all_avatars)
+        new_avatar = await self.get_we_heart_it_image()
+        if new_avatar == 404:
+            if not is_automated:
+                await ctx.send("No images found for your queries.")
+            return
+        if not new_avatar:
+            if not is_automated:
+                await ctx.send("There seems to be issues with weheartit currently.")
+            return
 
         for x in range(5):
             try:
@@ -142,27 +131,16 @@ class AutoAvatar(commands.Cog):
                     if request.status == 200:
                         avatar = await request.read()
                         break
-                    else:
-                        if not we_heart_it:
-                            all_avatars.remove(new_avatar)
-                            await self.config.avatars.set(all_avatars)
-                        return
             except (
                 aiohttp.ServerDisconnectedError,
                 aiohttp.ServerTimeoutError,
                 asyncio.TimeoutError,
             ):
                 if x == 4:
-                    if we_heart_it:
-                        if not is_automated:
-                            await ctx.send(
-                                "There seems to be an issue with weheartit currently."
-                            )
-                    else:
-                        if not is_automated:
-                            await ctx.send(
-                                "There seems to be an issue trying to download an avatar."
-                            )
+                    if not is_automated:
+                        await ctx.send(
+                            "There seems to be an issue with weheartit currently."
+                        )
                     return
                 continue
 
@@ -174,10 +152,6 @@ class AutoAvatar(commands.Cog):
         try:
             await self.bot.user.edit(avatar=avatar)
         except discord.HTTPException:
-            return
-        except discord.InvalidArgument:
-            all_avatars.remove(new_avatar)
-            await self.config.avatars.set(all_avatars)
             return
 
         if not is_automated:
