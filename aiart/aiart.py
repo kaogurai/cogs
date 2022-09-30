@@ -75,8 +75,8 @@ class AIArt(
         """
         Draw an image using AI.
 
-        Currently this proxies towards the Stable Diffusion command.
+        Currently this proxies towards the Dall-E 2 command.
         """
         msg = copy(ctx.message)
-        msg.content = f"{ctx.prefix}stablediffusion {args}"
+        msg.content = f"{ctx.prefix}dalle {args}"
         self.bot.dispatch("message", msg)
