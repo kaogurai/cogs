@@ -70,6 +70,7 @@ class CLIPCommand(MixinMeta):
                 "https://replicate.com/api/models/methexis-inc/img2prompt/versions/50adaf2d3ad20a6f911a8a9e3ccf777b263b8596fbd2c8fc26e8888f8a0edbb5/predictions",
                 json=json,
             ) as req:
+                print(await req.text())
                 if req.status == 201:
                     json = await req.json()
                     uuid = json["uuid"]
@@ -88,6 +89,7 @@ class CLIPCommand(MixinMeta):
                 async with self.session.get(
                     f"https://replicate.com/api/models/methexis-inc/img2prompt/versions/50adaf2d3ad20a6f911a8a9e3ccf777b263b8596fbd2c8fc26e8888f8a0edbb5/predictions/{uuid}"
                 ) as req:
+                    print(await req.text())
                     if req.status == 200:
                         json = await req.json()
                         if json["prediction"]["status"] == "failed":
@@ -98,7 +100,7 @@ class CLIPCommand(MixinMeta):
                             )
                             return
 
-                        if json["prediction"]["status"] == "success":
+                        if json["prediction"]["status"] == "succeeded":
                             break
                     else:
                         with contextlib.suppress(discord.NotFound):
