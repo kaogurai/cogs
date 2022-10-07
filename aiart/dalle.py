@@ -43,7 +43,7 @@ class DalleCommand(MixinMeta):
                     with contextlib.suppress(discord.NotFound):
                         await m.delete()
                     if "filter" in await req.text():
-                        await ctx.send(
+                        await ctx.reply(
                             "Your prompt triggered the NSFW filters. Please try again with a different prompt."
                         )
                         return
