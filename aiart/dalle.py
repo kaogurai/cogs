@@ -33,7 +33,7 @@ class DalleCommand(MixinMeta):
                 "__Secure-next-auth.session-token": "eca9ae53-49c6-47ba-a5c9-51b599ca2aa8"
             }
             async with self.session.post(
-                "https://playgroundai.com/api/models/stability",
+                "https://playgroundai.com/api/models",
                 json=json,
                 cookies=cookies,
             ) as req:
@@ -45,7 +45,7 @@ class DalleCommand(MixinMeta):
                     await ctx.reply("Failed to generate art. Please try again later.")
                     return
 
-            async with self.session.get(json["image"]["url"]) as req:
+            async with self.session.get(json["images"][0]["url"]) as req:
                 if req.status == 200:
                     image = BytesIO(await req.read())
                 else:
