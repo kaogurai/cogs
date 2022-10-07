@@ -42,6 +42,11 @@ class DalleCommand(MixinMeta):
                 else:
                     with contextlib.suppress(discord.NotFound):
                         await m.delete()
+                    if "filter" in await req.text():
+                        await ctx.send(
+                            "Your prompt triggered the NSFW filters. Please try again with a different prompt."
+                        )
+                        return
                     await ctx.reply("Failed to generate art. Please try again later.")
                     return
 
