@@ -17,7 +17,7 @@ class SmartLyrics(commands.Cog):
     Gets lyrics for your current song.
     """
 
-    __version__ = "1.2.4"
+    __version__ = "1.2.5"
 
     def __init__(self, bot: Red):
         self.bot = bot
@@ -140,6 +140,9 @@ class SmartLyrics(commands.Cog):
                         player = None
                     if player and player.current:
                         title = player.current.title
+                        if "-" not in title:
+                            title = player.current.author + " " + title
+                        
                         results = await self.get_lyrics(title)
                         if results:
                             await self.create_menu(ctx, results, "Voice Channel")
