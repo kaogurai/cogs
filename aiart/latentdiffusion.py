@@ -3,13 +3,10 @@ import base64
 import contextlib
 import random
 import string
-from io import BytesIO
 
 import discord
 from redbot.core import commands
 from redbot.core.commands import Context
-from redbot.core.utils.menus import start_adding_reactions
-from redbot.core.utils.predicates import ReactionPredicate
 
 from .abc import MixinMeta
 
@@ -103,49 +100,7 @@ class LatentDiffusionCommand(MixinMeta):
                 await ctx.reply("Failed to generate art. Please try again later.")
                 return
 
-            image_bytes = base64.b64decode(image_base64.split(",")[1])
+            with contextlib.suppress(discord.NotFound):
+                await m.delete()
 
-            image = BytesIO(image_bytes)
-            image.seek(0)
-
-            embed = discord.Embed(
-                title="Here's your art!",
-                color=await ctx.embed_color(),
-            )
-            embed.set_image(url="attachment://latentdiffusion.png")
-            file = discord.File(image, "latentdiffusion.png")
-
-            if ctx.guild and not ctx.channel.is_nsfw():
-
-                is_nsfw = await self.check_nsfw(image_bytes)
-                if is_nsfw:
-                    with contextlib.suppress(discord.NotFound):
-                        await m.delete()
-
-                    m = await ctx.reply(
-                        "This image may contain NSFW content. Would you like me to DM you the image?"
-                    )
-                    start_adding_reactions(m, ReactionPredicate.YES_OR_NO_EMOJIS)
-                    pred = ReactionPredicate.yes_or_no(m, ctx.author)
-                    try:
-                        await ctx.bot.wait_for("reaction_add", check=pred, timeout=300)
-                    except asyncio.TimeoutError:
-                        with contextlib.suppress(discord.NotFound):
-                            await m.delete()
-                        return
-                    if pred.result is True:
-                        with contextlib.suppress(discord.NotFound):
-                            await m.edit(content="Sending image...")
-                        try:
-                            await ctx.author.send(embed=embed, file=file)
-                        except discord.Forbidden:
-                            await ctx.reply(
-                                "Failed to send image. Please make sure you have DMs enabled."
-                            )
-                        return
-                    else:
-                        with contextlib.suppress(discord.NotFound):
-                            await m.delete()
-                        return
-
-            await ctx.reply(embed=embed, file=file)
+            await self.send_images(ctx, [base64.b64decode(image_base64.split(",")[1])]) 

@@ -9,8 +9,6 @@ from PIL import Image
 from redbot.core import commands
 from redbot.core.commands import BadArgument, Context, Converter
 from redbot.core.utils.chat_formatting import humanize_list
-from redbot.core.utils.menus import start_adding_reactions
-from redbot.core.utils.predicates import ReactionPredicate
 from thefuzz import process
 
 from .abc import MixinMeta
@@ -226,55 +224,13 @@ class WomboCommand(MixinMeta):
                 )
                 return
 
+            with contextlib.suppress(discord.NotFound):
+                await m.delete()
+
             async with self.session.get(link) as req:
-                with contextlib.suppress(discord.NotFound):
-                    await m.delete()
                 if req.status != 200:
                     await ctx.reply(f"Something went wrong when downloading the image.")
                     return
                 data = await req.read()
 
-            vfile = BytesIO(data)
-            vfile.seek(0)
-            file = discord.File(vfile, filename="result.jpg")
-
-            embed = discord.Embed(title="Here's your art!", color=await ctx.embed_color())
-            embed.set_image(url="attachment://result.jpg")
-
-            if ctx.guild and not ctx.channel.is_nsfw():
-
-                is_nsfw = await self.check_nsfw(data)
-                if is_nsfw:
-                    with contextlib.suppress(discord.NotFound):
-                        await m.delete()
-
-                    m = await ctx.reply(
-                        f"This image may contain NSFW content. Would you like me to DM you the image?"
-                    )
-                    start_adding_reactions(m, ReactionPredicate.YES_OR_NO_EMOJIS)
-                    pred = ReactionPredicate.yes_or_no(m, ctx.author)
-                    try:
-                        await ctx.bot.wait_for("reaction_add", check=pred, timeout=300)
-                    except asyncio.TimeoutError:
-                        with contextlib.suppress(discord.NotFound):
-                            await m.delete()
-                        return
-                    if pred.result is True:
-                        with contextlib.suppress(discord.NotFound):
-                            await m.edit(content=f"Sending image...")
-                        try:
-                            await ctx.author.send(embed=embed, file=file)
-                        except discord.Forbidden:
-                            await ctx.reply(
-                                "Failed to send image. Please make sure you have DMs enabled."
-                            )
-                        return
-                    else:
-                        with contextlib.suppress(discord.NotFound):
-                            await m.delete()
-                        return
-
-            with contextlib.suppress(discord.NotFound):
-                await m.delete()
-
-            await ctx.reply(embed=embed, file=file)
+        await self.send_images(ctx, [data])
