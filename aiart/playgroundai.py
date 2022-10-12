@@ -99,11 +99,15 @@ class PlaygroundAI(MixinMeta):
             try:
                 images = await self._generate_playground_images("dalle-2", {"prompt": text})
             except PlaygroundNSFWError:
+                with contextlib.suppress(discord.NotFound):
+                    await m.delete()
                 await ctx.reply(
                     "Your prompt triggered the NSFW filters. Please try again with a different prompt."
                 )
                 return
             except PlaygroundError:
+                with contextlib.suppress(discord.NotFound):
+                    await m.delete()
                 await ctx.reply("Failed to generate art. Please try again later.")
                 return
 
@@ -144,11 +148,15 @@ class PlaygroundAI(MixinMeta):
                     "stable-diffusion", params
                 )
             except PlaygroundNSFWError:
+                with contextlib.suppress(discord.NotFound):
+                    await m.delete()
                 await ctx.reply(
                     "Your prompt triggered the NSFW filters. Please try again with a different prompt."
                 )
                 return
             except PlaygroundError:
+                with contextlib.suppress(discord.NotFound):
+                    await m.delete()
                 await ctx.reply("Failed to generate art. Please try again later.")
                 return
 
