@@ -3,6 +3,7 @@ import contextlib
 from io import BytesIO
 
 import discord
+from PIL import Image
 from redbot.core import commands
 from redbot.core.commands import Context
 from redbot.core.utils.menus import start_adding_reactions
@@ -28,6 +29,7 @@ class DalleCommand(MixinMeta):
                 "prompt": text,
                 "modelType": "dalle-2",
                 "isPrivate": True,
+                "num_images": 4,
             }
             cookies = {
                 "__Secure-next-auth.session-token": "eca9ae53-49c6-47ba-a5c9-51b599ca2aa8"
@@ -50,26 +52,45 @@ class DalleCommand(MixinMeta):
                     await ctx.reply("Failed to generate art. Please try again later.")
                     return
 
-            async with self.session.get(json["images"][0]["url"]) as req:
-                if req.status == 200:
-                    image = BytesIO(await req.read())
-                else:
-                    with contextlib.suppress(discord.NotFound):
-                        await m.delete()
-                    await ctx.reply("Failed to download. Please try again later.")
-                    return
+            async def get_image(url: str):
+                async with self.session.get(url) as req:
+                    if req.status == 200:
+                        return await req.read()
+
+            images = [
+                Image.open(BytesIO(await get_image(image["url"])))
+                for image in json["images"]
+            ]
 
             with contextlib.suppress(discord.NotFound):
                 await m.delete()
 
+            if not images:
+                await ctx.reply("Failed to download images. Please try again later.")
+                return
+
+            width = max(image.width for image in images)
+            height = max(image.height for image in images)
+
+            image = Image.new("RGB", (width * 2, height * 2))
+
+            for i in range(2):
+                for j in range(2):
+                    image.paste(images[i * 2 + j], (width * j, height * i))
+
+            buffer = BytesIO()
+            image.save(buffer, format="PNG")
+            buffer.seek(0)
+
             embed = discord.Embed(
                 title="Here's your art!",
+                description="Type the number next to the image to select it. If you want more than one image, seperate the numbers with a comma.",
                 color=await ctx.embed_color(),
             )
-            embed.set_image(url="attachment://dalle2.png")
-            file = discord.File(image, "dalle2.png")
+            embed.set_image(url="attachment://dalle.png")
+            file = discord.File(buffer, "dalle.png")
 
-            is_nsfw = await self.check_nsfw(image.getvalue())
+            is_nsfw = await self.check_nsfw(buffer.getvalue())
             if is_nsfw:
                 m = await ctx.reply(
                     "These images may contain NSFW content. Would you like me to DM them to you?"
@@ -84,7 +105,7 @@ class DalleCommand(MixinMeta):
                     return
                 if pred.result is True:
                     with contextlib.suppress(discord.NotFound):
-                        await m.edit(content="Sending image...")
+                        await m.edit(content="Sending images...")
                     try:
                         await ctx.author.send(embed=embed, file=file)
                     except discord.Forbidden:
@@ -99,3 +120,29 @@ class DalleCommand(MixinMeta):
 
             else:
                 await ctx.reply(embed=embed, file=file)
+
+            def check(m):
+                if is_nsfw:
+                    return m.author == ctx.author and m.channel == ctx.author.dm_channel
+                else:
+                    return m.author == ctx.author and m.channel == ctx.channel
+
+            try:
+                msg = await self.bot.wait_for("message", check=check, timeout=300)
+            except asyncio.TimeoutError:
+                return
+
+            try:
+                selected = [int(i) for i in msg.content.split(",")]
+                selected = [images[i - 1] for i in selected]
+            except:
+                return
+
+            for image in selected:
+                buffer = BytesIO()
+                image.save(buffer, format="PNG")
+                buffer.seek(0)
+                if is_nsfw:
+                    await ctx.author.send(file=discord.File(buffer, "craiyon.png"))
+                else:
+                    await ctx.send(file=discord.File(buffer, "craiyon.png"))

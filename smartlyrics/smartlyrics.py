@@ -142,7 +142,7 @@ class SmartLyrics(commands.Cog):
                         title = player.current.title
                         if "-" not in title:
                             title = player.current.author + " " + title
-                        
+
                         results = await self.get_lyrics(title)
                         if results:
                             await self.create_menu(ctx, results, "Voice Channel")
