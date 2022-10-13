@@ -62,10 +62,6 @@ class WomboConverter(Converter):
 
 
 class WomboCommand(MixinMeta):
-    """
-    Implements the Internal WOMBO API used in their iOS app.
-    """
-
     async def _get_wombo_styles(self) -> dict:
         async with self.session.get("https://paint.api.wombo.ai/api/styles") as req:
             if req.status == 200:
