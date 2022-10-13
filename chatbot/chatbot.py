@@ -18,7 +18,7 @@ class ChatBot(commands.Cog):
     Talk to a ChatBot!
     """
 
-    __version__ = "1.0.2"
+    __version__ = "1.0.3"
 
     def __init__(self, bot: Red):
         self.bot = bot
@@ -111,6 +111,8 @@ class ChatBot(commands.Cog):
                         if (
                             ref_message is not None
                             and ref_message.author == self.bot.user
+                            and message.content != "all"  # For AIArt,
+                            and self.bot.user in message.mentions
                         ):
                             response = await self.get_response(
                                 message.author, message.clean_content
