@@ -123,10 +123,6 @@ class PixelzArguments(Converter):
 
 
 class PixelzCommand(MixinMeta):
-    """
-    Implements the Internal Pixelz API used in their web client.
-    """
-
     @commands.command()
     @commands.bot_has_permissions(embed_links=True)
     async def pixelz(self, ctx: Context, *, arguments: PixelzArguments):
@@ -224,5 +220,5 @@ class PixelzCommand(MixinMeta):
 
             with contextlib.suppress(discord.NotFound):
                 await m.delete()
-        
+
         await self.send_images(ctx, [data])

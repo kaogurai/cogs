@@ -11,10 +11,6 @@ from .abc import MixinMeta
 
 
 class CLIPCommand(MixinMeta):
-    """
-    Implements the Replicate API for methexis-inc/img2prompt.
-    """
-
     @commands.command(aliases=["image2text", "img2txt", "image2prompt", "img2prompt"])
     @commands.bot_has_permissions(embed_links=True)
     async def clip(self, ctx: Context, url: Optional[str] = None):

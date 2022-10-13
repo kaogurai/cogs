@@ -3,7 +3,7 @@ import contextlib
 import math
 from copy import copy
 from io import BytesIO
-from typing import List
+from typing import List, Optional
 
 import aiohttp
 import discord
@@ -37,7 +37,7 @@ class AIArt(
     Generate incredible art using AI.
     """
 
-    __version__ = "1.9.2"
+    __version__ = "1.10.0"
 
     def __init__(self, bot: Red):
         self.bot = bot
@@ -106,6 +106,42 @@ class AIArt(
 
         return buffer.read()
 
+    async def compress_image(self, image_data: bytes) -> Optional[bytes]:
+        """
+        Params:
+            image: bytes - The image to compress.
+
+        Returns:
+            Optional[bytes] - The compressed image.
+        """
+
+        def func():
+            try:
+                image = Image.open(BytesIO(image_data))
+                image = image.convert("RGB")
+
+                buffer = BytesIO()
+                image.save(buffer, format="JPEG", quality=75, optimize=True)
+                buffer.seek(0)
+                return buffer.read()
+            except Exception:
+                ...
+
+        return await self.bot.loop.run_in_executor(None, func)
+
+    async def get_image(self, url: str) -> Optional[str]:
+        """
+        Params:
+            url: str - The image URL to get.
+
+        Returns:
+            Optional[str] - The image data.
+        """
+        with contextlib.suppress(Exception):
+            async with self.session.get(url) as req:
+                if req.status == 200:
+                    return await req.read()
+
     async def send_images(self, ctx: Context, images: List[bytes]) -> None:
         """
         Params:
@@ -115,7 +151,9 @@ class AIArt(
             if len(images) == 1:
                 image = images[0]
             else:
-                image = await self.bot.loop.run_in_executor(None, self._generate_grid, images)
+                image = await self.bot.loop.run_in_executor(
+                    None, self._generate_grid, images
+                )
 
             embed = discord.Embed(
                 title="Here's your art!",

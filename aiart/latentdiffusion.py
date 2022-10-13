@@ -12,10 +12,6 @@ from .abc import MixinMeta
 
 
 class LatentDiffusionCommand(MixinMeta):
-    """
-    Implements the Hugging Face Latent Diffusion API.
-    """
-
     @commands.command()
     @commands.bot_has_permissions(embed_links=True)
     async def latentdiffusion(self, ctx: Context, *, text: str):
@@ -103,4 +99,4 @@ class LatentDiffusionCommand(MixinMeta):
             with contextlib.suppress(discord.NotFound):
                 await m.delete()
 
-            await self.send_images(ctx, [base64.b64decode(image_base64.split(",")[1])]) 
+            await self.send_images(ctx, [base64.b64decode(image_base64.split(",")[1])])
