@@ -20,6 +20,7 @@ from .craiyon import CraiyonCommand
 from .latentdiffusion import LatentDiffusionCommand
 from .pixelz import PixelzCommand
 from .playgroundai import PlaygroundAI
+from .waifudiffusion import WaifuDiffusionCommand
 from .wombo import WomboCommand
 
 
@@ -29,6 +30,7 @@ class AIArt(
     PixelzCommand,
     PlaygroundAI,
     LatentDiffusionCommand,
+    WaifuDiffusionCommand,
     WomboCommand,
     commands.Cog,
     metaclass=CompositeMetaClass,
@@ -37,7 +39,7 @@ class AIArt(
     Generate incredible art using AI.
     """
 
-    __version__ = "1.10.0"
+    __version__ = "1.11.0"
 
     def __init__(self, bot: Red):
         self.bot = bot
@@ -89,19 +91,24 @@ class AIArt(
 
         image_list = [Image.open(BytesIO(image)) for image in images]
 
+        # Get the number of rows and columns
+        rows = int(math.sqrt(len(image_list)))
+        _columns = math.sqrt(len(image_list))
+        columns = int(_columns) if _columns.is_integer() else int(_columns) + 1
+
+        # Get the width and height of each image
         width = max(image.width for image in image_list)
         height = max(image.height for image in image_list)
 
-        multiplier = int(math.sqrt(len(image_list)))
+        # Create a new image with the correct size
+        grid = Image.new("RGB", (width * columns, height * rows))
 
-        new_image = Image.new("RGB", ((width * multiplier), height * multiplier))
-
-        for i in range(multiplier):
-            for j in range(multiplier):
-                new_image.paste(image_list[i * multiplier + j], (width * j, height * i))
+        # Paste the images into the correct position
+        for index, image in enumerate(image_list):
+            grid.paste(image, (width * (index % columns), height * (index // columns)))
 
         buffer = BytesIO()
-        new_image.save(buffer, format="WEBP")
+        grid.save(buffer, format="WEBP")
         buffer.seek(0)
 
         return buffer.read()
