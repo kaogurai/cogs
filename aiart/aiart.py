@@ -37,7 +37,7 @@ class AIArt(
     Generate incredible art using AI.
     """
 
-    __version__ = "1.9.1"
+    __version__ = "1.9.2"
 
     def __init__(self, bot: Red):
         self.bot = bot

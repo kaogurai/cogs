@@ -116,7 +116,7 @@ class PlaygroundAI(MixinMeta):
 
         await self.send_images(ctx, images)
 
-    @commands.command(aliases=["sd"])
+    @commands.command(aliases=["diffuse"])
     @commands.bot_has_permissions(embed_links=True)
     async def stablediffusion(self, ctx: Context, *, args: StableDiffusionArguments):
         """
