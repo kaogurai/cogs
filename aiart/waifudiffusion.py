@@ -31,8 +31,8 @@ class WaifuDiffusionCommand(MixinMeta):
         """
         Generate art using Waifu Diffusion.
         """
-        if len(text) > 250:
-            await ctx.reply("The text needs to be 250 characters or less.")
+        if len(text) > 800:
+            await ctx.reply("The text needs to be 800 characters or less.")
             return
 
         m = await ctx.reply("Attempting to join queue... This may take a while.")
