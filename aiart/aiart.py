@@ -20,6 +20,7 @@ from .craiyon import CraiyonCommand
 from .latentdiffusion import LatentDiffusionCommand
 from .pixelz import PixelzCommand
 from .playgroundai import PlaygroundAI
+from .upscale import UpscaleCommand
 from .waifudiffusion import WaifuDiffusionCommand
 from .wombo import WomboCommand
 
@@ -30,6 +31,7 @@ class AIArt(
     PixelzCommand,
     PlaygroundAI,
     LatentDiffusionCommand,
+    UpscaleCommand,
     WaifuDiffusionCommand,
     WomboCommand,
     commands.Cog,
@@ -39,7 +41,7 @@ class AIArt(
     Generate incredible art using AI.
     """
 
-    __version__ = "1.11.0"
+    __version__ = "1.12.0"
 
     def __init__(self, bot: Red):
         self.bot = bot
@@ -136,6 +138,22 @@ class AIArt(
 
         return await self.bot.loop.run_in_executor(None, func)
 
+    async def get_image_mimetype(self, data: bytes) -> Optional[str]:
+        """
+        Params:
+            data: bytes - The image data to get the mimetype of.
+
+        Returns:
+            Optional[str] - The mimetype of the image.
+        """
+
+        def func():
+            image = Image.open(BytesIO(data))
+            return image.format
+
+        with contextlib.suppress(Exception):
+            return await self.bot.loop.run_in_executor(None, func)
+
     async def get_image(self, url: str) -> Optional[str]:
         """
         Params:
@@ -163,7 +181,7 @@ class AIArt(
                 )
 
             embed = discord.Embed(
-                title="Here's your art!",
+                title="Here's your image" + ("s" if len(images) > 1 else "") + "!",
                 color=await ctx.embed_color(),
             )
             embed.set_image(url="attachment://image.webp")

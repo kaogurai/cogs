@@ -44,33 +44,23 @@ class WaifuDiffusionCommand(MixinMeta):
                     await m.delete()
                 await ctx.reply("Failed to join queue. Please try again later.")
                 return
-
-            await session.receive_json()  # This just tells us to send data
-
-            await session.send_json(
-                {
-                    "fn_index": 2,
-                    "data": [text],
-                    "session_hash": "".join(
-                        random.choice(string.ascii_letters + string.digits)
-                        for _ in range(11)
-                    ),
-                }
-            )
-            estimate = await session.receive_json()
-            seconds = estimate["rank_eta"]
-            minutes = int(seconds / 60)
             message_deleted = False
-
-            try:
-                await m.edit(content=f"Estimated wait time: {minutes} minutes.")
-            except discord.NotFound:
-                message_deleted = True
-
             async for msg in session:
                 if msg.type == aiohttp.WSMsgType.TEXT:
                     data = msg.json()
-                    if data["msg"] == "estimation":
+
+                    if data["msg"] == "send_data":
+                        await session.send_json(
+                            {
+                                "fn_index": 2,
+                                "data": [text],
+                                "session_hash": "".join(
+                                    random.choice(string.ascii_letters + string.digits)
+                                    for _ in range(11)
+                                ),
+                            }
+                        )
+                    elif data["msg"] == "estimation":
                         seconds = int(data["rank_eta"])
                         minutes = int(seconds / 60)
                         new_message = (
@@ -92,8 +82,8 @@ class WaifuDiffusionCommand(MixinMeta):
                                     await m.edit(content=new_message)
                                 except discord.NotFound:
                                     message_deleted = True
-                    if data["msg"] == "process_completed":
-                        break
+                        if data["msg"] == "process_completed":
+                            break
 
             if not message_deleted:
                 with contextlib.suppress(discord.NotFound):
