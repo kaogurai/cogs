@@ -5,6 +5,7 @@ from typing import List
 import discord
 from redbot.core import commands
 from redbot.core.commands import BadArgument, Context, Converter
+from thefuzz import process
 
 from .abc import MixinMeta
 from .utils import NoExitParser
@@ -18,6 +19,9 @@ class PlaygroundNSFWError(PlaygroundError):
     pass
 
 
+DALLE_SIZES = ["small", "large"]
+
+
 class DalleArguments(Converter):
     async def convert(self, ctx: Context, argument: str) -> dict:
         argument = argument.replace("—", "--")  # For iOS's weird smart punctuation
@@ -25,6 +29,7 @@ class DalleArguments(Converter):
         parser = NoExitParser(add_help=False)
         parser.add_argument("prompt", type=str, nargs="*")
         parser.add_argument("--image", type=str, default=None, nargs="?")
+        parser.add_argument("--size", type=str, default="large", nargs="?")
 
         try:
             values = vars(parser.parse_args(argument.split(" ")))
@@ -36,6 +41,8 @@ class DalleArguments(Converter):
 
         if not values["image"] and ctx.message.attachments:
             values["image"] = ctx.message.attachments[0].url
+
+        values["size"] = process.extract(values["size"], DALLE_SIZES, limit=1)[0][0]
 
         values["prompt"] = " ".join(values["prompt"])
 
@@ -134,13 +141,20 @@ class PlaygroundAI(MixinMeta):
         Arguments:
             `prompt:` The prompt to use.
            ` --image:` The image to use as a prompt. Must be a URL. You can also upload an image as an attachment.
+            `--size:` The size of the model to use. Can be `small` or `large`. Defaults to `large`.  `small` is 512x512, `large` is 1024x1024.
         """
         m = await ctx.reply("Generating art... This may take a while.")
         async with ctx.typing():
             try:
-                images = await self._generate_playground_images(
-                    "dalle-2", {"prompt": args["prompt"]}
-                )
+                if args["size"] == "small":
+                    images = await self._generate_playground_images(
+                        "dalle-2", {"prompt": args["prompt"], "width": 512, "height": 512}
+                    )
+                else:
+                    images = await self._generate_playground_images(
+                        "dalle-2",
+                        {"prompt": args["prompt"], "width": 1024, "height": 1024},
+                    )
             except PlaygroundNSFWError:
                 with contextlib.suppress(discord.NotFound):
                     await m.delete()
