@@ -19,7 +19,7 @@ from .clip import CLIPCommand
 from .craiyon import CraiyonCommand
 from .latentdiffusion import LatentDiffusionCommand
 from .pixelz import PixelzCommand
-from .playgroundai import PlaygroundAI
+from .dalle import DalleCommand
 from .upscale import UpscaleCommand
 from .waifudiffusion import WaifuDiffusionCommand
 from .wombo import WomboCommand
@@ -28,8 +28,8 @@ from .wombo import WomboCommand
 class AIArt(
     CLIPCommand,
     CraiyonCommand,
+    DalleCommand,
     PixelzCommand,
-    PlaygroundAI,
     LatentDiffusionCommand,
     UpscaleCommand,
     WaifuDiffusionCommand,
@@ -41,7 +41,7 @@ class AIArt(
     Generate incredible art using AI.
     """
 
-    __version__ = "1.12.1"
+    __version__ = "1.13.0"
 
     def __init__(self, bot: Red):
         self.bot = bot
