@@ -1,5 +1,5 @@
-import base64
 import contextlib
+import random
 from typing import List
 
 import discord
@@ -8,6 +8,8 @@ from redbot.core.commands import BadArgument, Context, Converter
 
 from .abc import MixinMeta
 from .utils import NoExitParser
+
+PLAYGROUND_SESSIONS = ["eca9ae53-49c6-47ba-a5c9-51b599ca2aa8"]
 
 
 class PlaygroundError(Exception):
@@ -50,9 +52,7 @@ class DalleCommand(MixinMeta):
             "num_images": 4,
         }
         json.update(params)
-        cookies = {
-            "__Secure-next-auth.session-token": "eca9ae53-49c6-47ba-a5c9-51b599ca2aa8"
-        }
+        cookies = {"__Secure-next-auth.session-token": random.choice(PLAYGROUND_SESSIONS)}
         async with self.session.post(
             "https://playgroundai.com/api/models",
             json=json,

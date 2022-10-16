@@ -17,9 +17,10 @@ from redbot.core.utils.predicates import ReactionPredicate
 from .abc import CompositeMetaClass
 from .clip import CLIPCommand
 from .craiyon import CraiyonCommand
+from .dalle import DalleCommand
 from .latentdiffusion import LatentDiffusionCommand
 from .pixelz import PixelzCommand
-from .dalle import DalleCommand
+from .stablediffusion import StableDiffusionCommand
 from .upscale import UpscaleCommand
 from .waifudiffusion import WaifuDiffusionCommand
 from .wombo import WomboCommand
@@ -30,6 +31,7 @@ class AIArt(
     CraiyonCommand,
     DalleCommand,
     PixelzCommand,
+    StableDiffusionCommand,
     LatentDiffusionCommand,
     UpscaleCommand,
     WaifuDiffusionCommand,
@@ -41,7 +43,7 @@ class AIArt(
     Generate incredible art using AI.
     """
 
-    __version__ = "1.13.0"
+    __version__ = "1.14.0"
 
     def __init__(self, bot: Red):
         self.bot = bot
@@ -56,6 +58,18 @@ class AIArt(
     def format_help_for_context(self, ctx: Context) -> str:
         pre_processed = super().format_help_for_context(ctx)
         return f"{pre_processed}\n\nCog Version: {self.__version__}"
+
+    async def _get_firebase_bearer_token(self, key: str) -> Optional[str]:
+        params = {"key": key}
+        data = {"returnSecureToken": True}
+        async with self.session.post(
+            "https://identitytoolkit.googleapis.com/v1/accounts:signUp",
+            json=data,
+            params=params,
+        ) as req:
+            if req.status == 200:
+                resp = await req.json()
+                return resp["idToken"]
 
     async def _check_nsfw(self, data: bytes) -> bool:
         """
@@ -96,14 +110,14 @@ class AIArt(
         # Get the number of rows and columns
         rows = int(math.sqrt(len(image_list)))
         _columns = math.sqrt(len(image_list))
-        columns = int(_columns) if _columns.is_integer() else int(_columns) + 1
+        columns = int(_columns) if _columns.is_integer() else int(_columns + 1.5)
 
         # Get the width and height of each image
         width = max(image.width for image in image_list)
         height = max(image.height for image in image_list)
 
         # Create a new image with the correct size
-        grid = Image.new("RGB", (width * columns, height * rows))
+        grid = Image.new("RGBA", (width * columns, height * rows))
 
         # Paste the images into the correct position
         for index, image in enumerate(image_list):
@@ -251,10 +265,8 @@ class AIArt(
                         file=discord.File(BytesIO(image), filename="image.png")
                     )
 
-    @commands.group(
-        aliases=["text2art", "text2im", "text2img", "text2image"],
-        invoke_without_command=True,
-    )
+    @commands.command(aliases=["text2art", "text2im", "text2img", "text2image"])
+    @commands.bot_has_permissions(embed_links=True)
     async def draw(self, ctx: Context, *, args: str):
         """
         Draw an image using AI.
