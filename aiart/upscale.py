@@ -29,7 +29,7 @@ class UpscaleCommand(MixinMeta):
         if not link:
             link = str(ctx.message.attachments[0].url)
 
-        m = await ctx.send("Upscaling image... This may take a while.")
+        m = await ctx.reply("Upscaling image... This may take a while.")
 
         async with ctx.typing():
 
