@@ -46,16 +46,9 @@ class KaoTools(
     def __init__(self, bot: Red):
         self.bot = bot
         self.session = aiohttp.ClientSession()
-        setattr(
-            bot._connection,
-            "parse_interaction_create",
-            self.parse_interaction_create,
-        )
-        bot._connection.parsers["INTERACTION_CREATE"] = self.parse_interaction_create
         self.bot.loop.create_task(self.set_token())
 
     def cog_unload(self):
-        del self.bot._connection.parsers["INTERACTION_CREATE"]
         self.bot.loop.create_task(self.session.close())
 
     async def red_delete_data_for_user(self, **kwargs):
@@ -74,10 +67,6 @@ class KaoTools(
             )
         app_info = await self.bot.application_info()
         return discord.utils.oauth_url(app_info.id, permissions, scopes=scopes)
-
-    # https://github.com/Kowlin/Sentinel/blob/master/slashinjector/core.py
-    def parse_interaction_create(self, data: dict):
-        self.bot.dispatch("interaction_create", data)
 
     async def set_token(self):
         token = await self.bot.get_shared_api_tokens("omdb")
@@ -116,48 +105,6 @@ class KaoTools(
             colour=await self.bot.get_embed_colour(message.channel), description=d
         )
         await message.channel.send(embed=embed)
-
-    @commands.command(aliases=["yt", "ytsearch", "youtubesearch"])
-    async def youtube(self, ctx: Context, *, video: str):
-        """
-        Search for a youtube video.
-        Inspired by Aikaterna's YouTube cog
-        """
-        async with self.session.get(
-            f"{self.KAO_API_URL}/youtube/search", params={"query": video}
-        ) as r:
-            if r.status != 200:
-                await ctx.send("An error occurred while searching for videos.")
-                return
-            data = await r.json()
-        if not data:
-            await ctx.send("Nothing found.")
-            return
-
-        data = [video["url"] for video in data]
-
-        await menu(ctx, data, DEFAULT_CONTROLS)
-
-    @commands.command(aliases=["ytm", "ytmsearch", "youtubemusicsearch"])
-    async def youtubemusic(self, ctx: Context, *, video: str):
-        """
-        Search for a video on youtube music.
-        Inspired by Aikaterna's YouTube cog
-        """
-        async with self.session.get(
-            f"{self.KAO_API_URL}/youtube/musicsearch", params={"query": video}
-        ) as r:
-            if r.status != 200:
-                await ctx.send("An error occurred while searching for videos.")
-                return
-            data = await r.json()
-        if not data:
-            await ctx.send("Nothing found.")
-            return
-
-        data = [video["url"] for video in data]
-
-        await menu(ctx, data, DEFAULT_CONTROLS)
 
     @commands.command()
     @commands.bot_has_permissions(add_reactions=True, use_external_emojis=True)

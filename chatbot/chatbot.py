@@ -18,7 +18,7 @@ class ChatBot(commands.Cog):
     Talk to a ChatBot!
     """
 
-    __version__ = "1.0.3"
+    __version__ = "1.0.4"
 
     def __init__(self, bot: Red):
         self.bot = bot
@@ -111,7 +111,6 @@ class ChatBot(commands.Cog):
                         if (
                             ref_message is not None
                             and ref_message.author == self.bot.user
-                            and message.content != "all"  # For AIArt,
                             and self.bot.user in message.mentions
                         ):
                             response = await self.get_response(
@@ -123,6 +122,8 @@ class ChatBot(commands.Cog):
                                 except discord.NotFound:
                                     await message.channel.send(response)
         else:
+            if message.content in ["all", "1", "2", "3", "4", "5, 6", "7", "8", "9"]:
+                return
             response = await self.get_response(message.author, message.clean_content)
             if response:
                 await message.channel.send(response)

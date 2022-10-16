@@ -15,6 +15,7 @@ from .abc import MixinMeta
 
 class UpscaleCommand(MixinMeta):
     @commands.command()
+    @commands.bot_has_permissions(embed_links=True)
     async def upscale(self, ctx: Context, link: Optional[str] = None):
         """
         Upscale an image.
