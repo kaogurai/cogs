@@ -140,8 +140,9 @@ class StableDiffusionCommand(MixinMeta):
                 self._generate_stable_image(args, bearer_token)
                 for _ in range(args["amount"])
             ]
-            images = await asyncio.gather(*tasks)
-            if not any(images):
+            images = await asyncio.gather(*tasks, return_exceptions=True)
+            images = [i for i in images if isinstance(i, bytes)]
+            if not images:
                 with contextlib.suppress(discord.NotFound):
                     await m.delete()
 

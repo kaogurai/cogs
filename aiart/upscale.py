@@ -3,7 +3,6 @@ import base64
 import contextlib
 import random
 import string
-from io import BytesIO
 from typing import Optional
 
 import discord
