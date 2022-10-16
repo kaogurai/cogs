@@ -98,7 +98,7 @@ class StableDiffusionCommand(MixinMeta):
             json["seed"] = args["seed"]
 
         async with self.session.post(
-            "https://api.mage.space/api/v2/images/generate", headers=headers, json=json
+            "https://api.mage.space/api/v2/images/generate", headers=headers, json=json, timeout=300
         ) as resp:
             if resp.status != 200:
                 return
