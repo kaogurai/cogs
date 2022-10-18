@@ -68,8 +68,14 @@ class StableDiffusionArguments(Converter):
 
 class StableDiffusionCommand(MixinMeta):
     async def _generate_stable_image(
-        self, args: dict, bearer_token: str
+        self, args: dict
     ) -> Optional[bytes]:
+        bearer_token = await self._get_firebase_bearer_token(
+                "AIzaSyAzUV2NNUOlLTL04jwmUw9oLhjteuv6Qr4"
+            )
+        if bearer_token is None:
+            return 
+        
         headers = {
             "Authorization": f"Bearer {bearer_token}",
             "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.0.0 Safari/537.36 Edg/106.0.1370.42",
@@ -127,17 +133,8 @@ class StableDiffusionCommand(MixinMeta):
         """
         m = await ctx.reply("Generating art... This may take a while.")
         async with ctx.typing():
-            bearer_token = await self._get_firebase_bearer_token(
-                "AIzaSyAzUV2NNUOlLTL04jwmUw9oLhjteuv6Qr4"
-            )
-            if not bearer_token:
-                with contextlib.suppress(discord.NotFound):
-                    await m.delete()
-                await ctx.reply("Failed to generate art. Please try again later.")
-                return
-
             tasks = [
-                self._generate_stable_image(args, bearer_token)
+                self._generate_stable_image(args)
                 for _ in range(args["amount"])
             ]
             images = await asyncio.gather(*tasks, return_exceptions=True)
