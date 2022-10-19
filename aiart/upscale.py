@@ -34,14 +34,14 @@ class UpscaleCommand(MixinMeta):
 
             img = await self.get_image(link)
             if not img:
-                async with contextlib.suppress(discord.NotFound):
+                with contextlib.suppress(discord.NotFound):
                     await m.delete()
                 await ctx.reply("Failed to download image.")
                 return
 
             mime_type = await self.get_image_mimetype(img)
             if not mime_type:
-                async with contextlib.suppress(discord.NotFound):
+                with contextlib.suppress(discord.NotFound):
                     await m.delete()
                 await ctx.reply(
                     "Failed to get image mimetype. Might be an invalid image."
@@ -62,7 +62,7 @@ class UpscaleCommand(MixinMeta):
                 "https://hf.space/embed/akhaliq/SwinIR/api/queue/push/", json=data
             ) as r:
                 if r.status != 200:
-                    async with contextlib.suppress(discord.NotFound):
+                    with contextlib.suppress(discord.NotFound):
                         await m.delete()
                     await ctx.reply(
                         "Something went wrong when trying to upscale the image."
@@ -79,7 +79,7 @@ class UpscaleCommand(MixinMeta):
                     f"https://hf.space/embed/akhaliq/SwinIR/api/queue/status/", json=body
                 ) as r:
                     if r.status != 200:
-                        async with contextlib.suppress(discord.NotFound):
+                        with contextlib.suppress(discord.NotFound):
                             await m.delete()
                         await ctx.reply(
                             "Something went wrong when trying to upscale the image."
@@ -90,7 +90,7 @@ class UpscaleCommand(MixinMeta):
                         break
                     await asyncio.sleep(1)
                 if x == 299:
-                    async with contextlib.suppress(discord.NotFound):
+                    with contextlib.suppress(discord.NotFound):
                         await m.delete()
                     await ctx.reply(
                         "Something went wrong when trying to upscale the image."
@@ -106,7 +106,7 @@ class UpscaleCommand(MixinMeta):
                 limit = 8000000
 
             if len(image_bytes) > limit:
-                async with contextlib.suppress(discord.NotFound):
+                with contextlib.suppress(discord.NotFound):
                     await m.delete()
                 await ctx.reply(
                     "The upscaled image is too large to send. Try in a server with a larger file size limit."
