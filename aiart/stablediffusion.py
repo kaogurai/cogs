@@ -104,13 +104,13 @@ class StableDiffusionCommand(MixinMeta):
             json["seed"] = args["seed"]
 
         async with self.session.post(
-            "https://api.mage.space/api/v2/images/generate", headers=headers, json=json, timeout=60
+            "https://api.mage.space/api/v2/images/generate", headers=headers, json=json, timeout=90
         ) as resp:
             if resp.status != 200:
                 return
             data = await resp.json()
         url = data["results"][0]["image_url"]
-        async with self.session.get(url) as resp:
+        async with self.session.get(url, timeout=15) as resp:
 
             if resp.status != 200:
                 return
@@ -137,7 +137,7 @@ class StableDiffusionCommand(MixinMeta):
                 self._generate_stable_image(args)
                 for _ in range(args["amount"])
             ]
-            images = await asyncio.gather(*tasks)
+            images = await asyncio.gather(*tasks, return_exceptions=True)
             images = [i for i in images if isinstance(i, bytes)]
             if not images:
                 with contextlib.suppress(discord.NotFound):
