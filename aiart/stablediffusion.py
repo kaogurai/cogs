@@ -145,5 +145,8 @@ class StableDiffusionCommand(MixinMeta):
 
                 await ctx.reply("Failed to generate art. Please try again later.")
                 return
+        
+        with contextlib.suppress(discord.NotFound):
+            await m.delete()
 
         await self.send_images(ctx, images)
