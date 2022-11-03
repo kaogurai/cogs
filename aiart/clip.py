@@ -51,7 +51,7 @@ class CLIPCommand(MixinMeta):
             ) as req:
                 if req.status == 201:
                     json = await req.json()
-                    image_uri = json["filename"]
+                    image_uri = json["file_url"]
                 else:
                     with contextlib.suppress(discord.NotFound):
                         await m.delete()
