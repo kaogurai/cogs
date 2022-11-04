@@ -43,7 +43,7 @@ class AIArt(
     Generate incredible art using AI.
     """
 
-    __version__ = "1.14.9"
+    __version__ = "1.14.10"
 
     def __init__(self, bot: Red):
         self.bot = bot
@@ -265,14 +265,14 @@ class AIArt(
                         file=discord.File(BytesIO(image), filename="image.png")
                     )
 
-    @commands.command(aliases=["text2art", "text2im", "text2img", "text2image"])
+    @commands.command(aliases=["text2art", "text2im", "text2img", "text2image", "stablediffusion"])
     @commands.bot_has_permissions(embed_links=True)
     async def draw(self, ctx: Context, *, args: str):
         """
         Draw an image using AI.
 
-        Currently this proxies towards the Stable Diffusion command.
+        Currently this proxies towards the Wombo command.
         """
         msg = copy(ctx.message)
-        msg.content = f"{ctx.prefix}stablediffusion {args}"
+        msg.content = f"{ctx.prefix}wombo {args}"
         self.bot.dispatch("message", msg)

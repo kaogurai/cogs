@@ -77,8 +77,14 @@ class StableDiffusionCommand(MixinMeta):
             return 
         
         headers = {
-            "Authorization": f"Bearer {bearer_token}",
-            "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.0.0 Safari/537.36 Edg/106.0.1370.42",
+            'Accept': 'application/json',
+            'Origin': 'https://www.mage.space',
+            'Authorization': f'Bearer {bearer_token}',
+            'Referer': 'https://www.mage.space/',
+            'Host': 'api.mage.space',
+            'Accept-Language': 'en-US,en;q=0.9',
+            'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.4 Safari/605.1.15',
+            'Connection': 'keep-alive',
         }
         json = {
             "prompt": args["prompt"],
@@ -106,6 +112,7 @@ class StableDiffusionCommand(MixinMeta):
         async with self.session.post(
             "https://api.mage.space/api/v2/images/generate", headers=headers, json=json, timeout=90
         ) as resp:
+            print(await resp.text())
             if resp.status != 200:
                 return
             data = await resp.json()
@@ -116,8 +123,8 @@ class StableDiffusionCommand(MixinMeta):
                 return
             return await resp.read()
 
-    @commands.command(aliases=["stable"])
-    @commands.bot_has_permissions(embed_links=True)
+    #@commands.command(aliases=["stable"])
+    #@commands.bot_has_permissions(embed_links=True)
     async def stablediffusion(self, ctx: Context, *, args: StableDiffusionArguments):
         """
         Generate art using Stable Diffusion.
