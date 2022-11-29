@@ -15,23 +15,17 @@ from redbot.core.utils.menus import start_adding_reactions
 from redbot.core.utils.predicates import ReactionPredicate
 
 from .abc import CompositeMetaClass
-from .clip import CLIPCommand
 from .craiyon import CraiyonCommand
-from .dalle import DalleCommand
 from .latentdiffusion import LatentDiffusionCommand
 from .pixelz import PixelzCommand
-from .stablediffusion import StableDiffusionCommand
 from .upscale import UpscaleCommand
 from .waifudiffusion import WaifuDiffusionCommand
 from .wombo import WomboCommand
 
 
 class AIArt(
-    CLIPCommand,
     CraiyonCommand,
-    DalleCommand,
     PixelzCommand,
-    StableDiffusionCommand,
     LatentDiffusionCommand,
     UpscaleCommand,
     WaifuDiffusionCommand,
@@ -43,7 +37,7 @@ class AIArt(
     Generate incredible art using AI.
     """
 
-    __version__ = "1.14.10"
+    __version__ = "1.14.11"
 
     def __init__(self, bot: Red):
         self.bot = bot
