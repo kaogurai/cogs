@@ -265,7 +265,9 @@ class AIArt(
                         file=discord.File(BytesIO(image), filename="image.png")
                     )
 
-    @commands.command(aliases=["text2art", "text2im", "text2img", "text2image", "stablediffusion"])
+    @commands.command(
+        aliases=["text2art", "text2im", "text2img", "text2image", "stablediffusion"]
+    )
     @commands.bot_has_permissions(embed_links=True)
     async def draw(self, ctx: Context, *, args: str):
         """

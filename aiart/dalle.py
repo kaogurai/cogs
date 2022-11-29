@@ -81,8 +81,8 @@ class DalleCommand(MixinMeta):
 
         return images
 
-    #@commands.command(aliases=["dalle2", "d2"])
-    #@commands.bot_has_permissions(embed_links=True)
+    # @commands.command(aliases=["dalle2", "d2"])
+    # @commands.bot_has_permissions(embed_links=True)
     async def dalle(self, ctx: Context, *, args: DalleArguments):
         """
         Generate art using Dall-E 2.

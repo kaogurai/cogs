@@ -67,24 +67,22 @@ class StableDiffusionArguments(Converter):
 
 
 class StableDiffusionCommand(MixinMeta):
-    async def _generate_stable_image(
-        self, args: dict
-    ) -> Optional[bytes]:
+    async def _generate_stable_image(self, args: dict) -> Optional[bytes]:
         bearer_token = await self._get_firebase_bearer_token(
-                "AIzaSyAzUV2NNUOlLTL04jwmUw9oLhjteuv6Qr4"
-            )
+            "AIzaSyAzUV2NNUOlLTL04jwmUw9oLhjteuv6Qr4"
+        )
         if bearer_token is None:
-            return 
-        
+            return
+
         headers = {
-            'Accept': 'application/json',
-            'Origin': 'https://www.mage.space',
-            'Authorization': f'Bearer {bearer_token}',
-            'Referer': 'https://www.mage.space/',
-            'Host': 'api.mage.space',
-            'Accept-Language': 'en-US,en;q=0.9',
-            'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.4 Safari/605.1.15',
-            'Connection': 'keep-alive',
+            "Accept": "application/json",
+            "Origin": "https://www.mage.space",
+            "Authorization": f"Bearer {bearer_token}",
+            "Referer": "https://www.mage.space/",
+            "Host": "api.mage.space",
+            "Accept-Language": "en-US,en;q=0.9",
+            "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.4 Safari/605.1.15",
+            "Connection": "keep-alive",
         }
         json = {
             "prompt": args["prompt"],
@@ -110,7 +108,10 @@ class StableDiffusionCommand(MixinMeta):
             json["seed"] = args["seed"]
 
         async with self.session.post(
-            "https://api.mage.space/api/v2/images/generate", headers=headers, json=json, timeout=90
+            "https://api.mage.space/api/v2/images/generate",
+            headers=headers,
+            json=json,
+            timeout=90,
         ) as resp:
             print(await resp.text())
             if resp.status != 200:
@@ -123,8 +124,8 @@ class StableDiffusionCommand(MixinMeta):
                 return
             return await resp.read()
 
-    #@commands.command(aliases=["stable"])
-    #@commands.bot_has_permissions(embed_links=True)
+    # @commands.command(aliases=["stable"])
+    # @commands.bot_has_permissions(embed_links=True)
     async def stablediffusion(self, ctx: Context, *, args: StableDiffusionArguments):
         """
         Generate art using Stable Diffusion.
@@ -140,10 +141,7 @@ class StableDiffusionCommand(MixinMeta):
         """
         m = await ctx.reply("Generating art... This may take a while.")
         async with ctx.typing():
-            tasks = [
-                self._generate_stable_image(args)
-                for _ in range(args["amount"])
-            ]
+            tasks = [self._generate_stable_image(args) for _ in range(args["amount"])]
             images = await asyncio.gather(*tasks, return_exceptions=True)
             images = [i for i in images if isinstance(i, bytes)]
             if not images:
@@ -152,7 +150,7 @@ class StableDiffusionCommand(MixinMeta):
 
                 await ctx.reply("Failed to generate art. Please try again later.")
                 return
-        
+
         with contextlib.suppress(discord.NotFound):
             await m.delete()
 
