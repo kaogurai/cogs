@@ -17,7 +17,7 @@ class SmartLyrics(commands.Cog):
     Gets lyrics for your current song.
     """
 
-    __version__ = "1.2.5"
+    __version__ = "2.0.0"
 
     def __init__(self, bot: Red):
         self.bot = bot
@@ -41,25 +41,30 @@ class SmartLyrics(commands.Cog):
         pre_processed = super().format_help_for_context(ctx)
         return f"{pre_processed}\n\nCog Version: {self.__version__}"
 
-    async def get_lyrics(self, query: str):
-        regex_title = self.regex.sub("", query).strip()
-        renamed_title = regex_title.replace("-", "")
+    async def get_lyrics(
+        self, *, query: str = None, spotify_id: str = None
+    ) -> Optional[dict]:
+
+        if spotify_id:
+            params = {
+                "spotify_id": spotify_id,
+            }
+        else:
+            params = {
+                "query": query,
+            }
+
         async with self.session.get(
-            "https://api.kaogurai.xyz/v1/deezer/lyrics", params={"query": renamed_title}
+            "https://api.flowery.pw/v1/lyrics", params=params
         ) as resp:
             if resp.status != 200:
                 return
-            data = await resp.json()
-        if data:
-            return (
-                data["lyrics"]["text"],
-                data["track"]["name"],
-                data["artist"]["name"],
-                data["album"]["artwork"],
-            )
+            return await resp.json()
 
     # adapted https://github.com/Cog-Creators/Red-DiscordBot/blob/V3/develop/redbot/cogs/mod/names.py#L112-L126
-    def get_user_status_song(self, user: Union[discord.Member, discord.User]):
+    def get_user_status_song(
+        self, user: Union[discord.Member, discord.User]
+    ) -> Optional[str]:
         listening_statuses = [
             s for s in user.activities if s.type == discord.ActivityType.listening
         ]
@@ -67,26 +72,20 @@ class SmartLyrics(commands.Cog):
             return
         for listening_status in listening_statuses:
             if isinstance(listening_status, discord.Spotify):
-                text = ("{artist} {title}").format(
-                    artist=discord.utils.escape_markdown(listening_status.artist)
-                    if listening_status.artist
-                    else "",
-                    title=discord.utils.escape_markdown(listening_status.title),
-                )
-                return text
+                return listening_status.track_id
 
     async def create_menu(
-        self, ctx: Context, results: Tuple[str], source: Optional[str] = None
+        self, ctx: Context, results: dict, source: Optional[str] = None
     ):
         embeds = []
-        embed_content = [p for p in pagify(results[0], page_length=750)]
+        embed_content = [p for p in pagify(results["lyrics"]["text"], page_length=750)]
         for index, page in enumerate(embed_content):
             embed = discord.Embed(
                 color=await ctx.embed_color(),
-                title=f"{results[1]} by {results[2]}",
+                title=f"{results['track']['title']} by {results['track']['artist']}",
                 description=page,
             )
-            embed.set_thumbnail(url=results[3])
+            embed.set_thumbnail(url=results["track"]["media"]["artwork"])
             if len(embed_content) != 1:
                 if source:
                     embed.set_footer(
@@ -122,7 +121,7 @@ class SmartLyrics(commands.Cog):
             if query:
                 if len(query) > 2000:
                     return
-                results = await self.get_lyrics(query)
+                results = await self.get_lyrics(query=query)
                 if results:
                     await self.create_menu(ctx, results)
                     return
@@ -143,7 +142,7 @@ class SmartLyrics(commands.Cog):
                         if "-" not in title:
                             title = player.current.author + " " + title
 
-                        results = await self.get_lyrics(title)
+                        results = await self.get_lyrics(query=title)
                         if results:
                             await self.create_menu(ctx, results, "Voice Channel")
                             return
@@ -151,14 +150,14 @@ class SmartLyrics(commands.Cog):
                             await ctx.send(f"Nothing was found for `{title}`")
                             return
 
-            statustext = self.get_user_status_song(ctx.author)
-            if statustext:
-                results = await self.get_lyrics(statustext)
+            spotify_id = self.get_user_status_song(ctx.author)
+            if spotify_id:
+                results = await self.get_lyrics(spotify_id=spotify_id)
                 if results:
                     await self.create_menu(ctx, results, "Spotify")
                     return
                 else:
-                    await ctx.send(f"Nothing was found for `{statustext}`")
+                    await ctx.send(f"Nothing was found for your spotify song.")
                     return
 
             username = await lastfmcog.config.user(ctx.author).lastfm_username()
@@ -175,7 +174,7 @@ class SmartLyrics(commands.Cog):
                     return
 
                 trackname = f"{trackname} {artistname}"
-                results = await self.get_lyrics(trackname)
+                results = await self.get_lyrics(query=trackname)
                 if results:
                     await self.create_menu(ctx, results, "Last.fm")
                     return

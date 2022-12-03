@@ -26,7 +26,7 @@ Please join the support server [here](https://discord.gg/p6ehU9qhg8) if you have
 | NTFYStatus   | v1.0.6  | Send push notifications using ntfy.sh when a bot goes offline.                    |
 | Radio        | v1.0.3  | Saves radio URLs for easy access.                                                 |
 | SFX          | v5.2.10 | Allow users to play TTS, SFX, and Join/Leave sounds. (originally made by baiumbg) |
-| SmartLyrics  | v1.2.5  | Gets lyrics for your current song.                                                |
+| SmartLyrics  | v2.0.0  | Gets lyrics for your current song.                                                |
 | Tio          | v1.0.0  | Runs arbitrary code using tio.run.                                                |
 | YTDL         | v1.0.5  | Download YouTube videos.                                                          |
 
