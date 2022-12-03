@@ -1,5 +1,4 @@
 import asyncio
-import base64
 from io import BytesIO
 from typing import Optional
 
@@ -76,51 +75,6 @@ class ImageMixin(MixinMeta):
         e.set_footer(text="Powered by api.martinebot.com")
         await ctx.send(embed=e)
 
-    @commands.command()
-    async def ocr(self, ctx: Context, link: Optional[str] = None):
-        """
-        Convert an image to text.
-
-        You can either upload an image or provide a direct link.
-
-        Supported formats: jpg, png, webp, gif, bmp, raw, ico
-        """
-        if not link and not ctx.message.attachments:
-            await ctx.send("Please provide an image to convert to text.")
-            return
-
-        if not link:
-            link = str(ctx.message.attachments[0].url)
-
-        async with ctx.typing():
-            async with self.session.get(
-                f"{self.KAO_API_URL}/ocr/image",
-                params={
-                    "url": link,
-                },
-            ) as resp:
-                if resp.status != 200:
-                    await ctx.send("Something went wrong when trying to get the text.")
-                    return
-                data = await resp.json()
-
-        if not data:
-            await ctx.send("No text was found.")
-            return
-
-        if "error" in data.keys():
-            await ctx.send(data["error"]["message"])
-            return
-
-        results = data["fullTextAnnotation"]["text"]
-        embed = discord.Embed(
-            title="OCR Results",
-            color=await ctx.embed_color(),
-            description=results[:4000],
-            url=link,
-        )
-        await ctx.send(embed=embed)
-
     def get_color_palette(self, img: BytesIO) -> discord.File:
         colors = colorgram.extract(img, 10)
         if sorted:
@@ -176,77 +130,3 @@ class ImageMixin(MixinMeta):
                     None, self.get_color_palette, img
                 )
             )
-
-    @commands.command()
-    async def mathocr(self, ctx: Context, link: Optional[str] = None):
-        """
-        Get the math equation from an image.
-        """
-        if not link and not ctx.message.attachments:
-            await ctx.send_help()
-            return
-
-        if not link:
-            link = str(ctx.message.attachments[0].url)
-
-        async with ctx.typing():
-
-            data = {
-                "src": link,
-                "formats": ["text", "data"],
-                "data_options": {"include_asciimath": True, "include_latex": True},
-            }
-            headers = {
-                "app_id": "alan_lee_coursehero_com_77bb43",
-                "app_key": "bb27ccfcfa8e61a95b40",
-                "User-Agent": "Course%20Hero/3 CFNetwork/1329 Darwin/21.3.0",
-            }
-            async with self.session.post(
-                "https://api.mathpix.com/v3/text", json=data, headers=headers
-            ) as r:
-                if r.status != 200:
-                    await ctx.send("Something went wrong when OCRing the image.")
-                    return
-                data = await r.json()
-
-            if not data.get("data"):
-                await ctx.send("I couldn't find any math in the image.")
-                return
-
-            embed = discord.Embed(color=await ctx.embed_color(), title="Math OCR Results")
-            for x in data["data"]:
-                if x["type"] == "latex":
-                    embed.add_field(name="LaTeX", value=x["value"])
-                    post_data = {
-                        "auth": {"user": "guest", "password": "guest"},
-                        "latex": x["value"],
-                        "resolution": 600,
-                        "color": "000000",
-                    }
-                    async with self.session.post(
-                        "https://latex2png.com/api/convert",
-                        json=post_data,
-                        headers=headers,
-                    ) as r:
-                        if r.status != 200:
-                            await ctx.send(
-                                "Something went wrong when getting an image of the LaTeX."
-                            )
-                            return
-                        latex_json_data = await r.json()
-                        async with self.session.get(
-                            "https://latex2png.com" + latex_json_data["url"]
-                        ) as r:
-                            if r.status != 200:
-                                await ctx.send(
-                                    "Something went wrong when getting an image of the LaTeX."
-                                )
-                                return
-                            latex_image_data = await r.read()
-                            latex_image_data = BytesIO(latex_image_data)
-                            latex_image_data.seek(0)
-                            embed.set_image(url="attachment://latex.png")
-                elif x["type"] == "asciimath":
-                    embed.add_field(name="ASCII Math", value=x["value"])
-
-            await ctx.send(embed=embed, file=discord.File(latex_image_data, "latex.png"))

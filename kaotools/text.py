@@ -73,17 +73,30 @@ class TextMixin(MixinMeta):
 
         `lang_code` is the language code for the language you want to translate to.
         """
-        url = f"{self.KAO_API_URL}/various/translate?result_language_code={lang_code[:10]}&text={urllib.parse.quote(text)}"
-        async with self.session.get(url) as resp:
+        params = {
+            "result_language_code": lang_code,
+            "text": text,
+        }
+        async with self.session.get(
+            f"{self.FLOWERY_API_URL}/translation/translate", params=params
+        ) as resp:
+            if resp.status == 400:
+                await ctx.send("Invalid language code.")
+                return
             if resp.status != 200:
                 await ctx.send("Something went wrong when trying to translate.")
                 return
             data = await resp.json()
+
         embed = discord.Embed(
             color=await ctx.embed_color(),
             title="Translation",
             description=data["text"][:4000],
         )
+        embed.set_footer(
+            text=data["language"]["original"] + " → " + data["language"]["result"]
+        )
+
         await ctx.send(embed=embed)
 
     # Truth Source

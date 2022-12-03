@@ -40,7 +40,7 @@ class KaoTools(
 
     __version__ = "1.0.1"
 
-    KAO_API_URL = "https://api.kaogurai.xyz/v1"
+    FLOWERY_API_URL = "https://api.flowery.pw/v1"
 
     def __init__(self, bot: Red):
         self.bot = bot
