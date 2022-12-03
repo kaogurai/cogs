@@ -44,6 +44,7 @@ class BaseCommandsMixin(MixinMeta):
         author_data = await self.config.user(ctx.author).all()
         author_voice = author_data["voice"]
         author_translate = author_data["translate"]
+        author_speed = author_data["speed"]
 
         is_voice = self.get_voice(author_voice)
         if not is_voice:
@@ -51,7 +52,7 @@ class BaseCommandsMixin(MixinMeta):
             author_voice = await self.config.user(ctx.author).voice()
 
         url = self.generate_url(
-            author_voice, author_translate, text.replace("--download", "")
+            author_voice, author_translate, text.replace("--download", ""), author_speed
         )
 
         if "--download" in text:

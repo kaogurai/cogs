@@ -33,9 +33,9 @@ class SFX(
 ):
     """Plays sound effects, text-to-speech, and sounds when you join or leave a voice channel."""
 
-    __version__ = "5.2.10"
+    __version__ = "6.0.0"
 
-    TTS_API_URL = "https://api.kaogurai.xyz/v1/tts"
+    TTS_API_URL = "https://api.flowery.pw/v1/tts"
     SFX_API_URL = "https://freesound.org/apiv2"
 
     def __init__(self, bot: Red):
@@ -43,7 +43,7 @@ class SFX(
         self.config = Config.get_conf(self, identifier=134621854878007296)
         self.session = aiohttp.ClientSession()
         user_config = {
-            "voice": "Anna",
+            "voice": "Christopher",
             "translate": False,
             "join_sound": "",
             "leave_sound": "",
@@ -101,7 +101,7 @@ class SFX(
         """
         async with self.session.get(f"{self.TTS_API_URL}/voices") as req:
             if req.status == 200:
-                self.voices = await req.json()
+                self.voices = (await req.json())["voices"]
 
     @tasks.loop(seconds=5)
     async def maybe_get_voices(self) -> None:
@@ -147,11 +147,11 @@ class SFX(
             self.id = api_tokens.get("id")
             self.key = api_tokens.get("key")
 
-    def generate_url(self, voice: str, translate: bool, text: str) -> str:
+    def generate_url(self, voice: str, translate: bool, text: str, speed: float) -> str:
         """
         Generates the URL for the TTS using kaogurai's TTS API.
         """
-        return f"{self.TTS_API_URL}/synthesize?voice={voice}&translate={translate}&text={quote(text)}&silence=500"
+        return f"{self.TTS_API_URL}?voice={voice}&translate={translate}&text={quote(text)}&silence=500&audio_format=ogg_opus&speed={speed}"
 
     def get_voice(self, voice: str) -> dict:
         """
@@ -186,13 +186,14 @@ class SFX(
         author_data = await self.config.user(user).all()
         author_voice = author_data["voice"]
         author_translate = author_data["translate"]
+        author_speed = author_data["speed"]
 
         is_voice = self.get_voice(author_voice)
         if not is_voice and self.voices:
             await self.config.user(user).voice.clear()
             author_voice = await self.config.user(user).voice()
 
-        url = self.generate_url(author_voice, author_translate, text)
+        url = self.generate_url(author_voice, author_translate, text, author_speed)
 
         track_info = ("Text to Speech", user)
 

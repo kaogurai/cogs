@@ -37,12 +37,13 @@ class UserConfigMixin(MixinMeta):
                     voice["name"],
                     False,
                     f"Hi, I'm {voice['name']}, nice to meet you.",
+                    1.0,
                 )
                 m = ""
                 if url:
                     m += f"Example: [Click Here]({url})\n"
                 m += f"• Gender: {voice['gender']}\n"
-                m += f"• Language: {voice['languageName']}\n"
+                m += f"• Language: {voice['language']['name']}\n"
                 m += f"• Source: {voice['source']}"
 
                 embed.add_field(name=voice["name"], value=m)
@@ -101,3 +102,18 @@ class UserConfigMixin(MixinMeta):
         else:
             await self.config.user(ctx.author).translate.set(True)
             await ctx.send("Your TTS translation is now on.")
+
+    @mytts.command()
+    async def speed(self, ctx: Context, speed: float = 1.0):
+        """
+        Changes your TTS speed.
+
+        Speed must be between 0.5 and 10 (both inclusive). The default is 1.0. (0.5 is half speed, 2.0 is double speed, etc.)
+        """
+        if speed <= 0.5 or speed >= 10:
+            await ctx.send("Speed must be between 0.5 and 10.")
+            return
+
+        await self.config.user(ctx.author).speed.set(speed)
+        await ctx.send(f"Your TTS speed is now {speed}.")
+        return
