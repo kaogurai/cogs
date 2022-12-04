@@ -73,7 +73,7 @@ class MediaMixin(MixinMeta):
                     return
 
             async with self.session.get(
-                f"http://zeus:9999/v1/track/download/{track['id']}"
+                f"http://100.65.138.23:9999/v1/track/download/{track['id']}"
             ) as resp:
                 if resp.status != 200:
                     await ctx.send(
