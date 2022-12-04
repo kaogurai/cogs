@@ -22,7 +22,7 @@ class MediaMixin(MixinMeta):
         """
         async with ctx.typing():
             async with self.session.get(
-                "http://zeus:9999/v1/search", params={"query": song}
+                "http://100.65.138.23:9999/v1/search", params={"query": song}
             ) as resp:
                 if resp.status != 200:
                     await ctx.send("Something went wrong when trying to search.")
