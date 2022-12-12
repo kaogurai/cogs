@@ -33,7 +33,7 @@ class SFX(
 ):
     """Plays sound effects, text-to-speech, and sounds when you join or leave a voice channel."""
 
-    __version__ = "6.0.0"
+    __version__ = "6.0.1"
 
     TTS_API_URL = "https://api.flowery.pw/v1/tts"
     SFX_API_URL = "https://freesound.org/apiv2"
@@ -47,6 +47,7 @@ class SFX(
             "translate": False,
             "join_sound": "",
             "leave_sound": "",
+            "speed": 1.0,
         }
         guild_config = {
             "channels": [],
