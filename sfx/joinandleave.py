@@ -153,7 +153,9 @@ class JoinAndLeaveMixin(MixinMeta):
         )
 
     @joinandleave_guild.command(name="setleave")
-    async def joinandleave_guild_setleave(self, ctx: Context, url: Optional[str] = None):
+    async def joinandleave_guild_setleave(
+        self, ctx: Context, url: Optional[str] = None
+    ):
         """
         Set the leave sound for this server.
 

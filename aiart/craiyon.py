@@ -30,7 +30,9 @@ class CraiyonCommand(MixinMeta):
                     if "images" not in json.keys():
                         with contextlib.suppress(discord.NotFound):
                             await m.delete()
-                        await ctx.reply("Failed to generate art. Please try again later.")
+                        await ctx.reply(
+                            "Failed to generate art. Please try again later."
+                        )
                         return
                 else:
                     with contextlib.suppress(discord.NotFound):

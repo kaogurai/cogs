@@ -1,6 +1,6 @@
 import asyncio
 import re
-from typing import Optional, Tuple, Union
+from typing import Optional, Union
 
 import aiohttp
 import discord
@@ -17,7 +17,7 @@ class SmartLyrics(commands.Cog):
     Gets lyrics for your current song.
     """
 
-    __version__ = "2.0.0"
+    __version__ = "2.0.1"
 
     def __init__(self, bot: Red):
         self.bot = bot
@@ -54,8 +54,12 @@ class SmartLyrics(commands.Cog):
                 "query": query,
             }
 
+        headers = {
+            "User-Agent": f'SmartLyrics/{self.__version__} ("https://github.com/kaogurai/cogs")',
+        }
+
         async with self.session.get(
-            "https://api.flowery.pw/v1/lyrics", params=params
+            "https://api.flowery.pw/v1/lyrics", params=params, headers=headers
         ) as resp:
             if resp.status != 200:
                 return
@@ -85,7 +89,8 @@ class SmartLyrics(commands.Cog):
                 title=f"{results['track']['title']} by {results['track']['artist']}",
                 description=page,
             )
-            embed.set_thumbnail(url=results["track"]["media"]["artwork"])
+            if results["track"]["media"]["artwork"] is not None:
+                embed.set_thumbnail(url=results["track"]["media"]["artwork"])
             if len(embed_content) != 1:
                 if source:
                     embed.set_footer(
@@ -99,7 +104,9 @@ class SmartLyrics(commands.Cog):
             embeds.append(embed)
 
         if len(embed_content) != 1:
-            asyncio.create_task(menu(ctx, embeds, controls=DEFAULT_CONTROLS, timeout=120))
+            asyncio.create_task(
+                menu(ctx, embeds, controls=DEFAULT_CONTROLS, timeout=120)
+            )
         else:
             await ctx.send(embed=embeds[0])
 

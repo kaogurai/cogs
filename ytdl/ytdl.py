@@ -64,12 +64,16 @@ class YTDL(commands.Cog):
         data = {
             "url": url,
         }
-        async with self.session.post("https://mfus.tk/api/short", json=data) as response:
+        async with self.session.post(
+            "https://mfus.tk/api/short", json=data
+        ) as response:
             if response.status == 200:
                 json = await response.json()
                 return "https://mfus.tk/" + json["code"]
 
-    async def _injector(self, data: dict, coro: Coroutine) -> Tuple[dict, Optional[str]]:
+    async def _injector(
+        self, data: dict, coro: Coroutine
+    ) -> Tuple[dict, Optional[str]]:
         return data, await coro
 
     async def _fix_urls(self, data: dict) -> dict:
@@ -130,7 +134,9 @@ class YTDL(commands.Cog):
             description = "**Regular Formats:**\n"
 
             for video_format in video_info["formatStreams"]:
-                if not video_format.get("container") or not video_format.get("encoding"):
+                if not video_format.get("container") or not video_format.get(
+                    "encoding"
+                ):
                     continue
 
                 description += f"[{len(urls) + 1}. {video_format['resolution']} - {video_format['container']} ({video_format['encoding']})]({video_format['url']})\n"
@@ -140,7 +146,9 @@ class YTDL(commands.Cog):
 
             for video_format in video_info["adaptiveFormats"]:
 
-                if not video_format.get("container") or not video_format.get("encoding"):
+                if not video_format.get("container") or not video_format.get(
+                    "encoding"
+                ):
                     continue
 
                 if "resolution" in video_format.keys():

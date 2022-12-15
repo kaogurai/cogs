@@ -270,9 +270,13 @@ class KaoTools(
                 msg += f"{emoji} - `:{emoji.name}:` (<{emoji.url}>)\n"
             else:
                 if emoji.animated:
-                    msg += f"{emoji} - `:{emoji.name}:` (`<a:{emoji.name}:{emoji.id}>`)\n"
+                    msg += (
+                        f"{emoji} - `:{emoji.name}:` (`<a:{emoji.name}:{emoji.id}>`)\n"
+                    )
                 else:
-                    msg += f"{emoji} - `:{emoji.name}:` (`<:{emoji.name}:{emoji.id}>`)\n"
+                    msg += (
+                        f"{emoji} - `:{emoji.name}:` (`<:{emoji.name}:{emoji.id}>`)\n"
+                    )
 
         for page in pagify(msg):
             await ctx.send(page)
@@ -285,7 +289,7 @@ class KaoTools(
         red_proccess = psutil.Process()
 
         with red_proccess.oneshot():
-            memory_amount = int(red_proccess.memory_info().rss / 1024 ** 2)
+            memory_amount = int(red_proccess.memory_info().rss / 1024**2)
             memory_usage = red_proccess.memory_percent("rss")
         delta = datetime.datetime.utcnow() - self.bot.uptime
         uptime_str = humanize_timedelta(timedelta=delta) or "Less than one second."

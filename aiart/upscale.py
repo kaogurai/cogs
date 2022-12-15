@@ -54,7 +54,8 @@ class UpscaleCommand(MixinMeta):
                 ],
                 "example_id": None,
                 "session_hash": "".join(
-                    random.choice(string.ascii_letters + string.digits) for _ in range(11)
+                    random.choice(string.ascii_letters + string.digits)
+                    for _ in range(11)
                 ),
                 "action": "predict",
             }
@@ -76,7 +77,8 @@ class UpscaleCommand(MixinMeta):
                     "hash": image_hash,
                 }
                 async with self.session.post(
-                    f"https://hf.space/embed/akhaliq/SwinIR/api/queue/status/", json=body
+                    f"https://hf.space/embed/akhaliq/SwinIR/api/queue/status/",
+                    json=body,
                 ) as r:
                     if r.status != 200:
                         with contextlib.suppress(discord.NotFound):

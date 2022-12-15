@@ -81,7 +81,9 @@ class PixelzArguments(Converter):
         values["prompt"] = " ".join(values["prompt"])
 
         if len(values["prompt"]) > 239:
-            raise BadArgument("Prompt is too long. Please keep it under 240 characters.")
+            raise BadArgument(
+                "Prompt is too long. Please keep it under 240 characters."
+            )
 
         if values["artist"] and values["artist"] not in PIXELZ_ARTISTS:
             values["artist"] = process.extract(
@@ -115,9 +117,9 @@ class PixelzArguments(Converter):
             values["image"] = ctx.message.attachments[0].url
 
         if values["aspect"] not in PIXELZ_ASPECTS:
-            values["aspect"] = process.extract(values["aspect"], PIXELZ_ASPECTS, limit=1)[
-                0
-            ][0]
+            values["aspect"] = process.extract(
+                values["aspect"], PIXELZ_ASPECTS, limit=1
+            )[0][0]
 
         return values
 

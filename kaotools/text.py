@@ -21,7 +21,9 @@ class TextMixin(MixinMeta):
                 await ctx.send("I couldn't find a definition for that.")
                 return
             if resp.status != 200:
-                await ctx.send("Something went wrong when trying to get the definition.")
+                await ctx.send(
+                    "Something went wrong when trying to get the definition."
+                )
                 return
             data = await resp.json()
         embeds = []
@@ -48,7 +50,9 @@ class TextMixin(MixinMeta):
             ):
                 embed.add_field(
                     name="Synonyms",
-                    value=", ".join(result["meanings"][0]["definitions"][0]["synonyms"]),
+                    value=", ".join(
+                        result["meanings"][0]["definitions"][0]["synonyms"]
+                    ),
                 )
             if (
                 "antonyms" in result["meanings"][0]["definitions"][0]
@@ -56,7 +60,9 @@ class TextMixin(MixinMeta):
             ):
                 embed.add_field(
                     name="Antonyms",
-                    value=", ".join(result["meanings"][0]["definitions"][0]["antonyms"]),
+                    value=", ".join(
+                        result["meanings"][0]["definitions"][0]["antonyms"]
+                    ),
                 )
             if len(data) > 1:
                 embed.set_footer(text=f"Result {i + 1}/{len(data)}")

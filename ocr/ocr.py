@@ -107,7 +107,9 @@ class OCR(commands.Cog):
             def e(x):
                 return "`" + x + "`"
 
-            embed = discord.Embed(color=await ctx.embed_color(), title="Math OCR Results")
+            embed = discord.Embed(
+                color=await ctx.embed_color(), title="Math OCR Results"
+            )
             embed.add_field(name="Text", value=e(data["text"][:1000]))
             embed.add_field(name="ASCII Math", value=e(data["ascii"][:1000]))
             embed.add_field(name="LaTeX", value=e(data["latex"][:1000]))

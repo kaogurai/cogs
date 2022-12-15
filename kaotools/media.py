@@ -13,7 +13,9 @@ from .abc import MixinMeta
 
 class MediaMixin(MixinMeta):
     @commands.command(aliases=["dl", "musicdl", "musicdownload"])
-    @commands.bot_has_permissions(attach_files=True, add_reactions=True, embed_links=True)
+    @commands.bot_has_permissions(
+        attach_files=True, add_reactions=True, embed_links=True
+    )
     async def download(self, ctx: Context, *, song: str):
         """
         Download a song from Deezer.

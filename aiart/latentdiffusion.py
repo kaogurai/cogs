@@ -37,7 +37,8 @@ class LatentDiffusionCommand(MixinMeta):
                 "cleared": False,
                 "example_id": None,
                 "session_hash": "".join(
-                    random.choice(string.ascii_letters + string.digits) for _ in range(11)
+                    random.choice(string.ascii_letters + string.digits)
+                    for _ in range(11)
                 ),
                 "action": "predict",
             }
@@ -71,7 +72,9 @@ class LatentDiffusionCommand(MixinMeta):
                     if req.status != 200:
                         with contextlib.suppress(discord.NotFound):
                             await m.delete()
-                        await ctx.reply("Failed to generate art. Please try again later.")
+                        await ctx.reply(
+                            "Failed to generate art. Please try again later."
+                        )
                         return
 
                     json = await req.json()

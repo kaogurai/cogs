@@ -29,7 +29,9 @@ class TTSChannelMixin(MixinMeta):
         if channel.id not in channel_list:
             channel_list.append(channel.id)
             await self.config.guild(ctx.guild).channels.set(channel_list)
-            await ctx.send(f"Okay, {channel.mention} will now be used as a TTS channel.")
+            await ctx.send(
+                f"Okay, {channel.mention} will now be used as a TTS channel."
+            )
         else:
             await ctx.send(
                 f"{channel.mention} is already a TTS channel, did you mean use the `{ctx.clean_prefix}ttschannel remove` command?"

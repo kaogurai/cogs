@@ -60,7 +60,9 @@ class ChatBot(commands.Cog):
             "uid": author.id,
             "msg": message,
         }
-        async with self.session.get("http://api.brainshop.ai/get", params=params) as resp:
+        async with self.session.get(
+            "http://api.brainshop.ai/get", params=params
+        ) as resp:
             if resp.status != 200:
                 return
             try:
@@ -251,7 +253,8 @@ class ChatBot(commands.Cog):
             return
 
         text = "".join(
-            "<#" + str(channel) + "> - " + str(channel) + "\n" for channel in channel_list
+            "<#" + str(channel) + "> - " + str(channel) + "\n"
+            for channel in channel_list
         )
         pages = [p for p in pagify(text=text, delims="\n")]
         embeds = []

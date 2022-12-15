@@ -188,7 +188,9 @@ class AutoAvatar(commands.Cog):
         Show AutoAvatar settings.
         """
         id = await self.config.current_channel()
-        embed = discord.Embed(title="AutoAvatar Settings", colour=await ctx.embed_color())
+        embed = discord.Embed(
+            title="AutoAvatar Settings", colour=await ctx.embed_color()
+        )
         qs = await self.config.weheartit_queries()
         if not qs:
             thing = "No Queries"

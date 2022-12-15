@@ -52,7 +52,9 @@ class WomboConverter(Converter):
             return
 
         values["style"] = styles[
-            process.extract(" ".join(values["style"]), list(styles.keys()), limit=1)[0][0]
+            process.extract(" ".join(values["style"]), list(styles.keys()), limit=1)[0][
+                0
+            ]
         ]
 
         if not values["image"] and ctx.message.attachments:
@@ -202,7 +204,9 @@ class WomboCommand(MixinMeta):
             if arguments["image"]:
                 async with self.session.get(arguments["image"]) as req:
                     if req.status == 200:
-                        media_id = await self._get_wombo_media_id(token, await req.read())
+                        media_id = await self._get_wombo_media_id(
+                            token, await req.read()
+                        )
 
             link = await self._get_wombo_image_link(
                 token,
