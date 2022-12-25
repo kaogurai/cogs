@@ -21,7 +21,7 @@ class AntiPhishing(commands.Cog):
     Protects users against phishing attacks.
     """
 
-    __version__ = "1.2.12"
+    __version__ = "1.2.13"
 
     def __init__(self, bot: Red):
         self.bot = bot
@@ -261,15 +261,13 @@ class AntiPhishing(commands.Cog):
             await ctx.send("That's not a valid URL.")
             return
 
-        url = urls[0]
-        status, redirects = await self.get_redirects(url)
-        real_url = redirects[-1]
+        real_url = urls[0]
         domain = urlparse(real_url).netloc
 
         if domain in self.domains:
-            await ctx.send(f"{real_url[:1000]} is a phishing scam.")
+            await ctx.send("That URL is likely a phishing scam.")
         else:
-            await ctx.send(f"{real_url[:1000]} is likely not a phishing scam.")
+            await ctx.send("That URL is likely not a phishing scam.")
 
     @commands.group(aliases=["antiphish"])
     @commands.guild_only()

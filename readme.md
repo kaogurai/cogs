@@ -18,7 +18,7 @@ Please join the support server [here](https://discord.gg/p6ehU9qhg8) if you have
 | Name         | Version | Description                                                                       |
 |--------------|---------|-----------------------------------------------------------------------------------|
 | AIArt        | v1.14.12 | Generate incredible art using AI.                                                |
-| AntiPhishing | v1.2.12 | Fight back against phishing attacks.                                              |
+| AntiPhishing | v1.2.13 | Fight back against phishing attacks.                                              |
 | AutoAvatar   | v1.0.1  | Automatically changes the bot avatar.                                             |
 | BlenderBot   | v1.0.4  | Discord version of blenderbot.ai.                                                 |
 | ChatBot      | v1.0.4  | Talk to a ChatBot!                                                                |
@@ -32,4 +32,4 @@ Please join the support server [here](https://discord.gg/p6ehU9qhg8) if you have
 | YTDL         | v1.0.5  | Download YouTube videos.                                                          |
 
 ## License
-This repo is licensed under the [MIT license.](https://github.com/kaogurai/cogs/blob/master/LICENSE)
+This repo is licensed under the [MIT license.](https://github.com/kaogurai/cogs/blob/master/LICENSE
