@@ -73,31 +73,6 @@ class WomboCommand(MixinMeta):
                     if not style["is_premium"]
                 }
 
-    async def _get_wombo_bearer_token(self) -> Optional[str]:
-        params = {"key": "AIzaSyDCvp5MTJLUdtBYEKYWXJrlLzu1zuKM6Xw"}
-        data = {"returnSecureToken": True}
-        async with self.session.post(
-            "https://identitytoolkit.googleapis.com/v1/accounts:signUp",
-            json=data,
-            params=params,
-        ) as req:
-            if req.status == 200:
-                resp = await req.json()
-                return resp["idToken"]
-
-    async def _create_wombo_session(self, token: str) -> Optional[str]:
-        headers = {
-            "authorization": f"bearer {token}",
-            "content-type": "text/plain;charset=UTF-8",
-        }
-        data = {"premium": False}
-        async with self.session.post(
-            "https://paint.api.wombo.ai/api/tasks", json=data, headers=headers
-        ) as req:
-            if req.status == 200:
-                resp = await req.json()
-                return resp["id"]
-
     async def _get_wombo_media_id(self, token: str, data: bytes) -> Optional[str]:
         try:
             image = Image.open(BytesIO(data))
@@ -105,25 +80,30 @@ class WomboCommand(MixinMeta):
             return
 
         headers = {
-            "authorization": f"bearer {token}",
-            "content-type": "text/plain;charset=UTF-8",
+            "Authorization": f"Bearer {token}",
+            "service": "Dream",
         }
-        data = {
+        post_data = {
             "media_suffix": image.format,
+            "media_expiry": "HOURS_72",
             "num_uploads": 1,
-            "image": base64.b64encode(data).decode("utf-8"),
         }
         async with self.session.post(
-            "https://app.wombo.art/api/mediastore", json=data, headers=headers
+            "https://mediastore.api.wombo.ai/io/", json=post_data, headers=headers
         ) as req:
+            if req.status != 200:
+                return
+            resp = await req.json()
+            media_id = resp[0]["id"]
+            upload_url = resp[0]["media_url"]
+
+        async with self.session.put(upload_url, data=data) as req:
             if req.status == 200:
-                resp = await req.json()
-                return resp["mediastore_uid"]
+                return media_id
 
     async def _get_wombo_image_link(
         self,
         token: str,
-        session_id: str,
         style: str,
         text: str,
         *,
@@ -134,6 +114,7 @@ class WomboCommand(MixinMeta):
                 "display_freq": 1,
                 "prompt": text,
                 "style": style,
+                "gen_type": "NORMAL",
             }
         }
         if input_image:
@@ -146,8 +127,8 @@ class WomboCommand(MixinMeta):
             "authorization": f"bearer {token}",
             "content-type": "text/plain;charset=UTF-8",
         }
-        async with self.session.put(
-            f"https://paint.api.wombo.ai/api/tasks/{session_id}",
+        async with self.session.post(
+            f"https://paint.api.wombo.ai/api/v2/tasks",
             json=params,
             headers=headers,
         ) as req:
@@ -155,14 +136,21 @@ class WomboCommand(MixinMeta):
                 return
             resp = await req.json()
 
+        session_id = resp["id"]
+
         for x in range(25):
+            params = {
+                "ids": session_id,
+            }
             async with self.session.get(
-                f"https://paint.api.wombo.ai/api/tasks/{session_id}", headers=headers
+                f"https://paint.api.wombo.ai/api/v2/tasks/batch",
+                headers=headers,
+                params=params,
             ) as req:
                 if req.status not in [200, 304]:
                     return
 
-                resp = await req.json()
+                resp = (await req.json())[0]
 
                 if resp["state"] == "failed":
                     return
@@ -187,14 +175,10 @@ class WomboCommand(MixinMeta):
 
         m = await ctx.reply("Generating art... This may take a while.")
         async with ctx.typing():
-            token = await self._get_wombo_bearer_token()
+            token = await self._get_firebase_bearer_token(
+                "AIzaSyDCvp5MTJLUdtBYEKYWXJrlLzu1zuKM6Xw"
+            )
             if not token:
-                with contextlib.suppress(discord.NotFound):
-                    await m.delete()
-                await ctx.reply("Failed to generate art. Please try again later.")
-                return
-            session_id = await self._create_wombo_session(token)
-            if not session_id:
                 with contextlib.suppress(discord.NotFound):
                     await m.delete()
                 await ctx.reply("Failed to generate art. Please try again later.")
@@ -210,7 +194,6 @@ class WomboCommand(MixinMeta):
 
             link = await self._get_wombo_image_link(
                 token,
-                session_id,
                 arguments["style"],
                 arguments["prompt"],
                 input_image=media_id,
