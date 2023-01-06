@@ -8,7 +8,7 @@ import lavalink
 from redbot.core import commands
 from redbot.core.bot import Red
 from redbot.core.commands import Context
-from redbot.core.utils.chat_formatting import pagify
+from redbot.core.utils.chat_formatting import pagify, text_to_file
 from redbot.core.utils.menus import DEFAULT_CONTROLS, menu
 
 
@@ -17,7 +17,7 @@ class SmartLyrics(commands.Cog):
     Gets lyrics for your current song.
     """
 
-    __version__ = "2.0.1"
+    __version__ = "2.1.0"
 
     def __init__(self, bot: Red):
         self.bot = bot
@@ -65,22 +65,40 @@ class SmartLyrics(commands.Cog):
                 return
             return await resp.json()
 
-    # adapted https://github.com/Cog-Creators/Red-DiscordBot/blob/V3/develop/redbot/cogs/mod/names.py#L112-L126
     def get_user_status_song(
         self, user: Union[discord.Member, discord.User]
     ) -> Optional[str]:
-        listening_statuses = [
-            s for s in user.activities if s.type == discord.ActivityType.listening
-        ]
-        if not listening_statuses:
-            return
-        for listening_status in listening_statuses:
-            if isinstance(listening_status, discord.Spotify):
-                return listening_status.track_id
+        s =  next(
+            (
+                s.title
+                for s in user.activities
+                if s.type == discord.ActivityType.listening
+                and isinstance(s, discord.Spotify)
+            ),
+            None,
+        )
+        if s:
+            return s.track_id
 
-    async def create_menu(
-        self, ctx: Context, results: dict, source: Optional[str] = None
+    async def send_results(
+        self, ctx: Context, lrc: bool, results: dict, source: Optional[str] = None
     ):
+        # Check if there is timed lyrics
+        # If there is not, we will ignore the lrc argument
+        if not results["lyrics"]["lines"]:
+            lrc = False
+
+        if lrc:
+            lrc_string = ""
+            for line in results["lyrics"]["lines"]:
+                start = line["start"]
+                # Convert start (ms) to [mm:ss.xx] format
+                start = f"{start // 60000:02d}:{start % 60000 // 1000:02d}.{start % 1000 // 10:02d}"
+                lrc_string += f"[{start}] {line['text']}\n"
+            
+            await ctx.send(file=text_to_file(lrc_string, filename=f"{results['track']['artist']} - {results['track']['title']}.lrc"))
+            return
+
         embeds = []
         embed_content = [p for p in pagify(results["lyrics"]["text"], page_length=750)]
         for index, page in enumerate(embed_content):
@@ -113,30 +131,22 @@ class SmartLyrics(commands.Cog):
     @commands.bot_has_permissions(embed_links=True)
     @commands.guild_only()
     @commands.command(aliases=["l", "ly"])
-    async def lyrics(self, ctx: Context, *, query: Optional[str] = None):
+    async def lyrics(self, ctx: Context, lrc: Optional[bool] = False, *, query: Optional[str] = None):
         """
         Gets the lyrics for your current song.
 
-        If a query (song name) is provided, it will immediately search that.
-        Next, it checks if you are in VC and a song is playing.
-        Then, it checks if you are listening to a song on spotify.
-        Lastly, it checks your last.fm account for your latest song.
+        It checks for a query, your voice channel, your spotify status, and your last.fm status (in that order)
 
-        If all of these provide nothing, it will simply ask you to name a song.
+        If you would like to download the lyrics as a .lrc file, use `[p]lyrics true` or `[p]lyrics true <query>`
         """
         async with ctx.typing():
             if query:
-                if len(query) > 2000:
-                    return
                 results = await self.get_lyrics(query=query)
                 if results:
-                    await self.create_menu(ctx, results)
-                    return
+                    await self.send_results(ctx,lrc, results)
                 else:
-                    await ctx.send(f"Nothing was found for `{query}`")
-                    return
-
-            lastfmcog = self.bot.get_cog("LastFM")
+                    await ctx.send(f"No results were found for `{query[:500]}`")
+                return
 
             if ctx.author.voice and ctx.guild.me.voice:
                 if ctx.author.voice.channel == ctx.guild.me.voice.channel:
@@ -151,42 +161,41 @@ class SmartLyrics(commands.Cog):
 
                         results = await self.get_lyrics(query=title)
                         if results:
-                            await self.create_menu(ctx, results, "Voice Channel")
-                            return
+                            await self.send_results(ctx, lrc, results, "Voice Channel")
                         else:
-                            await ctx.send(f"Nothing was found for `{title}`")
-                            return
+                            await ctx.send(f"No results were found for `{title[:500]}`")
+                        return
 
             spotify_id = self.get_user_status_song(ctx.author)
             if spotify_id:
                 results = await self.get_lyrics(spotify_id=spotify_id)
                 if results:
-                    await self.create_menu(ctx, results, "Spotify")
-                    return
+                    await self.send_results(ctx, lrc, results, "Spotify")
                 else:
-                    await ctx.send(f"Nothing was found for your spotify song.")
-                    return
+                    await ctx.send("No results were found for your Spotify status.")
+                return
 
-            username = await lastfmcog.config.user(ctx.author).lastfm_username()
-            if lastfmcog and username:
+            lastfm_cog = self.bot.get_cog("LastFM")
+            lastfm_username = await lastfm_cog.config.user(ctx.author).lastfm_username()
+
+            if lastfm_cog and lastfm_username:
                 try:
                     (
                         trackname,
                         artistname,
                         albumname,
                         imageurl,
-                    ) = await lastfmcog.get_current_track(ctx, username)
+                    ) = await lastfm_cog.get_current_track(ctx, lastfm_username)
                 except:
                     await ctx.send("Please provide a query to search.")
                     return
 
-                trackname = f"{trackname} {artistname}"
-                results = await self.get_lyrics(query=trackname)
+                q = f"{trackname} {artistname}"
+                results = await self.get_lyrics(query=q)
                 if results:
-                    await self.create_menu(ctx, results, "Last.fm")
-                    return
+                    await self.send_results(ctx, lrc, results, "Last.fm")
                 else:
-                    await ctx.send(f"Nothing was found for `{trackname}`")
-                    return
+                    await ctx.send(f"Nothing was found for `{q[:500]}`")
+                return
 
             await ctx.send("Please provide a query to search.")
