@@ -18,7 +18,7 @@ class WaifuDiffusionCommand(MixinMeta):
     async def _waifu_diffusion_join_queue(self) -> Optional[_WSRequestContextManager]:
         for x in range(25):
             session = await self.session.ws_connect(
-                "wss://spaces.huggingface.tech/hakurei/waifu-diffusion-demo/queue/join"
+                "wss://hakurei-waifu-diffusion-demo.hf.space/queue/join"
             )
             first_message = await session.receive_json()
             if first_message["msg"] != "queue_full":
