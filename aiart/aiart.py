@@ -37,7 +37,7 @@ class AIArt(
     Generate incredible art using AI.
     """
 
-    __version__ = "1.14.14"
+    __version__ = "1.14.15"
 
     def __init__(self, bot: Red):
         self.bot = bot
@@ -73,8 +73,11 @@ class AIArt(
         Returns:
             bool - Whether the image is NSFW or not.
         """
+        headers = {
+            "User-Agent": f"AIArt/{self.__version__} (https://github.com/kaogurai/cogs)"
+        }
         async with self.session.post(
-            "https://api.flowery.pw/v1/nsfwdetection", data={"file": data}
+            "https://api.flowery.pw/v1/nsfwdetection", data={"file": data}, headers=headers
         ) as req:
             if req.status == 200:
                 resp = await req.json()

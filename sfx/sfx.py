@@ -33,9 +33,12 @@ class SFX(
 ):
     """Plays sound effects, text-to-speech, and sounds when you join or leave a voice channel."""
 
-    __version__ = "6.0.1"
+    __version__ = "6.0.2"
 
     TTS_API_URL = "https://api.flowery.pw/v1/tts"
+    TTS_API_HEADERS = {
+        "User-Agent": f"SFX/{__version__} (https://github.com/kaogurai/cogs)"
+    }
     SFX_API_URL = "https://freesound.org/apiv2"
 
     def __init__(self, bot: Red):
@@ -100,7 +103,9 @@ class SFX(
 
         It runs every 48 hours since it's uncommon voices will change.
         """
-        async with self.session.get(f"{self.TTS_API_URL}/voices") as req:
+        async with self.session.get(
+            f"{self.TTS_API_URL}/voices", headers=self.TTS_API_HEADERS
+        ) as req:
             if req.status == 200:
                 self.voices = (await req.json())["voices"]
 

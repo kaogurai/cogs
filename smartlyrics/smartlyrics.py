@@ -17,7 +17,7 @@ class SmartLyrics(commands.Cog):
     Gets lyrics for your current song.
     """
 
-    __version__ = "2.1.0"
+    __version__ = "2.1.1"
 
     def __init__(self, bot: Red):
         self.bot = bot
@@ -55,7 +55,7 @@ class SmartLyrics(commands.Cog):
             }
 
         headers = {
-            "User-Agent": f'SmartLyrics/{self.__version__} ("https://github.com/kaogurai/cogs")',
+            "User-Agent": f"SmartLyrics/{self.__version__} (https://github.com/kaogurai/cogs)",
         }
 
         async with self.session.get(
@@ -68,7 +68,7 @@ class SmartLyrics(commands.Cog):
     def get_user_status_song(
         self, user: Union[discord.Member, discord.User]
     ) -> Optional[str]:
-        s =  next(
+        s = next(
             (
                 s.title
                 for s in user.activities
@@ -95,8 +95,13 @@ class SmartLyrics(commands.Cog):
                 # Convert start (ms) to [mm:ss.xx] format
                 start = f"{start // 60000:02d}:{start % 60000 // 1000:02d}.{start % 1000 // 10:02d}"
                 lrc_string += f"[{start}] {line['text']}\n"
-            
-            await ctx.send(file=text_to_file(lrc_string, filename=f"{results['track']['artist']} - {results['track']['title']}.lrc"))
+
+            await ctx.send(
+                file=text_to_file(
+                    lrc_string,
+                    filename=f"{results['track']['artist']} - {results['track']['title']}.lrc",
+                )
+            )
             return
 
         embeds = []
@@ -131,7 +136,9 @@ class SmartLyrics(commands.Cog):
     @commands.bot_has_permissions(embed_links=True)
     @commands.guild_only()
     @commands.command(aliases=["l", "ly"])
-    async def lyrics(self, ctx: Context, lrc: Optional[bool] = False, *, query: Optional[str] = None):
+    async def lyrics(
+        self, ctx: Context, lrc: Optional[bool] = False, *, query: Optional[str] = None
+    ):
         """
         Gets the lyrics for your current song.
 
@@ -143,7 +150,7 @@ class SmartLyrics(commands.Cog):
             if query:
                 results = await self.get_lyrics(query=query)
                 if results:
-                    await self.send_results(ctx,lrc, results)
+                    await self.send_results(ctx, lrc, results)
                 else:
                     await ctx.send(f"No results were found for `{query[:500]}`")
                 return

@@ -66,7 +66,7 @@ class BaseCommandsMixin(MixinMeta):
                     "I do not have permissions to send files in this channel."
                 )
                 return
-            async with self.session.get(url) as resp:
+            async with self.session.get(url, headers=self.TTS_API_HEADERS) as resp:
                 if resp.status != 200:
                     await ctx.send("Something went wrong. Try again later.")
                     return
