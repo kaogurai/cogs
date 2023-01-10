@@ -15,7 +15,7 @@ class OCR(commands.Cog):
     Converts an image to text.
     """
 
-    __version__ = "1.0.1"
+    __version__ = "1.0.2"
 
     def __init__(self, bot: Red):
         self.bot = bot
@@ -45,11 +45,15 @@ class OCR(commands.Cog):
             link = str(ctx.message.attachments[0].url)
 
         async with ctx.typing():
+            headers = {
+                "User-Agent": f"Red-DiscordBot, OCR/v{self.__version__} (https://github.com/kaogurai/cogs)"
+            }
             async with self.session.get(
                 f"{FLOWERY_API_URL}/ocr",
                 params={
                     "url": link,
                 },
+                headers=headers,
             ) as resp:
                 if resp.status == 404:
                     await ctx.send("No text was found in the image.")
@@ -85,7 +89,7 @@ class OCR(commands.Cog):
 
         async with ctx.typing():
             headers = {
-                "User-Agent": f"OCR/{self.__version__} (https://github.com/kaogurai/cogs)"
+                "User-Agent": f"Red-DiscordBot, OCR/v{self.__version__} (https://github.com/kaogurai/cogs)"
             }
             async with self.session.get(
                 f"{FLOWERY_API_URL}/mathocr",

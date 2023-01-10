@@ -83,6 +83,9 @@ class TextMixin(MixinMeta):
             "result_language_code": lang_code,
             "text": text,
         }
+        headers = {
+            "User-Agent": f"Red-DiscordBot, KaoTools/v{self.__version__} (https://github.com/kaogurai/cogs)"
+        }
         async with self.session.get(
             f"{self.FLOWERY_API_URL}/translation/translate", params=params
         ) as resp:
