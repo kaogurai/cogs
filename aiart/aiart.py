@@ -17,7 +17,6 @@ from redbot.core.utils.predicates import ReactionPredicate
 from .abc import CompositeMetaClass
 from .craiyon import CraiyonCommand
 from .latentdiffusion import LatentDiffusionCommand
-from .stablediffusion import StableDiffusionCommand
 from .upscale import UpscaleCommand
 from .waifudiffusion import WaifuDiffusionCommand
 from .wombo import WomboCommand
@@ -26,7 +25,6 @@ from .wombo import WomboCommand
 class AIArt(
     CraiyonCommand,
     LatentDiffusionCommand,
-    StableDiffusionCommand,
     UpscaleCommand,
     WaifuDiffusionCommand,
     WomboCommand,
@@ -37,11 +35,17 @@ class AIArt(
     Generate incredible art using AI.
     """
 
-    __version__ = "1.14.16"
+    __version__ = "1.15.0"
 
     def __init__(self, bot: Red):
         self.bot = bot
         self.session = aiohttp.ClientSession()
+        self.wombo_data = {
+            "app_token": None,
+            "app_token_expires": None,
+            "api_token": None,
+        }
+        self.bot.loop.create_task(self.set_token())
 
     def cog_unload(self):
         self.bot.loop.create_task(self.session.close())
@@ -52,6 +56,23 @@ class AIArt(
     def format_help_for_context(self, ctx: Context) -> str:
         pre_processed = super().format_help_for_context(ctx)
         return f"{pre_processed}\n\nCog Version: {self.__version__}"
+
+    async def set_token(self) -> None:
+        """
+        Possibly sets the token for the Wombo Dream API.
+        """
+        tokens = await self.bot.get_shared_api_tokens("wombo")
+        self.wombo_data["api_token"] = tokens.get("token")
+
+    @commands.Cog.listener()
+    async def on_red_api_tokens_update(self, service_name: str, api_tokens: dict):
+        """
+        Updates the token when the API tokens are updated.
+
+        Possibly sets the token for the Wombo Dream API.
+        """
+        if service_name == "wombo":
+            self.wombo_data["api_token"] = api_tokens.get("token")
 
     async def _get_firebase_bearer_token(self, key: str) -> Optional[str]:
         params = {"key": key}
@@ -260,9 +281,7 @@ class AIArt(
                         file=discord.File(BytesIO(image), filename="image.png")
                     )
 
-    @commands.command(
-        aliases=["text2art", "text2im", "text2img", "text2image", "stablediffusion"]
-    )
+    @commands.command(aliases=["text2art", "text2im", "text2img", "text2image"])
     @commands.bot_has_permissions(embed_links=True)
     async def draw(self, ctx: Context, *, args: str):
         """

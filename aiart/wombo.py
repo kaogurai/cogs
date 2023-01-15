@@ -1,6 +1,6 @@
 import asyncio
-import base64
 import contextlib
+import time
 from io import BytesIO
 from typing import Optional
 
@@ -27,6 +27,10 @@ class WomboConverter(Converter):
         parser.add_argument("--style", type=str, default=["Realistic"], nargs="*")
         parser.add_argument("--image", type=str, default=None, nargs="?")
 
+        if ctx.cog.wombo_data["api_token"]:
+            parser.add_argument("--height", type=int, default=1024, nargs="?")
+            parser.add_argument("--width", type=int, default=1024, nargs="?")
+
         try:
             values = vars(parser.parse_args(argument.split(" ")))
         except Exception:
@@ -41,6 +45,8 @@ class WomboConverter(Converter):
             raise BadArgument("The prompt needs to be 100 characters or less.")
 
         styles = await ctx.cog._get_wombo_styles()
+        if not styles:
+            raise BadArgument("Could not get available styles.")
 
         if values["styles"]:
             embed = discord.Embed(
@@ -64,7 +70,28 @@ class WomboConverter(Converter):
 
 
 class WomboCommand(MixinMeta):
-    async def _get_wombo_styles(self) -> dict:
+    async def _get_wombo_app_token(self) -> Optional[str]:
+        if (
+            self.wombo_data["app_token"]
+            and self.wombo_data["app_token_expires"] > time.time()
+        ):
+            return self.wombo_data["app_token"]
+
+        # Yes, I am aware that we could just refresh the token
+        # But, for rate limiting purposes, it's better to just get a new one
+        new_token = await self._get_firebase_bearer_token(
+            "AIzaSyDCvp5MTJLUdtBYEKYWXJrlLzu1zuKM6Xw"
+        )
+
+        if new_token:
+            self.wombo_data["app_token"] = new_token
+            self.wombo_data["app_token_expires"] = (
+                time.time() + 3500
+            )  # It's actually 3600, but we still need time to get the image
+
+        return new_token
+
+    async def _get_wombo_app_styles(self) -> Optional[dict]:
         async with self.session.get("https://paint.api.wombo.ai/api/styles") as req:
             if req.status == 200:
                 return {
@@ -73,7 +100,23 @@ class WomboCommand(MixinMeta):
                     if not style["is_premium"]
                 }
 
-    async def _get_wombo_media_id(self, token: str, data: bytes) -> Optional[str]:
+    async def _get_wombo_api_styles(self) -> Optional[dict]:
+        headers = {
+            "Authorization": f"bearer {self.wombo_data['api_token']}",
+        }
+        async with self.session.get(
+            "https://api.luan.tools/api/styles", headers=headers
+        ) as req:
+            if req.status == 200:
+                return {style["name"]: style["id"] for style in await req.json()}
+
+    async def _get_wombo_styles(self) -> Optional[dict]:
+        if self.wombo_data["api_token"]:
+            return await self._get_wombo_api_styles()
+        else:
+            return await self._get_wombo_app_styles()
+
+    async def _get_wombo_app_media_id(self, token: str, data: bytes) -> Optional[str]:
         try:
             image = Image.open(BytesIO(data))
         except Exception:
@@ -101,26 +144,32 @@ class WomboCommand(MixinMeta):
             if req.status == 200:
                 return media_id
 
-    async def _get_wombo_image_link(
-        self,
-        token: str,
-        style: str,
-        text: str,
-        *,
-        input_image: Optional[str] = None,
-    ) -> Optional[str]:
+    async def _get_wombo_app_image_link(self, arguments: dict) -> Optional[str]:
+
+        token = await self._get_wombo_app_token()
+        if not token:
+            return
+
+        media_id = None
+        if arguments["image"]:
+            async with self.session.get(arguments["image"]) as req:
+                if req.status == 200:
+                    media_id = await self._get_wombo_app_media_id(
+                        token, await req.read()
+                    )
+
         params = {
             "input_spec": {
                 "display_freq": 1,
-                "prompt": text,
-                "style": style,
+                "prompt": arguments["prompt"],
+                "style": arguments["style"],
                 "gen_type": "NORMAL",
             }
         }
-        if input_image:
+        if media_id:
             params["input_spec"]["input_image"] = {
-                "weight": "HIGH",
-                "mediastore_id": input_image,
+                "weight": "MEDIUM",
+                "mediastore_id": media_id,
             }
 
         headers = {
@@ -160,44 +209,78 @@ class WomboCommand(MixinMeta):
 
             await asyncio.sleep(3)
 
+    async def _get_wombo_api_image_link(self, arguments: dict) -> Optional[str]:
+
+        headers = {
+            "Authorization": f"bearer {self.wombo_data['api_token']}",
+        }
+        data = {
+            "use_target_image": bool(arguments["image"]),
+        }
+        async with self.session.post(
+            "https://api.luan.tools/api/tasks", headers=headers, json=data
+        ) as req:
+            if req.status != 200:
+                return
+            resp = await req.json()
+            task_id = resp["id"]
+
+        if arguments["image"]:
+            async with self.session.get(arguments["image"]) as req:
+                if req.status == 200:
+                    resp["target_image_url"]["fields"]["file"] = await req.read()
+                    async with self.session.post(
+                        resp["target_image_url"]["url"],
+                        data=resp["target_image_url"]["fields"],
+                    ):
+                        pass
+
+        data = {
+            "input_spec": {
+                "style": arguments["style"],
+                "prompt": arguments["style"],
+                "target_image_weight": 0.1,
+                "width": arguments["width"],
+                "height": arguments["height"],
+            }
+        }
+        async with self.session.put(
+            "https://api.luan.tools/api/tasks/" + task_id, headers=headers, json=data
+        ) as req:
+            if req.status != 200:
+                return
+
+        for x in range(25):
+            async with self.session.get(
+                "https://api.luan.tools/api/tasks/" + task_id, headers=headers
+            ) as req:
+                if req.status != 200:
+                    return
+                resp = await req.json()
+
+                if resp["state"] == "failed":
+                    return
+                elif resp["state"] == "completed":
+                    return resp["result"]
+                else:
+                    await asyncio.sleep(3)
+
     @commands.command()
     @commands.bot_has_permissions(embed_links=True)
     async def wombo(self, ctx: Context, *, arguments: WomboConverter):
         """
         Generate art using Wombo.
-
-        You can use the following arguments (all are optional):
-        `--style`: The style of art to generate. Defaults to `Realistic`. Run `[p]wombo --styles` to see a list of styles.
-        `--image`: The image to use as input. If not provided, the first image attached to the message will be used.
         """
         if not arguments:
             return  # This should mean that the user ran `[p]wombo --styles`
 
         m = await ctx.reply("Generating art... This may take a while.")
         async with ctx.typing():
-            token = await self._get_firebase_bearer_token(
-                "AIzaSyDCvp5MTJLUdtBYEKYWXJrlLzu1zuKM6Xw"
-            )
-            if not token:
-                with contextlib.suppress(discord.NotFound):
-                    await m.delete()
-                await ctx.reply("Failed to generate art. Please try again later.")
-                return
 
-            media_id = None
-            if arguments["image"]:
-                async with self.session.get(arguments["image"]) as req:
-                    if req.status == 200:
-                        media_id = await self._get_wombo_media_id(
-                            token, await req.read()
-                        )
-
-            link = await self._get_wombo_image_link(
-                token,
-                arguments["style"],
-                arguments["prompt"],
-                input_image=media_id,
-            )
+            if not self.wombo_data["api_token"]:
+                link = await self._get_wombo_app_image_link(arguments)
+            else:
+                link = await self._get_wombo_api_image_link(arguments)
 
             if not link:
                 with contextlib.suppress(discord.NotFound):

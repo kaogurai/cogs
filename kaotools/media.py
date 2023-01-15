@@ -12,7 +12,6 @@ from .abc import MixinMeta
 
 
 class MediaMixin(MixinMeta):
-
     async def get_omdb_info(self, type: str, query: str) -> dict:
         params = {"apikey": self.omdb_key, "type": type, "t": query}
         async with self.session.get("http://www.omdbapi.com/", params=params) as req:

@@ -84,13 +84,17 @@ class YTDL(commands.Cog):
 
         for video_format in data["adaptiveFormats"]:
             domain = urlparse(video_format["url"]).netloc
-            video_format["url"] = video_format["url"].replace(domain, INVIDIOUS_DOMAIN, 1)
+            video_format["url"] = video_format["url"].replace(
+                domain, INVIDIOUS_DOMAIN, 1
+            )
             func = self._shorten_url(video_format["url"])
             things.append(self._injector(video_format, func))
 
         for video_format in data["formatStreams"]:
             domain = urlparse(video_format["url"]).netloc
-            video_format["url"] = video_format["url"].replace(domain, INVIDIOUS_DOMAIN, 1)
+            video_format["url"] = video_format["url"].replace(
+                domain, INVIDIOUS_DOMAIN, 1
+            )
 
             func = self._shorten_url(video_format["url"])
             things.append(self._injector(video_format, func))
