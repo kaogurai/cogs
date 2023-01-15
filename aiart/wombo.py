@@ -105,7 +105,7 @@ class WomboCommand(MixinMeta):
             "Authorization": f"bearer {self.wombo_data['api_token']}",
         }
         async with self.session.get(
-            "https://api.luan.tools/api/styles", headers=headers
+            "https://api.luan.tools/api/styles/", headers=headers
         ) as req:
             if req.status == 200:
                 return {style["name"]: style["id"] for style in await req.json()}
@@ -218,7 +218,7 @@ class WomboCommand(MixinMeta):
             "use_target_image": bool(arguments["image"]),
         }
         async with self.session.post(
-            "https://api.luan.tools/api/tasks", headers=headers, json=data
+            "https://api.luan.tools/api/tasks/", headers=headers, json=data
         ) as req:
             if req.status != 200:
                 return
@@ -238,7 +238,7 @@ class WomboCommand(MixinMeta):
         data = {
             "input_spec": {
                 "style": arguments["style"],
-                "prompt": arguments["style"],
+                "prompt": arguments["prompt"],
                 "target_image_weight": 0.1,
                 "width": arguments["width"],
                 "height": arguments["height"],
@@ -270,6 +270,14 @@ class WomboCommand(MixinMeta):
     async def wombo(self, ctx: Context, *, arguments: WomboConverter):
         """
         Generate art using Wombo.
+
+        **Arguments:**
+            - `prompt` The prompt to use for the art.
+            - `--style` The style to use for the art.
+            - `--image` The image to use for the art. This can be a URL or an attachment.
+            - `--width` The width of the art. Defaults to 1024.
+            - `--height` The height of the art. Defaults to 1024.
+
         """
         if not arguments:
             return  # This should mean that the user ran `[p]wombo --styles`
