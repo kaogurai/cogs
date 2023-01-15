@@ -21,7 +21,7 @@ class YTDL(commands.Cog):
     Downloads YouTube videos.
     """
 
-    __version__ = "1.0.7"
+    __version__ = "1.0.8"
 
     def __init__(self, bot: Red):
         self.bot = bot
@@ -84,21 +84,22 @@ class YTDL(commands.Cog):
 
         for video_format in data["adaptiveFormats"]:
             domain = urlparse(video_format["url"]).netloc
-            url = video_format["url"].replace(domain, INVIDIOUS_DOMAIN, 1)
-            func = self._shorten_url(url)
+            video_format["url"] = video_format["url"].replace(domain, INVIDIOUS_DOMAIN, 1)
+            func = self._shorten_url(video_format["url"])
             things.append(self._injector(video_format, func))
 
         for video_format in data["formatStreams"]:
             domain = urlparse(video_format["url"]).netloc
-            url = video_format["url"].replace(domain, INVIDIOUS_DOMAIN, 1)
-            func = self._shorten_url(url)
+            video_format["url"] = video_format["url"].replace(domain, INVIDIOUS_DOMAIN, 1)
+
+            func = self._shorten_url(video_format["url"])
             things.append(self._injector(video_format, func))
 
         results = await asyncio.gather(*things)
 
         for video_data, url_data in results:
             if url_data:
-                video_data["url"] = url_data
+                video_data["shortened_url"] = url_data
 
         return data
 
@@ -141,7 +142,7 @@ class YTDL(commands.Cog):
                 ):
                     continue
 
-                description += f"[{len(urls) + 1}. {video_format['resolution']} - {video_format['container']} ({video_format['encoding']})]({video_format['url']})\n"
+                description += f"[{len(urls) + 1}. {video_format['resolution']} - {video_format['container']} ({video_format['encoding']})]({video_format['shortened_url']})\n"
                 urls.append(video_format)
 
             description += "\n**Split Formats:**\n"
@@ -154,9 +155,9 @@ class YTDL(commands.Cog):
                     continue
 
                 if "resolution" in video_format.keys():
-                    description += f"[{len(urls) + 1}. Video Only - {video_format['resolution']} - {video_format['container']} ({video_format['encoding']})]({video_format['url']})\n"
+                    description += f"[{len(urls) + 1}. Video Only - {video_format['resolution']} - {video_format['container']} ({video_format['encoding']})]({video_format['shortened_url']})\n"
                 else:
-                    description += f"[{len(urls) + 1}. Audio Only - {float(video_format['bitrate']) / 1000} kb/s - {video_format['container']} ({video_format['encoding']})]({video_format['url']})\n"
+                    description += f"[{len(urls) + 1}. Audio Only - {float(video_format['bitrate']) / 1000} kb/s - {video_format['container']} ({video_format['encoding']})]({video_format['shortened_url']})\n"
                 urls.append(video_format)
 
             embed.description = description[:4000]
@@ -212,7 +213,7 @@ class YTDL(commands.Cog):
                 m = await ctx.send(embed=embed)
 
                 async with self.session.get(
-                    video["url"], allow_redirects=True, timeout=300
+                    video["url"], allow_redirects=True, timeout=1800
                 ) as response:
                     if response.status == 200:
                         data = await response.read()
