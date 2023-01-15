@@ -77,7 +77,9 @@ class AIArt(
             "User-Agent": f"Red-DiscordBot, AIArt/v{self.__version__} (https://github.com/kaogurai/cogs)"
         }
         async with self.session.post(
-            "https://api.flowery.pw/v1/nsfwdetection", data={"file": data}, headers=headers
+            "https://api.flowery.pw/v1/nsfwdetection",
+            data={"file": data},
+            headers=headers,
         ) as req:
             if req.status == 200:
                 resp = await req.json()

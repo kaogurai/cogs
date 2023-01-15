@@ -1,7 +1,9 @@
 import asyncio
 import contextlib
 import io
+import random
 import re
+import string
 from typing import Coroutine, Optional, Tuple
 from urllib.parse import urlparse
 
@@ -19,7 +21,7 @@ class YTDL(commands.Cog):
     Downloads YouTube videos.
     """
 
-    __version__ = "1.0.6"
+    __version__ = "1.0.7"
 
     def __init__(self, bot: Red):
         self.bot = bot
@@ -61,15 +63,15 @@ class YTDL(commands.Cog):
         """
         Shortens a URL so more can fit in an embed.
         """
-        data = {
-            "url": url,
-        }
-        async with self.session.post(
-            "https://mfus.tk/api/short", json=data
-        ) as response:
+        # 16 random chars
+        key = "".join(
+            random.choice(string.ascii_lowercase + string.digits) for _ in range(24)
+        )
+
+        data = {"golink": key, "dest": url, "addLogo": False, "caption": ""}
+        async with self.session.post("https://zgzg.link/edit", json=data) as response:
             if response.status == 200:
-                json = await response.json()
-                return "https://mfus.tk/" + json["code"]
+                return f"https://zgzg.link/{key}"
 
     async def _injector(
         self, data: dict, coro: Coroutine
