@@ -310,6 +310,10 @@ class WomboCommand(MixinMeta):
                     )
                 )
 
+            if not self.wombo_data["api_token"]:
+                # This is so if the token is expired, it will get refreshed here instead of every task needing to do it.
+                await self._get_wombo_app_token()
+
             links = await asyncio.gather(*tasks)
 
             with contextlib.suppress(discord.NotFound):
@@ -336,3 +340,37 @@ class WomboCommand(MixinMeta):
             images = await asyncio.gather(*tasks)
 
         await self.send_images(ctx,  [x for x in images if x])
+
+    @commands.command(aliases=["enhanceprompt", "betterprompt"])
+    async def magicprompt(self, ctx: Context, *, prompt: str):
+        """
+        Generate a prompt using MagicPrompt.
+
+        **Arguments:**
+            - `prompt` The prompt to use for the art.
+        """
+        async with ctx.typing():
+            token = await self._get_wombo_app_token()
+            if not token:
+                await ctx.reply("Something went wrong when getting the token.")
+                return
+
+            headers = {
+                "Authorization": f"bearer {token}",
+            }
+            params = {
+                "prompt": prompt,
+            }
+            async with self.session.get("https://paint.api.wombo.ai/api/prompt/suggestion/", headers=headers, params=params) as req:
+                if req.status != 200:
+                    await ctx.reply("Something went wrong when getting the prompt.")
+                    return
+                resp = await req.json()
+
+            embed = discord.Embed(
+                title="MagicPrompt",
+                description=resp["suggestion"],
+                color=await ctx.embed_color(),
+            )
+            await ctx.reply(embed=embed)
+        
