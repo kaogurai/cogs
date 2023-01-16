@@ -26,10 +26,10 @@ class WomboConverter(Converter):
         parser.add_argument("--styles", action="store_true")
         parser.add_argument("--style", type=str, default=["Realistic"], nargs="*")
         parser.add_argument("--image", type=str, default=None, nargs="?")
+        parser.add_argument("--amount", type=int, default=4, nargs="?")
+        parser.add_argument("--height", type=int, default=1024, nargs="?")
+        parser.add_argument("--width", type=int, default=1024, nargs="?")
 
-        if ctx.cog.wombo_data["api_token"]:
-            parser.add_argument("--height", type=int, default=1024, nargs="?")
-            parser.add_argument("--width", type=int, default=1024, nargs="?")
 
         try:
             values = vars(parser.parse_args(argument.split(" ")))
@@ -41,7 +41,14 @@ class WomboConverter(Converter):
 
         values["prompt"] = " ".join(values["prompt"])
 
-        if len(values["prompt"]) > 100 and not values["styles"]:
+        if values["amount"] not in range(1, 10):
+            raise BadArgument("The amount needs to be between 1 and 9.")
+
+        total_pixels = values["height"] * values["width"]
+        if total_pixels not in range(8000, 1500000):
+            raise BadArgument("The image needs to be between 8000 and 1500000 pixels")
+
+        if not ctx.cog.wombo_data["api_token"] and len(values["prompt"]) > 100 and not values["styles"]:
             raise BadArgument("The prompt needs to be 100 characters or less.")
 
         styles = await ctx.cog._get_wombo_styles()
@@ -239,9 +246,10 @@ class WomboCommand(MixinMeta):
             "input_spec": {
                 "style": arguments["style"],
                 "prompt": arguments["prompt"],
-                "target_image_weight": 0.1,
+                "target_image_weight": 0.5,
                 "width": arguments["width"],
                 "height": arguments["height"],
+                "allow_nsfw": True,
             }
         }
         async with self.session.put(
@@ -275,6 +283,9 @@ class WomboCommand(MixinMeta):
             - `prompt` The prompt to use for the art.
             - `--style` The style to use for the art.
             - `--image` The image to use for the art. This can be a URL or an attachment.
+            - `--amount` The amount of art to generate. Defaults to 4. Range is 1-9.
+
+            These arguments may or may not be available depending on if the bot is using the API or the app.
             - `--width` The width of the art. Defaults to 1024.
             - `--height` The height of the art. Defaults to 1024.
 
@@ -285,26 +296,43 @@ class WomboCommand(MixinMeta):
         m = await ctx.reply("Generating art... This may take a while.")
         async with ctx.typing():
 
-            if not self.wombo_data["api_token"]:
-                link = await self._get_wombo_app_image_link(arguments)
-            else:
-                link = await self._get_wombo_api_image_link(arguments)
+            tasks = []
 
-            if not link:
-                with contextlib.suppress(discord.NotFound):
-                    await m.delete()
-                await ctx.reply(
-                    "Failed to generate art. Please try again later. Usually this is caused by triggering Wombo's NSFW filter."
+            for x in range(arguments["amount"]):
+                if not self.wombo_data["api_token"]:
+                    task = self._get_wombo_app_image_link(arguments)
+                else:
+                    task = self._get_wombo_api_image_link(arguments)
+
+                tasks.append(
+                    asyncio.create_task(
+                        task
+                    )
                 )
-                return
+
+            links = await asyncio.gather(*tasks)
 
             with contextlib.suppress(discord.NotFound):
                 await m.delete()
+                
+            if not links:
+                await ctx.reply(
+                    "Something went wrong when generating the art."
+                )
+                return
 
-            async with self.session.get(link) as req:
-                if req.status != 200:
-                    await ctx.reply(f"Something went wrong when downloading the image.")
-                    return
-                data = await req.read()
+            images = []
+            tasks = []
+            for link in links:
+                if not link:
+                    continue
 
-        await self.send_images(ctx, [data])
+                tasks.append(
+                    asyncio.create_task(
+                        self.get_image(link)
+                    )
+                )
+
+            images = await asyncio.gather(*tasks)
+
+        await self.send_images(ctx,  [x for x in images if x])
