@@ -19,7 +19,7 @@ from .autotts import AutoTTSMixin
 from .channels import TTSChannelMixin
 from .commands import BaseCommandsMixin
 from .joinandleave import JoinAndLeaveMixin
-from .userconfig import UserConfigMixin
+from .mytts import MyTTSCommand
 
 
 class SFX(
@@ -28,12 +28,12 @@ class SFX(
     BaseCommandsMixin,
     commands.Cog,
     JoinAndLeaveMixin,
-    UserConfigMixin,
+    MyTTSCommand,
     metaclass=CompositeMetaClass,
 ):
     """Plays sound effects, text-to-speech, and sounds when you join or leave a voice channel."""
 
-    __version__ = "6.0.3"
+    __version__ = "6.1.0"
 
     TTS_API_URL = "https://api.flowery.pw/v1/tts"
     TTS_API_HEADERS = {
@@ -153,11 +153,13 @@ class SFX(
             self.id = api_tokens.get("id")
             self.key = api_tokens.get("key")
 
-    def generate_url(self, voice: str, translate: bool, text: str, speed: float) -> str:
+    def generate_url(
+        self, voice: str, translate: bool, text: str, speed: float, format: str
+    ) -> str:
         """
         Generates the URL for the TTS using kaogurai's TTS API.
         """
-        return f"{self.TTS_API_URL}?voice={voice}&translate={translate}&text={quote(text)}&silence=500&audio_format=ogg_opus&speed={speed}"
+        return f"{self.TTS_API_URL}?voice={voice}&translate={translate}&text={quote(text)}&silence=500&audio_format={format}&speed={speed}"
 
     def get_voice(self, voice: str) -> dict:
         """
@@ -199,7 +201,9 @@ class SFX(
             await self.config.user(user).voice.clear()
             author_voice = await self.config.user(user).voice()
 
-        url = self.generate_url(author_voice, author_translate, text, author_speed)
+        url = self.generate_url(
+            author_voice, author_translate, text, author_speed, "ogg_opus"
+        )
 
         track_info = ("Text to Speech", user)
 

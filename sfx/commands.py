@@ -1,26 +1,125 @@
+import argparse
+import asyncio
 import io
+from typing import Any, List
 
 import discord
 from redbot.core import commands
-from redbot.core.commands import Context
+from redbot.core.commands import BadArgument, Context, Converter
 from redbot.core.utils.chat_formatting import escape
+from redbot.core.utils.menus import DEFAULT_CONTROLS, menu
+from thefuzz import process
 
 from .abc import MixinMeta
 
 
+class NoExitParser(argparse.ArgumentParser):
+    def error(self, message: str) -> None:
+        raise BadArgument()
+
+
+class TTSConverter(Converter):
+    def divide_chunks(self, list: List[Any], n: int):
+        """
+        Divides a list into chunks of size n.
+        """
+        for i in range(0, len(list), n):
+            yield list[i : i + n]
+
+    async def convert(self, ctx: Context, argument: str) -> int:
+        argument = argument.replace("—", "--")  # For iOS's weird smart punctuation
+
+        user_config = await ctx.cog.config.user(ctx.author).all()
+
+        parser = NoExitParser(add_help=False)
+        parser.add_argument("text", type=str, nargs="*")
+        parser.add_argument("--voices", action="store_true")
+        parser.add_argument(
+            "--voice", type=str, default=user_config["voice"], nargs="*"
+        )
+        parser.add_argument("--speed", type=float, default=user_config["speed"])
+        parser.add_argument(
+            "--translate", action="store_true", default=user_config["translate"]
+        )
+        parser.add_argument("--download", action="store_true")
+
+        try:
+            values = vars(parser.parse_args(argument.split(" ")))
+        except Exception:
+            raise BadArgument()
+
+        if not values["text"] and not values["voices"]:
+            raise BadArgument()
+
+        values["text"] = " ".join(values["text"])
+
+        voices_list = [voice["name"] for voice in ctx.cog.voices]
+
+        if user_config["voice"] not in voices_list:
+            await ctx.cog.config.user(ctx.author).voice.clear()
+
+        if values["voice"] not in voices_list:
+            values["voice"] = process.extract(
+                " ".join(values["voice"]),
+                voices_list,
+                limit=1,
+            )[0][0]
+
+        if values["voices"]:
+            pages = []
+            divided = ctx.cog.divide_chunks(ctx.cog.voices, 12)
+            if not divided:
+                await ctx.send(
+                    "Something is going wrong with the TTS API, please try again later."
+                )
+                return
+
+            for chunk in divided:
+                embed = discord.Embed(color=await ctx.embed_color())
+                for voice in chunk:
+                    url = ctx.cog.generate_url(
+                        voice["name"],
+                        False,
+                        f"Hi, I'm {voice['name']}, nice to meet you.",
+                        1.0,
+                        "mp3",
+                    )
+                    m = f"""
+                    Example: [Click Here]({url})
+                    • Gender: {voice['gender']}
+                    • Language: {voice['language']['name']}
+                    • Source: {voice['source']}
+                    """
+                    embed.add_field(name=voice["name"], value=m)
+                pages.append(embed)
+
+            for index, embed in enumerate(pages):
+                embed.set_footer(
+                    text=f"Page {index + 1}/{len(pages)} | {len(ctx.cog.voices)} voices"
+                )
+
+            asyncio.create_task(menu(ctx, pages, DEFAULT_CONTROLS))
+            return
+
+        return values
+
+
 class BaseCommandsMixin(MixinMeta):
-    @commands.command(usage="<text> [--download]")
+    @commands.command()
     @commands.cooldown(
         rate=1, per=3, type=discord.ext.commands.cooldowns.BucketType.user
     )
     @commands.guild_only()
-    async def tts(self, ctx: Context, *, text: str):
+    async def tts(self, ctx: Context, *, args: TTSConverter):
         """
         Plays the given text as TTS in your current voice channel.
 
         If you want to download the audio, use the --download flag.
         """
-        if "--download" not in text:
+        if not args:
+            return
+
+        if not args["download"]:
             if not ctx.author.voice or not ctx.author.voice.channel:
                 await ctx.send("You are not connected to a voice channel.")
                 return
@@ -43,29 +142,21 @@ class BaseCommandsMixin(MixinMeta):
                 )
                 return
 
-        author_data = await self.config.user(ctx.author).all()
-        author_voice = author_data["voice"]
-        author_translate = author_data["translate"]
-        author_speed = author_data["speed"]
-
-        is_voice = self.get_voice(author_voice)
-        if not is_voice:
-            await self.config.user(ctx.author).voice.clear()
-            author_voice = await self.config.user(ctx.author).voice()
-
         url = self.generate_url(
-            author_voice, author_translate, text.replace("--download", ""), author_speed
+            args["voice"],
+            args["translate"],
+            args["text"],
+            args["speed"],
+            "mp3" if args["download"] else "ogg_opus",
         )
 
-        if "--download" in text:
-            if text == "":
-                await ctx.send_help()
-                return
+        if args["download"]:
             if not ctx.channel.permissions_for(ctx.guild.me).attach_files:
                 await ctx.send(
                     "I do not have permissions to send files in this channel."
                 )
                 return
+
             async with self.session.get(url, headers=self.TTS_API_HEADERS) as resp:
                 if resp.status != 200:
                     await ctx.send("Something went wrong. Try again later.")

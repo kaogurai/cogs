@@ -26,10 +26,14 @@ class WomboConverter(Converter):
         parser.add_argument("--styles", action="store_true")
         parser.add_argument("--style", type=str, default=["Realistic"], nargs="*")
         parser.add_argument("--image", type=str, default=None, nargs="?")
-        parser.add_argument("--amount", type=int, default=4, nargs="?")
+        parser.add_argument(
+            "--amount",
+            type=int,
+            default=4 if ctx.cog.wombo_data["api_token"] else 2,
+            nargs="?",
+        )
         parser.add_argument("--height", type=int, default=1024, nargs="?")
         parser.add_argument("--width", type=int, default=1024, nargs="?")
-
 
         try:
             values = vars(parser.parse_args(argument.split(" ")))
@@ -48,7 +52,11 @@ class WomboConverter(Converter):
         if total_pixels not in range(8000, 1500000):
             raise BadArgument("The image needs to be between 8000 and 1500000 pixels")
 
-        if not ctx.cog.wombo_data["api_token"] and len(values["prompt"]) > 100 and not values["styles"]:
+        if (
+            not ctx.cog.wombo_data["api_token"]
+            and len(values["prompt"]) > 100
+            and not values["styles"]
+        ):
             raise BadArgument("The prompt needs to be 100 characters or less.")
 
         styles = await ctx.cog._get_wombo_styles()
@@ -69,6 +77,10 @@ class WomboConverter(Converter):
                 0
             ]
         ]
+
+        if values["style"] == 22:
+            # The Meme style does 9 images already, so we don't need to do it again
+            values["amount"] = 1
 
         if not values["image"] and ctx.message.attachments:
             values["image"] = ctx.message.attachments[0].url
@@ -283,9 +295,9 @@ class WomboCommand(MixinMeta):
             - `prompt` The prompt to use for the art.
             - `--style` The style to use for the art.
             - `--image` The image to use for the art. This can be a URL or an attachment.
-            - `--amount` The amount of art to generate. Defaults to 4. Range is 1-9.
+            - `--amount` The amount of art to generate.
 
-            These arguments may or may not be available depending on if the bot is using the API or the app.
+            These arguments may or may not be available depending on if the bot is using the official or app API.
             - `--width` The width of the art. Defaults to 1024.
             - `--height` The height of the art. Defaults to 1024.
 
@@ -304,11 +316,7 @@ class WomboCommand(MixinMeta):
                 else:
                     task = self._get_wombo_api_image_link(arguments)
 
-                tasks.append(
-                    asyncio.create_task(
-                        task
-                    )
-                )
+                tasks.append(asyncio.create_task(task))
 
             if not self.wombo_data["api_token"]:
                 # This is so if the token is expired, it will get refreshed here instead of every task needing to do it.
@@ -318,11 +326,9 @@ class WomboCommand(MixinMeta):
 
             with contextlib.suppress(discord.NotFound):
                 await m.delete()
-                
+
             if not links:
-                await ctx.reply(
-                    "Something went wrong when generating the art."
-                )
+                await ctx.reply("Something went wrong when generating the art.")
                 return
 
             images = []
@@ -331,15 +337,11 @@ class WomboCommand(MixinMeta):
                 if not link:
                     continue
 
-                tasks.append(
-                    asyncio.create_task(
-                        self.get_image(link)
-                    )
-                )
+                tasks.append(asyncio.create_task(self.get_image(link)))
 
             images = await asyncio.gather(*tasks)
 
-        await self.send_images(ctx,  [x for x in images if x])
+        await self.send_images(ctx, [x for x in images if x])
 
     @commands.command(aliases=["enhanceprompt", "betterprompt"])
     async def magicprompt(self, ctx: Context, *, prompt: str):
@@ -361,7 +363,11 @@ class WomboCommand(MixinMeta):
             params = {
                 "prompt": prompt,
             }
-            async with self.session.get("https://paint.api.wombo.ai/api/prompt/suggestion/", headers=headers, params=params) as req:
+            async with self.session.get(
+                "https://paint.api.wombo.ai/api/prompt/suggestion/",
+                headers=headers,
+                params=params,
+            ) as req:
                 if req.status != 200:
                     await ctx.reply("Something went wrong when getting the prompt.")
                     return
@@ -373,4 +379,3 @@ class WomboCommand(MixinMeta):
                 color=await ctx.embed_color(),
             )
             await ctx.reply(embed=embed)
-        
