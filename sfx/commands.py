@@ -67,7 +67,7 @@ class TTSConverter(Converter):
 
         if values["voices"]:
             pages = []
-            divided = ctx.cog.divide_chunks(ctx.cog.voices, 12)
+            divided = self.divide_chunks(ctx.cog.voices, 12)
             if not divided:
                 await ctx.send(
                     "Something is going wrong with the TTS API, please try again later."
