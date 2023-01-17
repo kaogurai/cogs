@@ -39,14 +39,23 @@ class TTSConverter(Converter):
         )
         parser.add_argument("--speed", type=float, default=user_config["speed"])
         parser.add_argument(
-            "--translate", action="store_true", default=user_config["translate"]
+            "--translate", action="store_true", default=False
         )
+        parser.add_argument("--no-translate", action="store_true", default=False)
         parser.add_argument("--download", action="store_true")
 
         try:
             values = vars(parser.parse_args(argument.split(" ")))
         except Exception:
             raise BadArgument()
+
+        translate = user_config["translate"]
+        if values["translate"]:
+            translate = True
+        elif values["no_translate"]:
+            translate = False
+
+        values["translate"] = translate
 
         if not values["text"] and not values["voices"]:
             raise BadArgument()
@@ -114,7 +123,14 @@ class BaseCommandsMixin(MixinMeta):
         """
         Plays the given text as TTS in your current voice channel.
 
-        If you want to download the audio, use the --download flag.
+        Arguments:
+            text: The text to be spoken.
+            `--voice`: The voice to use.
+            `--speed`: The speed to speak at.
+            `--download`: Whether to download the file instead of playing it.
+            `--translate`: Whether to translate the text to the voice language. Use `--no-translate` if your default is `True`.
+
+            `--voices`: Lists all available voices. Cannot be used with other arguments.
         """
         if not args:
             return
