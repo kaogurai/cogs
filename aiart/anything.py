@@ -37,6 +37,10 @@ class AnythingCommand(MixinMeta):
     async def anything(self, ctx: Context, *, args: AnythingConverter):
         """
         Generate art using the Anything V4 model.
+
+        Arguments:
+            `prompt`: The prompt to use for the model.
+            `--negative`: The negative prompt to use for the model.
         """
         m = await ctx.reply("Generating art... This may take a while.")
         async with ctx.typing():
