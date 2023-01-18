@@ -15,6 +15,7 @@ from redbot.core.utils.menus import start_adding_reactions
 from redbot.core.utils.predicates import ReactionPredicate
 
 from .abc import CompositeMetaClass
+from .anything import AnythingCommand
 from .craiyon import CraiyonCommand
 from .latentdiffusion import LatentDiffusionCommand
 from .upscale import UpscaleCommand
@@ -23,6 +24,7 @@ from .wombo import WomboCommand
 
 
 class AIArt(
+    AnythingCommand,
     CraiyonCommand,
     LatentDiffusionCommand,
     UpscaleCommand,
@@ -35,7 +37,7 @@ class AIArt(
     Generate incredible art using AI.
     """
 
-    __version__ = "1.15.4"
+    __version__ = "1.16.0"
 
     def __init__(self, bot: Red):
         self.bot = bot

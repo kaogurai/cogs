@@ -38,9 +38,7 @@ class TTSConverter(Converter):
             "--voice", type=str, default=user_config["voice"], nargs="*"
         )
         parser.add_argument("--speed", type=float, default=user_config["speed"])
-        parser.add_argument(
-            "--translate", action="store_true", default=False
-        )
+        parser.add_argument("--translate", action="store_true", default=False)
         parser.add_argument("--no-translate", action="store_true", default=False)
         parser.add_argument("--download", action="store_true")
 
