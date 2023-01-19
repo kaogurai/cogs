@@ -38,6 +38,8 @@ class AnythingCommand(MixinMeta):
         """
         Generate art using the Anything V4 model.
 
+        Warning: This model has a high likelihood of generating NSFW content (it will still be behind the NSFW filter.)
+
         Arguments:
             `prompt`: The prompt to use for the model.
             `--negative`: The negative prompt to use for the model.
