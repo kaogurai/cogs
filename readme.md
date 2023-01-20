@@ -17,17 +17,17 @@ Please join the support server [here](https://discord.gg/p6ehU9qhg8) if you have
 ## Cogs
 | Name         | Version | Description                                                                       |
 |--------------|---------|-----------------------------------------------------------------------------------|
-| AIArt        | v1.16.2 | Generate incredible art using AI.                                                |
+| AIArt        | v1.16.3 | Generate incredible art using AI.                                                |
 | AntiPhishing | v1.2.13 | Fight back against phishing attacks.                                              |
 | AutoAvatar   | v1.0.1  | Automatically changes the bot avatar.                                             |
 | BlenderBot   | v1.0.4  | Discord version of blenderbot.ai.                                                 |
 | ChatBot      | v1.0.4  | Talk to a ChatBot!                                                                |
 | GuildManager | v1.0.3  | Automatically leaves guilds that are not approved by the bot owner.               |
 | NTFYStatus   | v1.0.6  | Send push notifications using ntfy.sh when a bot goes offline.                    |
-| OCR          | v1.0.2  | Converts images to text.                                                          |
+| OCR          | v1.0.3  | Converts images to text.                                                          |
 | Radio        | v1.0.3  | Saves radio URLs for easy access.                                                 |
-| SFX          | v6.1.2  | Allow users to play TTS, SFX, and Join/Leave sounds. (originally made by baiumbg) |
-| SmartLyrics  | v2.1.2  | Gets lyrics for your current song.                                                |
+| SFX          | v6.1.3  | Allow users to play TTS, SFX, and Join/Leave sounds. (originally made by baiumbg) |
+| SmartLyrics  | v2.1.3  | Gets lyrics for your current song.                                                |
 | Tio          | v1.0.0  | Runs arbitrary code using tio.run.                                                |
 | YTDL         | v1.0.8  | Download YouTube videos.                                                          |
 

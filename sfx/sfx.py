@@ -33,11 +33,11 @@ class SFX(
 ):
     """Plays sound effects, text-to-speech, and sounds when you join or leave a voice channel."""
 
-    __version__ = "6.1.2"
+    __version__ = "6.1.3"
 
     TTS_API_URL = "https://api.flowery.pw/v1/tts"
     TTS_API_HEADERS = {
-        "User-Agent": f"Red-DiscordBot, SFX/v{__version__} (https://github.com/kaogurai/cogs)"
+        "User-Agent": f"Red-DiscordBot, SFX/{__version__} (https://github.com/kaogurai/cogs)"
     }
     SFX_API_URL = "https://freesound.org/apiv2"
 

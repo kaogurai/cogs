@@ -17,7 +17,7 @@ class SmartLyrics(commands.Cog):
     Gets lyrics for your current song.
     """
 
-    __version__ = "2.1.2"
+    __version__ = "2.1.3"
 
     def __init__(self, bot: Red):
         self.bot = bot
@@ -55,7 +55,7 @@ class SmartLyrics(commands.Cog):
             }
 
         headers = {
-            "User-Agent": f"Red-DiscordBot, SmartLyrics/v{self.__version__} (https://github.com/kaogurai/cogs)",
+            "User-Agent": f"Red-DiscordBot, SmartLyrics/{self.__version__} (https://github.com/kaogurai/cogs)",
         }
 
         async with self.session.get(

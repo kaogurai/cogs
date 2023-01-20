@@ -37,7 +37,7 @@ class AIArt(
     Generate incredible art using AI.
     """
 
-    __version__ = "1.16.2"
+    __version__ = "1.16.3"
 
     def __init__(self, bot: Red):
         self.bot = bot
@@ -97,7 +97,7 @@ class AIArt(
             bool - Whether the image is NSFW or not.
         """
         headers = {
-            "User-Agent": f"Red-DiscordBot, AIArt/v{self.__version__} (https://github.com/kaogurai/cogs)"
+            "User-Agent": f"Red-DiscordBot, AIArt/{self.__version__} (https://github.com/kaogurai/cogs)"
         }
         async with self.session.post(
             "https://api.flowery.pw/v1/nsfwdetection",
@@ -224,7 +224,8 @@ class AIArt(
             file = discord.File(BytesIO(image), filename="image.webp")
 
             is_nsfw = await self._check_nsfw(image)
-        if is_nsfw:
+
+        if is_nsfw and ctx.guild and not ctx.channel.is_nsfw():
             m = await ctx.reply(
                 "These images may contain NSFW content. Would you like me to DM them to you?"
             )
@@ -248,6 +249,9 @@ class AIArt(
                     await ctx.reply(
                         "Failed to send image. Please make sure you have DMs enabled."
                     )
+            else:
+                with contextlib.suppress(discord.NotFound):
+                    await m.edit(content="Cancelled image sending.")
         else:
             await ctx.reply(embed=embed, file=file)
 
