@@ -54,7 +54,7 @@ class AnythingCommand(MixinMeta):
                 "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.114 Safari/537.36",
             }
             async with self.session.post(
-                "https://waifus-api.nemusona.com/api/generate",
+                "https://waifus-api.nemusona.com/generate",
                 json=data,
                 headers=headers,
             ) as r:
