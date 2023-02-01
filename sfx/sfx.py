@@ -33,7 +33,7 @@ class SFX(
 ):
     """Plays sound effects, text-to-speech, and sounds when you join or leave a voice channel."""
 
-    __version__ = "6.1.3"
+    __version__ = "6.1.4"
 
     TTS_API_URL = "https://api.flowery.pw/v1/tts"
     TTS_API_HEADERS = {

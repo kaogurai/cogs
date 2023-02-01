@@ -236,14 +236,14 @@ class BaseCommandsMixin(MixinMeta):
                 return
 
         async with ctx.typing():
-
+            headers = {"Authorization": "Token " + self.key}
             async with self.session.get(
                 f"{self.SFX_API_URL}/search/text/",
                 params={
                     "query": sound.replace("--download", ""),
-                    "token": self.key,
                     "filter": "duration:[0.5 TO 15]",
                 },
+                headers=headers,
             ) as resp:
                 if resp.status != 200:
                     await ctx.send(
@@ -261,8 +261,7 @@ class BaseCommandsMixin(MixinMeta):
                 sound_id = results[0]["id"]
 
             async with self.session.get(
-                f"{self.SFX_API_URL}/sounds/{sound_id}/",
-                params={"token": self.key},
+                f"{self.SFX_API_URL}/sounds/{sound_id}/", headers=headers
             ) as resp:
                 if resp.status != 200:
                     await ctx.send(
