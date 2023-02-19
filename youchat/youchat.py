@@ -51,7 +51,9 @@ class YouChat(commands.Cog):
         async with self.session.get(
             f"https://api.betterapi.net/youdotcom/chat?message={message}&key={token}"
         ) as resp:
-            if resp.status == 200 and resp.content_type == "application/json": # this stupid ass api returns 200 even when it's down
+            if (
+                resp.status == 200 and resp.content_type == "application/json"
+            ):  # this stupid ass api returns 200 even when it's down
                 j = await resp.json()
                 return j["message"]
 

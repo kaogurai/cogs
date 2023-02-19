@@ -1,4 +1,4 @@
-from typing import List, Optional
+from typing import List, Optional, Tuple
 
 import aiohttp
 import discord
@@ -7,7 +7,10 @@ from redbot.core.bot import Red
 from redbot.core.commands import Context
 from redbot.core.utils.menus import DEFAULT_CONTROLS, menu
 
-QWANT_API_BASE = "https://api.qwant.com/v3/search/"
+QWANT_API_BASE = "https://api.qwant.com/v3"
+QWANT_HEADERS = {
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.114 Safari/537.36"
+}
 
 
 class Search(commands.Cog):
@@ -15,7 +18,7 @@ class Search(commands.Cog):
     Search the web, from Discord.
     """
 
-    __version__ = "1.0.0"
+    __version__ = "1.0.1"
 
     def __init__(self, bot: Red):
         self.bot = bot
@@ -34,7 +37,7 @@ class Search(commands.Cog):
         type: str,
         count: int,
         query: str,
-    ) -> Optional[List[dict]]:
+    ) -> Optional[Tuple[Optional[str], List[dict]]]:
         """
         Search Qwant for something.
         """
@@ -48,23 +51,26 @@ class Search(commands.Cog):
             "device": "desktop",
             "t": type,
         }
-        headers = {
-            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.114 Safari/537.36"
-        }
         async with self.session.get(
-            QWANT_API_BASE + type, params=params, headers=headers
+            QWANT_API_BASE + "/search/" + type, params=params, headers=QWANT_HEADERS
         ) as resp:
             if resp.status != 200:
                 return
             data = await resp.json()
-            items = data["data"]["result"]["items"]
+            _items = data["data"]["result"]["items"]
+            items = _items
+            sidebar = None
 
             if type == "web":
-                for result in items["mainline"]:
+                for result in _items["mainline"]:
                     if result["type"] == type:
-                        return result["items"]  # Filters out ads
+                        items = result["items"]  # Filters out ads
 
-            return items
+                for result in _items["sidebar"]:
+                    if result["type"] == "ia/knowledge":
+                        sidebar = result["endpoint"]
+
+            return sidebar, items
 
     @commands.command(aliases=["google"])
     @commands.bot_has_permissions(embed_links=True)
@@ -79,23 +85,41 @@ class Search(commands.Cog):
             await ctx.send("No results found.")
             return
 
+        sidebar, results = results
+
+        if sidebar:
+            async with self.session.get(
+                QWANT_API_BASE + sidebar, headers=QWANT_HEADERS
+            ) as resp:
+                if resp.status == 200:
+                    sidebar = (await resp.json())["data"]["result"]
+
         embeds = []
 
         # Max amount of items in results is 10
-        # We want to show 5 results per page
-        for i in range(0, 10, 5):
+        # We want to show 3 results per page
+        for i in range(0, 10, 3):
             embed = discord.Embed(
                 title=f"Search Results for {query[:50] + '...' if len(query) > 50 else query}",
                 color=await ctx.embed_color(),
             )
-            for result in results[i : i + 5]:
+            # Add sidebar if it exists, only on first page
+            if sidebar and i == 0:
+                embed.add_field(
+                    name="Info Box - " + sidebar["title"],
+                    value=f"{sidebar['url']}\n{sidebar['description']}",
+                    inline=False,
+                )
+                embed.set_thumbnail(url=sidebar["thumbnail"]["portrait"])
+
+            for result in results[i : i + 3]:
                 embed.add_field(
                     name=result["title"],
                     value=f"{result['url']}\n{result['desc']}",
                     inline=False,
                 )
 
-            embed.set_footer(text=f"Page {i // 5 + 1}/2")
+            embed.set_footer(text=f"Page {i // 3 + 1}/{len(results) // 3 + 1}")
 
             embeds.append(embed)
 
@@ -114,13 +138,15 @@ class Search(commands.Cog):
             await ctx.send("No results found.")
             return
 
+        _, results = results
+
         embeds = []
         for i, result in enumerate(results):
             embed = discord.Embed(
                 title=result["title"], color=await ctx.embed_color(), url=result["url"]
             )
             embed.set_image(url=result["media"])
-            embed.set_footer(text=f"Image {i + 1}/50")
+            embed.set_footer(text=f"Image {i + 1}/{len(results)}")
             embeds.append(embed)
 
         await menu(ctx, embeds, DEFAULT_CONTROLS)
@@ -138,13 +164,15 @@ class Search(commands.Cog):
             await ctx.send("No results found.")
             return
 
+        _, results = results
+
         embeds = []
         for i, result in enumerate(results):
             embed = discord.Embed(
                 title=result["title"], color=await ctx.embed_color(), url=result["url"]
             )
             embed.set_image(url=result["thumbnail"])
-            embed.set_footer(text=f"Video {i + 1}/50")
+            embed.set_footer(text=f"Video {i + 1}/{len(results)}")
             embeds.append(embed)
 
         await menu(ctx, embeds, DEFAULT_CONTROLS)
@@ -160,23 +188,29 @@ class Search(commands.Cog):
             await ctx.send("No results found.")
             return
 
+        _, results = results
+
+        print(len(results))
+
         embeds = []
 
         # Max amount of items in results is 10
         # We want to show 5 results per page
-        for i in range(0, 10, 5):
+        for i in range(0, 10, 3):
             embed = discord.Embed(
                 title=f"News for {query[:50] + '...' if len(query) > 50 else query}",
                 color=await ctx.embed_color(),
             )
-            for result in results[i : i + 5]:
+            for result in results[i : i + 3]:
                 embed.add_field(
-                    name=result["title"] + " - " + result["press_name"],
+                    name=result["title"]
+                    + " - "
+                    + (result["press_name"] or result["domain"]),
                     value=f"{result['url']}\n{result['desc']}",
                     inline=False,
                 )
 
-            embed.set_footer(text=f"Page {i // 5 + 1}/2")
+            embed.set_footer(text=f"Page {i // 3 + 1}/{len(results) // 3 + 1}")
 
             embeds.append(embed)
 
