@@ -1,7 +1,6 @@
 import asyncio
 import contextlib
 import math
-from copy import copy
 from io import BytesIO
 from typing import List, Optional
 
@@ -37,7 +36,7 @@ class AIArt(
     Generate incredible art using AI.
     """
 
-    __version__ = "1.16.4"
+    __version__ = "1.16.5"
 
     def __init__(self, bot: Red):
         self.bot = bot
@@ -286,15 +285,3 @@ class AIArt(
                     await ctx.send(
                         file=discord.File(BytesIO(image), filename="image.png")
                     )
-
-    @commands.command(aliases=["text2art", "text2im", "text2img", "text2image"])
-    @commands.bot_has_permissions(embed_links=True)
-    async def draw(self, ctx: Context, *, args: str):
-        """
-        Draw an image using AI.
-
-        Currently this proxies towards the Wombo command.
-        """
-        msg = copy(ctx.message)
-        msg.content = f"{ctx.prefix}wombo {args}"
-        self.bot.dispatch("message", msg)

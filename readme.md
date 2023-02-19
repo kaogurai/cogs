@@ -1,9 +1,11 @@
 # kaogurai's cogs
 
 ## Support
+
 Please join the support server [here](https://discord.gg/p6ehU9qhg8) if you have any questions. If you are sure it is a bug, feel free to make a GitHub issue or send a PR.
 
 ## Installation
+
 ```
 [p]load downloader
 
@@ -15,9 +17,10 @@ Please join the support server [here](https://discord.gg/p6ehU9qhg8) if you have
 ```
 
 ## Cogs
+
 | Name         | Version | Description                                                                       |
-|--------------|---------|-----------------------------------------------------------------------------------|
-| AIArt        | v1.16.4 | Generate incredible art using AI.                                                |
+| ------------ | ------- | --------------------------------------------------------------------------------- |
+| AIArt        | v1.16.5 | Generate incredible art using AI.                                                 |
 | AntiPhishing | v1.2.13 | Fight back against phishing attacks.                                              |
 | AutoAvatar   | v1.0.1  | Automatically changes the bot avatar.                                             |
 | BlenderBot   | v1.0.4  | Discord version of blenderbot.ai.                                                 |
@@ -26,11 +29,9 @@ Please join the support server [here](https://discord.gg/p6ehU9qhg8) if you have
 | NTFYStatus   | v1.0.6  | Send push notifications using ntfy.sh when a bot goes offline.                    |
 | OCR          | v1.0.3  | Converts images to text.                                                          |
 | Radio        | v1.0.3  | Saves radio URLs for easy access.                                                 |
+| Search       | v1.0.0  | Search the web, from Discord.                                                     |
 | SFX          | v6.1.4  | Allow users to play TTS, SFX, and Join/Leave sounds. (originally made by baiumbg) |
 | SmartLyrics  | v2.1.3  | Gets lyrics for your current song.                                                |
 | Tio          | v1.0.0  | Runs arbitrary code using tio.run.                                                |
-| YouChat      | v1.0.0  | Use YouChat via a Discord Bot.                                                    |
+| YouChat      | v1.0.1  | Use YouChat via a Discord Bot.                                                    |
 | YTDL         | v1.0.8  | Download YouTube videos.                                                          |
-
-## License
-This repo is licensed under the [MIT license.](https://github.com/kaogurai/cogs/blob/master/LICENSE

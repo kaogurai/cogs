@@ -1,0 +1,183 @@
+from typing import List, Optional
+
+import aiohttp
+import discord
+from redbot.core import commands
+from redbot.core.bot import Red
+from redbot.core.commands import Context
+from redbot.core.utils.menus import DEFAULT_CONTROLS, menu
+
+QWANT_API_BASE = "https://api.qwant.com/v3/search/"
+
+
+class Search(commands.Cog):
+    """
+    Search the web, from Discord.
+    """
+
+    __version__ = "1.0.0"
+
+    def __init__(self, bot: Red):
+        self.bot = bot
+        self.session = aiohttp.ClientSession()
+
+    async def red_delete_data_for_user(self, **kwargs):
+        return
+
+    def format_help_for_context(self, ctx: Context):
+        pre_processed = super().format_help_for_context(ctx)
+        return f"{pre_processed}\n\nCog Version: {self.__version__}"
+
+    async def _search_qwant(
+        self,
+        ctx: Context,
+        type: str,
+        count: int,
+        query: str,
+    ) -> Optional[List[dict]]:
+        """
+        Search Qwant for something.
+        """
+        safesearch = 0 if ctx.channel.is_nsfw() or ctx.guild is None else 1
+        params = {
+            "q": query,
+            "count": count,
+            "offset": 0,
+            "safesearch": safesearch,
+            "locale": "en_US",
+            "device": "desktop",
+            "t": type,
+        }
+        headers = {
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.114 Safari/537.36"
+        }
+        async with self.session.get(
+            QWANT_API_BASE + type, params=params, headers=headers
+        ) as resp:
+            if resp.status != 200:
+                return
+            data = await resp.json()
+            items = data["data"]["result"]["items"]
+
+            if type == "web":
+                for result in items["mainline"]:
+                    if result["type"] == type:
+                        return result["items"]  # Filters out ads
+
+            return items
+
+    @commands.command(aliases=["google"])
+    @commands.bot_has_permissions(embed_links=True)
+    async def websearch(self, ctx: Context, *, query: str):
+        """
+        Search for something on the web.
+
+        SafeSearch will be disabled in NSFW channels.
+        """
+        results = await self._search_qwant(ctx, "web", 10, query)
+        if not results:
+            await ctx.send("No results found.")
+            return
+
+        embeds = []
+
+        # Max amount of items in results is 10
+        # We want to show 5 results per page
+        for i in range(0, 10, 5):
+            embed = discord.Embed(
+                title=f"Search Results for {query[:50] + '...' if len(query) > 50 else query}",
+                color=await ctx.embed_color(),
+            )
+            for result in results[i : i + 5]:
+                embed.add_field(
+                    name=result["title"],
+                    value=f"{result['url']}\n{result['desc']}",
+                    inline=False,
+                )
+
+            embed.set_footer(text=f"Page {i // 5 + 1}/2")
+
+            embeds.append(embed)
+
+        await menu(ctx, embeds, DEFAULT_CONTROLS)
+
+    @commands.command(aliases=["imgsearch", "img", "image"])
+    @commands.bot_has_permissions(embed_links=True)
+    async def imagesearch(self, ctx: Context, *, query: str):
+        """
+        Search for images on the web.
+
+        SafeSearch will be disabled in NSFW channels.
+        """
+        results = await self._search_qwant(ctx, "images", 50, query)
+        if not results:
+            await ctx.send("No results found.")
+            return
+
+        embeds = []
+        for i, result in enumerate(results):
+            embed = discord.Embed(
+                title=result["title"], color=await ctx.embed_color(), url=result["url"]
+            )
+            embed.set_image(url=result["media"])
+            embed.set_footer(text=f"Image {i + 1}/50")
+            embeds.append(embed)
+
+        await menu(ctx, embeds, DEFAULT_CONTROLS)
+
+    @commands.command(aliases=["vidsearch", "vid", "video"])
+    @commands.bot_has_permissions(embed_links=True)
+    async def videosearch(self, ctx: Context, *, query: str):
+        """
+        Search for videos on the web.
+
+        SafeSearch will be disabled in NSFW channels.
+        """
+        results = await self._search_qwant(ctx, "videos", 10, query)
+        if not results:
+            await ctx.send("No results found.")
+            return
+
+        embeds = []
+        for i, result in enumerate(results):
+            embed = discord.Embed(
+                title=result["title"], color=await ctx.embed_color(), url=result["url"]
+            )
+            embed.set_image(url=result["thumbnail"])
+            embed.set_footer(text=f"Video {i + 1}/50")
+            embeds.append(embed)
+
+        await menu(ctx, embeds, DEFAULT_CONTROLS)
+
+    @commands.command(aliases=["newsearch", "news"])
+    @commands.bot_has_permissions(embed_links=True)
+    async def newssearch(self, ctx: Context, *, query: str):
+        """
+        Search for news on the web.
+        """
+        results = await self._search_qwant(ctx, "news", 10, query)
+        if not results:
+            await ctx.send("No results found.")
+            return
+
+        embeds = []
+
+        # Max amount of items in results is 10
+        # We want to show 5 results per page
+        for i in range(0, 10, 5):
+            embed = discord.Embed(
+                title=f"News for {query[:50] + '...' if len(query) > 50 else query}",
+                color=await ctx.embed_color(),
+            )
+            for result in results[i : i + 5]:
+                embed.add_field(
+                    name=result["title"] + " - " + result["press_name"],
+                    value=f"{result['url']}\n{result['desc']}",
+                    inline=False,
+                )
+
+            embed.set_footer(text=f"Page {i // 5 + 1}/2")
+
+            embeds.append(embed)
+
+        await menu(ctx, embeds, DEFAULT_CONTROLS)

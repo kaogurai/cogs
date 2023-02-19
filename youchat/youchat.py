@@ -13,7 +13,7 @@ class YouChat(commands.Cog):
     Use YouChat via a Discord bot.
     """
 
-    __version__ = "1.0.0"
+    __version__ = "1.0.1"
 
     def __init__(self, bot: Red):
         self.bot = bot
@@ -51,7 +51,7 @@ class YouChat(commands.Cog):
         async with self.session.get(
             f"https://api.betterapi.net/youdotcom/chat?message={message}&key={token}"
         ) as resp:
-            if resp.status == 200:
+            if resp.status == 200 and resp.content_type == "application/json": # this stupid ass api returns 200 even when it's down
                 j = await resp.json()
                 return j["message"]
 

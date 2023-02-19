@@ -24,7 +24,7 @@ class WomboConverter(Converter):
         parser = NoExitParser(add_help=False)
         parser.add_argument("prompt", type=str, nargs="*")
         parser.add_argument("--styles", action="store_true")
-        parser.add_argument("--style", type=str, default=["Realistic"], nargs="*")
+        parser.add_argument("--style", type=str, default=["Realistic v2"], nargs="*")
         parser.add_argument("--image", type=str, default=None, nargs="?")
         parser.add_argument(
             "--amount",
@@ -285,15 +285,17 @@ class WomboCommand(MixinMeta):
                 else:
                     await asyncio.sleep(3)
 
-    @commands.command()
+    @commands.command(aliases=["draw", "text2art", "text2img", "text2image"])
     @commands.bot_has_permissions(embed_links=True)
     async def wombo(self, ctx: Context, *, arguments: WomboConverter):
         """
         Generate art using Wombo.
 
+        If you would like to view the styles available, run `[p]wombo --styles`.
+
         **Arguments:**
             - `prompt` The prompt to use for the art.
-            - `--style` The style to use for the art.
+            - `--style` The style to use for the art. Defaults to `Realistic v2`.
             - `--image` The image to use for the art. This can be a URL or an attachment.
             - `--amount` The amount of art to generate.
 
