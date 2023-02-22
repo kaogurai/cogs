@@ -9,7 +9,7 @@ from .abc import MixinMeta
 from .utils import NoExitParser
 
 
-class AnythingConverter(Converter):
+class NemuSonaConverter(Converter):
     async def convert(self, ctx: Context, argument: str) -> int:
         argument = argument.replace("—", "--")  # For iOS's weird smart punctuation
 
@@ -43,20 +43,9 @@ class AnythingConverter(Converter):
         return values
 
 
-class AnythingCommand(MixinMeta):
-    @commands.command()
-    async def anything(self, ctx: Context, *, args: AnythingConverter):
-        """
-        Generate art using the Anything V4 model.
+class NemuSonaCommands(MixinMeta):
 
-        Warning: This model has a high likelihood of generating NSFW content (it will still be behind the NSFW filter.)
-
-        Arguments:
-            `prompt`: The prompt to use for the model.
-            `--negative`: The negative prompt to use for the model.
-            `--cfg-scale`: The cfg scale to use for the model. This is a number between 1 and 10, inclusive.
-            `--denoising-strength`: The denoising strength to use for the model. This is a number between 0 and 1, inclusive.
-        """
+    async def _generate_nemusona_images(self, ctx: Context, model: str, args: NemuSonaConverter) -> None:
         m = await ctx.reply("Generating art... This may take a while.")
         async with ctx.typing():
             data = {
@@ -69,7 +58,7 @@ class AnythingCommand(MixinMeta):
                 "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.114 Safari/537.36",
             }
             async with self.session.post(
-                "https://waifus-api.nemusona.com/generate",
+                f"https://waifus-api.nemusona.com/generate/{model}",
                 json=data,
                 headers=headers,
             ) as r:
@@ -86,3 +75,48 @@ class AnythingCommand(MixinMeta):
                 image = base64.b64decode(await r.text())
 
         await self.send_images(ctx, [image])
+
+    
+    @commands.command()
+    async def anything(self, ctx: Context, *, args: NemuSonaConverter):
+        """
+        Generate art using the Anything v4 model.
+
+        Warning: This model has a high likelihood of generating NSFW content (it will still be behind the NSFW filter.)
+
+        Arguments:
+            `prompt`: The prompt to use for the model.
+            `--negative`: The negative prompt to use for the model.
+            `--cfg-scale`: The cfg scale to use for the model. This is a number between 1 and 10, inclusive.
+            `--denoising-strength`: The denoising strength to use for the model. This is a number between 0 and 1, inclusive.
+        """
+        await self._generate_nemusona_images(ctx, "anything", args)
+
+    @commands.command()
+    async def aom(self, ctx: Context, *, args: NemuSonaConverter):
+        """
+        Generate art using the AOM3 model.
+
+        Arguments:
+            `prompt`: The prompt to use for the model.
+            `--negative`: The negative prompt to use for the model.
+            `--cfg-scale`: The cfg scale to use for the model. This is a number between 1 and 10, inclusive.
+            `--denoising-strength`: The denoising strength to use for the model. This is a number between 0 and 1, inclusive.
+        """
+        await self._generate_nemusona_images(ctx, "aom", args)
+
+    @commands.command()
+    async def counterfeit(self, ctx: Context, *, args: NemuSonaConverter):
+        """
+        Generate art using the Counterfeit v2.5 model.
+
+        Warning: This model has a high likelihood of generating NSFW content (it will still be behind the NSFW filter.)
+
+        Arguments:
+            `prompt`: The prompt to use for the model.
+            `--negative`: The negative prompt to use for the model.
+            `--cfg-scale`: The cfg scale to use for the model. This is a number between 1 and 10, inclusive.
+            `--denoising-strength`: The denoising strength to use for the model. This is a number between 0 and 1, inclusive.
+        """
+        await self._generate_nemusona_images(ctx, "counterfeit", args)
+
