@@ -17,7 +17,7 @@ class SmartLyrics(commands.Cog):
     Gets lyrics for your current song.
     """
 
-    __version__ = "2.1.4"
+    __version__ = "2.1.5"
 
     def __init__(self, bot: Red):
         self.bot = bot
@@ -68,17 +68,15 @@ class SmartLyrics(commands.Cog):
     def get_user_status_song(
         self, user: Union[discord.Member, discord.User]
     ) -> Optional[str]:
-        s = next(
+        return next(
             (
-                s
+                s.track_id
                 for s in user.activities
                 if s.type == discord.ActivityType.listening
                 and isinstance(s, discord.Spotify)
             ),
             None,
         )
-        if s:
-            return s.track_id
 
     async def send_results(
         self, ctx: Context, lrc: bool, results: dict, source: Optional[str] = None
@@ -169,40 +167,35 @@ class SmartLyrics(commands.Cog):
                         results = await self.get_lyrics(query=title)
                         if results:
                             await self.send_results(ctx, lrc, results, "Voice Channel")
-                        else:
-                            await ctx.send(f"No results were found for `{title[:500]}`")
-                        return
+                            return
 
             spotify_id = self.get_user_status_song(ctx.author)
             if spotify_id:
                 results = await self.get_lyrics(spotify_id=spotify_id)
                 if results:
                     await self.send_results(ctx, lrc, results, "Spotify")
-                else:
-                    await ctx.send("No results were found for your Spotify status.")
-                return
-
-            lastfm_cog = self.bot.get_cog("LastFM")
-            lastfm_username = await lastfm_cog.config.user(ctx.author).lastfm_username()
-
-            if lastfm_cog and lastfm_username:
-                try:
-                    (
-                        trackname,
-                        artistname,
-                        albumname,
-                        imageurl,
-                    ) = await lastfm_cog.get_current_track(ctx, lastfm_username)
-                except:
-                    await ctx.send("Please provide a query to search.")
                     return
 
-                q = f"{trackname} {artistname}"
-                results = await self.get_lyrics(query=q)
-                if results:
-                    await self.send_results(ctx, lrc, results, "Last.fm")
-                else:
-                    await ctx.send(f"Nothing was found for `{q[:500]}`")
-                return
+            lastfm_cog = self.bot.get_cog("LastFM")
+
+            if lastfm_cog:
+                lastfm_username = await lastfm_cog.config.user(ctx.author).lastfm_username()
+                if lastfm_username:
+                    try:
+                        (
+                            trackname,
+                            artistname,
+                            albumname,
+                            imageurl,
+                        ) = await lastfm_cog.get_current_track(ctx, lastfm_username)
+                    except:
+                        await ctx.send("Please provide a query to search.")
+                        return
+
+                    q = f"{trackname} {artistname}"
+                    results = await self.get_lyrics(query=q)
+                    if results:
+                        await self.send_results(ctx, lrc, results, "Last.fm")
+                        return
 
             await ctx.send("Please provide a query to search.")
