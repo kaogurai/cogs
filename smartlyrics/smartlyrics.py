@@ -17,7 +17,7 @@ class SmartLyrics(commands.Cog):
     Gets lyrics for your current song.
     """
 
-    __version__ = "2.1.3"
+    __version__ = "2.1.4"
 
     def __init__(self, bot: Red):
         self.bot = bot
@@ -70,7 +70,7 @@ class SmartLyrics(commands.Cog):
     ) -> Optional[str]:
         s = next(
             (
-                s.title
+                s
                 for s in user.activities
                 if s.type == discord.ActivityType.listening
                 and isinstance(s, discord.Spotify)
