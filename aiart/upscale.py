@@ -60,7 +60,7 @@ class UpscaleCommand(MixinMeta):
                 "action": "predict",
             }
             async with self.session.post(
-                "https://hf.space/embed/akhaliq/SwinIR/api/queue/push/", json=data
+                "https://akhaliq-swinir.hf.space/api/queue/push/", json=data
             ) as r:
                 if r.status != 200:
                     with contextlib.suppress(discord.NotFound):
@@ -77,7 +77,7 @@ class UpscaleCommand(MixinMeta):
                     "hash": image_hash,
                 }
                 async with self.session.post(
-                    f"https://hf.space/embed/akhaliq/SwinIR/api/queue/status/",
+                    f"https://akhaliq-swinir.hf.space/api/queue/status/",
                     json=body,
                 ) as r:
                     if r.status != 200:
