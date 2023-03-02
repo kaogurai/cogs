@@ -179,7 +179,9 @@ class SmartLyrics(commands.Cog):
             lastfm_cog = self.bot.get_cog("LastFM")
 
             if lastfm_cog:
-                lastfm_username = await lastfm_cog.config.user(ctx.author).lastfm_username()
+                lastfm_username = await lastfm_cog.config.user(
+                    ctx.author
+                ).lastfm_username()
                 if lastfm_username:
                     try:
                         (

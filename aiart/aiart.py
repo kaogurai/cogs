@@ -36,7 +36,7 @@ class AIArt(
     Generate incredible art using AI.
     """
 
-    __version__ = "1.17.1"
+    __version__ = "1.17.2"
 
     def __init__(self, bot: Red):
         self.bot = bot
@@ -198,7 +198,9 @@ class AIArt(
                 if req.status == 200:
                     return await req.read()
 
-    async def send_images(self, ctx: Context, images: List[bytes]) -> None:
+    async def send_images(
+        self, ctx: Context, images: List[bytes], footer: Optional[str] = None
+    ) -> None:
         """
         Params:
             images: List[bytes] - The images to send.
@@ -219,6 +221,12 @@ class AIArt(
             if len(images) > 1:
                 embed.description = "Type the number of the image to download it. If you want more than one image, seperate the numbers with a comma. If you want all of the images, type `all`."
                 embed.set_footer(text="Image selection will time out in 5 minutes.")
+
+            base_footer = "Image selection will time out in 5 minutes."
+            if footer:
+                embed.set_footer(text=f"{footer} | {base_footer}")
+            else:
+                embed.set_footer(text=base_footer)
 
             file = discord.File(BytesIO(image), filename="image.webp")
 

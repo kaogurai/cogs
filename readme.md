@@ -20,7 +20,7 @@ Please join the support server [here](https://discord.gg/p6ehU9qhg8) if you have
 
 | Name         | Version | Description                                                                       |
 | ------------ | ------- | --------------------------------------------------------------------------------- |
-| AIArt        | v1.17.1 | Generate incredible art using AI.                                                 |
+| AIArt        | v1.17.2 | Generate incredible art using AI.                                                 |
 | AntiPhishing | v1.2.13 | Fight back against phishing attacks.                                              |
 | AutoAvatar   | v1.0.1  | Automatically changes the bot avatar.                                             |
 | BlenderBot   | v1.0.4  | Discord version of blenderbot.ai.                                                 |
