@@ -29,7 +29,7 @@ Please join the support server [here](https://discord.gg/p6ehU9qhg8) if you have
 | NTFYStatus   | v1.0.6  | Send push notifications using ntfy.sh when a bot goes offline.                    |
 | OCR          | v1.0.3  | Converts images to text.                                                          |
 | Radio        | v1.0.3  | Saves radio URLs for easy access.                                                 |
-| Search       | v1.0.1  | Search the web, from Discord.                                                     |
+| Search       | v1.0.2  | Search the web, from Discord.                                                     |
 | SFX          | v6.1.4  | Allow users to play TTS, SFX, and Join/Leave sounds. (originally made by baiumbg) |
 | SmartLyrics  | v2.1.5  | Gets lyrics for your current song.                                                |
 | Tio          | v1.0.0  | Runs arbitrary code using tio.run.                                                |

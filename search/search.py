@@ -18,7 +18,7 @@ class Search(commands.Cog):
     Search the web, from Discord.
     """
 
-    __version__ = "1.0.1"
+    __version__ = "1.0.2"
 
     def __init__(self, bot: Red):
         self.bot = bot
@@ -110,7 +110,8 @@ class Search(commands.Cog):
                     value=f"{sidebar['url']}\n{sidebar['description']}",
                     inline=False,
                 )
-                embed.set_thumbnail(url=sidebar["thumbnail"]["portrait"])
+                if sidebar["thumbnail"]["portrait"]:
+                    embed.set_thumbnail(url=sidebar["thumbnail"]["portrait"])
 
             for result in results[i : i + 3]:
                 embed.add_field(
