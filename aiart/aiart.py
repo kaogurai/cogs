@@ -36,17 +36,12 @@ class AIArt(
     Generate incredible art using AI.
     """
 
-    __version__ = "1.17.2"
+    __version__ = "1.17.3"
 
     def __init__(self, bot: Red):
         self.bot = bot
         self.session = aiohttp.ClientSession()
-        self.wombo_data = {
-            "app_token": None,
-            "app_token_expires": None,
-            "api_token": None,
-        }
-        self.bot.loop.create_task(self.set_token())
+        self.wombo_data = {"app_token": None, "app_token_expires": None}
 
     def cog_unload(self):
         self.bot.loop.create_task(self.session.close())
@@ -57,23 +52,6 @@ class AIArt(
     def format_help_for_context(self, ctx: Context) -> str:
         pre_processed = super().format_help_for_context(ctx)
         return f"{pre_processed}\n\nCog Version: {self.__version__}"
-
-    async def set_token(self) -> None:
-        """
-        Possibly sets the token for the Wombo Dream API.
-        """
-        tokens = await self.bot.get_shared_api_tokens("wombo")
-        self.wombo_data["api_token"] = tokens.get("token")
-
-    @commands.Cog.listener()
-    async def on_red_api_tokens_update(self, service_name: str, api_tokens: dict):
-        """
-        Updates the token when the API tokens are updated.
-
-        Possibly sets the token for the Wombo Dream API.
-        """
-        if service_name == "wombo":
-            self.wombo_data["api_token"] = api_tokens.get("token")
 
     async def _get_firebase_bearer_token(self, key: str) -> Optional[str]:
         params = {"key": key}
@@ -121,7 +99,6 @@ class AIArt(
 
         The number of images needs to be a perfect square.
         """
-
         image_list = [Image.open(BytesIO(image)) for image in images]
 
         # Get the number of rows and columns

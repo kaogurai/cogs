@@ -29,11 +29,9 @@ class WomboConverter(Converter):
         parser.add_argument(
             "--amount",
             type=int,
-            default=4 if ctx.cog.wombo_data["api_token"] else 2,
+            default=2,
             nargs="?",
         )
-        parser.add_argument("--height", type=int, default=1024, nargs="?")
-        parser.add_argument("--width", type=int, default=1024, nargs="?")
 
         try:
             values = vars(parser.parse_args(argument.split(" ")))
@@ -48,18 +46,10 @@ class WomboConverter(Converter):
         if values["amount"] not in range(1, 10):
             raise BadArgument("The amount needs to be between 1 and 9.")
 
-        total_pixels = values["height"] * values["width"]
-        if total_pixels not in range(8000, 1500000):
-            raise BadArgument("The image needs to be between 8000 and 1500000 pixels")
-
-        if (
-            not ctx.cog.wombo_data["api_token"]
-            and len(values["prompt"]) > 100
-            and not values["styles"]
-        ):
+        if len(values["prompt"]) > 100 and not values["styles"]:
             raise BadArgument("The prompt needs to be 100 characters or less.")
 
-        styles = await ctx.cog._get_wombo_styles()
+        styles = await ctx.cog._get_wombo_app_styles()
         if not styles:
             raise BadArgument("Could not get available styles.")
 
@@ -118,22 +108,6 @@ class WomboCommand(MixinMeta):
                     for style in await req.json()
                     if not style["is_premium"]
                 }
-
-    async def _get_wombo_api_styles(self) -> Optional[dict]:
-        headers = {
-            "Authorization": f"bearer {self.wombo_data['api_token']}",
-        }
-        async with self.session.get(
-            "https://api.luan.tools/api/styles/", headers=headers
-        ) as req:
-            if req.status == 200:
-                return {style["name"]: style["id"] for style in await req.json()}
-
-    async def _get_wombo_styles(self) -> Optional[dict]:
-        if self.wombo_data["api_token"]:
-            return await self._get_wombo_api_styles()
-        else:
-            return await self._get_wombo_app_styles()
 
     async def _get_wombo_app_media_id(self, token: str, data: bytes) -> Optional[str]:
         try:
@@ -228,63 +202,6 @@ class WomboCommand(MixinMeta):
 
             await asyncio.sleep(3)
 
-    async def _get_wombo_api_image_link(self, arguments: dict) -> Optional[str]:
-
-        headers = {
-            "Authorization": f"bearer {self.wombo_data['api_token']}",
-        }
-        data = {
-            "use_target_image": bool(arguments["image"]),
-        }
-        async with self.session.post(
-            "https://api.luan.tools/api/tasks/", headers=headers, json=data
-        ) as req:
-            if req.status != 200:
-                return
-            resp = await req.json()
-            task_id = resp["id"]
-
-        if arguments["image"]:
-            async with self.session.get(arguments["image"]) as req:
-                if req.status == 200:
-                    resp["target_image_url"]["fields"]["file"] = await req.read()
-                    async with self.session.post(
-                        resp["target_image_url"]["url"],
-                        data=resp["target_image_url"]["fields"],
-                    ):
-                        pass
-
-        data = {
-            "input_spec": {
-                "style": arguments["style"],
-                "prompt": arguments["prompt"],
-                "target_image_weight": 0.5,
-                "width": arguments["width"],
-                "height": arguments["height"],
-                "allow_nsfw": True,
-            }
-        }
-        async with self.session.put(
-            "https://api.luan.tools/api/tasks/" + task_id, headers=headers, json=data
-        ) as req:
-            if req.status != 200:
-                return
-
-        for x in range(25):
-            async with self.session.get(
-                "https://api.luan.tools/api/tasks/" + task_id, headers=headers
-            ) as req:
-                if req.status != 200:
-                    return
-                resp = await req.json()
-
-                if resp["state"] == "failed":
-                    return
-                elif resp["state"] == "completed":
-                    return resp["result"]
-                else:
-                    await asyncio.sleep(3)
-
     @commands.command(aliases=["draw", "text2art", "text2img", "text2image"])
     @commands.bot_has_permissions(embed_links=True)
     async def wombo(self, ctx: Context, *, arguments: WomboConverter):
@@ -310,21 +227,14 @@ class WomboCommand(MixinMeta):
         m = await ctx.reply("Generating art... This may take a while.")
         async with ctx.typing():
 
-            tasks = []
+            tasks = [
+                asyncio.create_task(self._get_wombo_app_image_link(arguments))
+                for x in range(arguments["amount"])
+            ]
 
-            for x in range(arguments["amount"]):
-                if not self.wombo_data["api_token"]:
-                    task = self._get_wombo_app_image_link(arguments)
-                else:
-                    task = self._get_wombo_api_image_link(arguments)
+            await self._get_wombo_app_token()
 
-                tasks.append(asyncio.create_task(task))
-
-            if not self.wombo_data["api_token"]:
-                # This is so if the token is expired, it will get refreshed here instead of every task needing to do it.
-                await self._get_wombo_app_token()
-
-            links = await asyncio.gather(*tasks)
+            links = [x for x in await asyncio.gather(*tasks) if x]
 
             with contextlib.suppress(discord.NotFound):
                 await m.delete()

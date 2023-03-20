@@ -13,7 +13,7 @@ class CraiyonCommand(MixinMeta):
     @commands.bot_has_permissions(embed_links=True)
     async def craiyon(self, ctx: Context, *, text: str):
         """
-        Generate art using Craiyon. (dalle-mini/mega)
+        Generate art using Craiyon.
 
         The only argument is the text to generate the image from.
         """
