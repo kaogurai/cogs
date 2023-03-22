@@ -36,7 +36,7 @@ class AIArt(
     Generate incredible art using AI.
     """
 
-    __version__ = "1.17.3"
+    __version__ = "1.17.4"
 
     def __init__(self, bot: Red):
         self.bot = bot
@@ -83,7 +83,7 @@ class AIArt(
         ) as req:
             if req.status == 200:
                 resp = await req.json()
-                if resp["score"] > 0.75:
+                if resp["score"] >= 0.75:
                     return True
             return False
 
@@ -122,29 +122,6 @@ class AIArt(
         buffer.seek(0)
 
         return buffer.read()
-
-    async def compress_image(self, image_data: bytes) -> Optional[bytes]:
-        """
-        Params:
-            image: bytes - The image to compress.
-
-        Returns:
-            Optional[bytes] - The compressed image.
-        """
-
-        def func():
-            try:
-                image = Image.open(BytesIO(image_data))
-                image = image.convert("RGB")
-
-                buffer = BytesIO()
-                image.save(buffer, format="JPEG", quality=75, optimize=True)
-                buffer.seek(0)
-                return buffer.read()
-            except Exception:
-                ...
-
-        return await self.bot.loop.run_in_executor(None, func)
 
     async def get_image_mimetype(self, data: bytes) -> Optional[str]:
         """
