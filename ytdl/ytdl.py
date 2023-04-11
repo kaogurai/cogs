@@ -13,7 +13,7 @@ from redbot.core import commands
 from redbot.core.bot import Red
 from redbot.core.commands import Context
 
-INVIDIOUS_DOMAIN = "inv.riverside.rocks"
+INVIDIOUS_DOMAIN = "yt.funami.tech"
 
 
 class YTDL(commands.Cog):
@@ -21,7 +21,7 @@ class YTDL(commands.Cog):
     Downloads YouTube videos.
     """
 
-    __version__ = "1.0.8"
+    __version__ = "1.0.9"
 
     def __init__(self, bot: Red):
         self.bot = bot
@@ -53,7 +53,7 @@ class YTDL(commands.Cog):
             "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.149 Safari/537.36"
         }
         async with self.session.get(
-            f"https://{INVIDIOUS_DOMAIN}/api/v1/videos/{video_id}?local=true",
+            f"https://{INVIDIOUS_DOMAIN}/api/v1/videos/{video_id}",
             headers=headers,
         ) as response:
             if response.status == 200:
