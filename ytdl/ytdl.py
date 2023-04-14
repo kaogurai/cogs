@@ -21,7 +21,7 @@ class YTDL(commands.Cog):
     Downloads YouTube videos.
     """
 
-    __version__ = "1.0.10"
+    __version__ = "1.0.11"
 
     def __init__(self, bot: Red):
         self.bot = bot
@@ -83,16 +83,10 @@ class YTDL(commands.Cog):
         things = []
 
         for video_format in data["adaptiveFormats"]:
-            domain = urlparse(video_format["url"]).netloc
             func = self._shorten_url(video_format["url"])
             things.append(self._injector(video_format, func))
 
         for video_format in data["formatStreams"]:
-            domain = urlparse(video_format["url"]).netloc
-            video_format["url"] = video_format["url"].replace(
-                domain, INVIDIOUS_DOMAIN, 1
-            )
-
             func = self._shorten_url(video_format["url"])
             things.append(self._injector(video_format, func))
 
