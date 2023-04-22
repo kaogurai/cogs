@@ -23,7 +23,7 @@ class SmartLyrics(commands.Cog):
     Gets lyrics for your current song.
     """
 
-    __version__ = "2.1.6"
+    __version__ = "2.1.7"
 
     def __init__(self, bot: Red):
         self.bot = bot
@@ -140,14 +140,12 @@ class SmartLyrics(commands.Cog):
     @commands.guild_only()
     @commands.command(aliases=["l", "ly"])
     async def lyrics(
-        self, ctx: Context, lrc: Optional[bool] = False, *, query: Optional[str] = None
+        self, ctx: Context, query: Optional[str] = None
     ):
         """
         Gets the lyrics for your current song.
 
         It checks for a query, your voice channel, your spotify status, and your last.fm status (in that order)
-
-        If you would like to download the lyrics as a .lrc file, use `[p]lyrics true` or `[p]lyrics true <query>`
         """
         async with ctx.typing():
             if query:

@@ -29,6 +29,6 @@ Please join the support server [here](https://discord.gg/p6ehU9qhg8) if you have
 | Radio        | v1.0.3  | Saves radio URLs for easy access.                                                 |
 | Search       | v1.0.2  | Search the web, from Discord.                                                     |
 | SFX          | v6.1.4  | Allow users to play TTS, SFX, and Join/Leave sounds. (originally made by baiumbg) |
-| SmartLyrics  | v2.1.6  | Gets lyrics for your current song.                                                |
+| SmartLyrics  | v2.1.7  | Gets lyrics for your current song.                                                |
 | Tio          | v1.0.0  | Runs arbitrary code using tio.run.                                                |
 | YTDL         | v1.0.11 | Download YouTube videos.                                                          |
