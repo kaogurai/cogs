@@ -19,7 +19,7 @@ class NemuSonaConverter(Converter):
             "-n", "--negative", "--negative-prompt", type=str, default=[""], nargs="*"
         )
         parser.add_argument("--cfg-scale", type=int, default=10)
-        parser.add_argument("--denoising-strength", type=float, default=.5)
+        parser.add_argument("--denoising-strength", type=float, default=0.5)
         parser.add_argument("--seed", type=int, default=-1)
 
         try:

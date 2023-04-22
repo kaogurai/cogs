@@ -31,7 +31,6 @@ class UpscaleCommand(MixinMeta):
         m = await ctx.reply("Upscaling image... This may take a while.")
 
         async with ctx.typing():
-
             img = await self.get_image(link)
             if not img:
                 with contextlib.suppress(discord.NotFound):

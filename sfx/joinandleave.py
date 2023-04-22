@@ -27,7 +27,6 @@ class JoinAndLeaveMixin(MixinMeta):
             return
 
         if guild_config["join_sound"] and before.channel is None and after.channel:
-
             current_perms = after.channel.permissions_for(user.guild.me)
             if not current_perms.speak or not current_perms.connect:
                 return
@@ -49,7 +48,6 @@ class JoinAndLeaveMixin(MixinMeta):
 
         # User leaves voice channel entirely
         if guild_config["leave_sound"] and before.channel and after.channel is None:
-
             current_perms = before.channel.permissions_for(user.guild.me)
             if not current_perms.speak or not current_perms.connect:
                 return
@@ -72,7 +70,6 @@ class JoinAndLeaveMixin(MixinMeta):
 
         # User joins voice channel
         if user_config["join_sound"] and before.channel is None and after.channel:
-
             current_perms = after.channel.permissions_for(user.guild.me)
             if not current_perms.speak or not current_perms.connect:
                 return
@@ -94,7 +91,6 @@ class JoinAndLeaveMixin(MixinMeta):
 
         # User leaves voice channel entirely
         if user_config["leave_sound"] and before.channel and after.channel is None:
-
             current_perms = before.channel.permissions_for(user.guild.me)
             if not current_perms.speak or not current_perms.connect:
                 return

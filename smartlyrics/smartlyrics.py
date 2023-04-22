@@ -8,8 +8,14 @@ import lavalink
 from redbot.core import commands
 from redbot.core.bot import Red
 from redbot.core.commands import Context
-from redbot.core.utils.chat_formatting import pagify, text_to_file
+from redbot.core.utils.chat_formatting import pagify
 from redbot.core.utils.menus import DEFAULT_CONTROLS, menu
+
+GENIUS_HEADERS = {
+    "X-Genius-iOS-Version": "6.7.0",
+    "X-Genius-Logged-Out": "true",
+    "User-Agent": "Genius/1015 CFNetwork/1390 Darwin/22.0.0",
+}
 
 
 class SmartLyrics(commands.Cog):
@@ -17,7 +23,7 @@ class SmartLyrics(commands.Cog):
     Gets lyrics for your current song.
     """
 
-    __version__ = "2.1.5"
+    __version__ = "2.1.6"
 
     def __init__(self, bot: Red):
         self.bot = bot
@@ -41,36 +47,55 @@ class SmartLyrics(commands.Cog):
         pre_processed = super().format_help_for_context(ctx)
         return f"{pre_processed}\n\nCog Version: {self.__version__}"
 
-    async def get_lyrics(
-        self, *, query: str = None, spotify_id: str = None
-    ) -> Optional[dict]:
-
-        if spotify_id:
-            params = {
-                "spotify_id": spotify_id,
-            }
-        else:
-            params = {
-                "query": query,
-            }
-
-        headers = {
-            "User-Agent": f"Red-DiscordBot, SmartLyrics/{self.__version__} (https://github.com/kaogurai/cogs)",
+    async def _search(self, query: str) -> Optional[int]:
+        params = {
+            "q": query,
         }
 
         async with self.session.get(
-            "https://api.flowery.pw/v1/lyrics", params=params, headers=headers
-        ) as resp:
-            if resp.status != 200:
-                return
-            return await resp.json()
+            "https://api.genius.com/search/multi", params=params, headers=GENIUS_HEADERS
+        ) as r:
+            if r.status != 200:
+                raise Exception("Could not get search results.")
 
-    def get_user_status_song(
+            j = await r.json()
+
+            tracks = j["response"]["sections"][1]["hits"]
+            if not tracks:
+                return
+
+            return tracks[0]["result"]["id"]
+
+    async def _get_lyrics(self, query: str) -> Optional[dict]:
+        track_id = await self._search(query)
+        if not track_id:
+            return
+
+        params = {
+            "text_format": "plain,dom",
+        }
+        async with self.session.get(
+            "https://api.genius.com/songs/" + str(track_id),
+            headers=GENIUS_HEADERS,
+            params=params,
+        ) as r:
+            if r.status != 200:
+                return
+
+            j = await r.json()
+
+            return {
+                "title": j["response"]["song"]["full_title"],
+                "artwork": j["response"]["song"]["song_art_image_url"],
+                "lyrics": j["response"]["song"]["lyrics"]["plain"],
+            }
+
+    def _get_user_status_song(
         self, user: Union[discord.Member, discord.User]
     ) -> Optional[str]:
         return next(
             (
-                s.track_id
+                s.title + " " + s.artist
                 for s in user.activities
                 if s.type == discord.ActivityType.listening
                 and isinstance(s, discord.Spotify)
@@ -78,40 +103,20 @@ class SmartLyrics(commands.Cog):
             None,
         )
 
-    async def send_results(
-        self, ctx: Context, lrc: bool, results: dict, source: Optional[str] = None
+    async def _send_results(
+        self, ctx: Context, data: dict, source: Optional[str] = None
     ):
-        # Check if there is timed lyrics
-        # If there is not, we will ignore the lrc argument
-        if not results["lyrics"]["lines"]:
-            lrc = False
-
-        if lrc:
-            lrc_string = ""
-            for line in results["lyrics"]["lines"]:
-                start = line["start"]
-                # Convert start (ms) to [mm:ss.xx] format
-                start = f"{start // 60000:02d}:{start % 60000 // 1000:02d}.{start % 1000 // 10:02d}"
-                lrc_string += f"[{start}] {line['text']}\n"
-
-            await ctx.send(
-                file=text_to_file(
-                    lrc_string,
-                    filename=f"{results['track']['artist']} - {results['track']['title']}.lrc",
-                )
-            )
-            return
 
         embeds = []
-        embed_content = [p for p in pagify(results["lyrics"]["text"], page_length=750)]
+        embed_content = [p for p in pagify(data["lyrics"], page_length=750)]
         for index, page in enumerate(embed_content):
             embed = discord.Embed(
                 color=await ctx.embed_color(),
-                title=f"{results['track']['title']} by {results['track']['artist']}",
+                title=data["title"],
                 description=page,
             )
-            if results["track"]["media"]["artwork"] is not None:
-                embed.set_thumbnail(url=results["track"]["media"]["artwork"])
+            if data["artwork"] is not None:
+                embed.set_thumbnail(url=data["artwork"])
             if len(embed_content) != 1:
                 if source:
                     embed.set_footer(
@@ -146,9 +151,9 @@ class SmartLyrics(commands.Cog):
         """
         async with ctx.typing():
             if query:
-                results = await self.get_lyrics(query=query)
+                results = await self._get_lyrics(query)
                 if results:
-                    await self.send_results(ctx, lrc, results)
+                    await self._send_results(ctx, results, "Query")
                 else:
                     await ctx.send(f"No results were found for `{query[:500]}`")
                 return
@@ -164,16 +169,16 @@ class SmartLyrics(commands.Cog):
                         if "-" not in title:
                             title = player.current.author + " " + title
 
-                        results = await self.get_lyrics(query=title)
+                        results = await self._get_lyrics(title)
                         if results:
-                            await self.send_results(ctx, lrc, results, "Voice Channel")
+                            await self._send_results(ctx, results, "Voice Channel")
                             return
 
-            spotify_id = self.get_user_status_song(ctx.author)
-            if spotify_id:
-                results = await self.get_lyrics(spotify_id=spotify_id)
+            spotify_track = self._get_user_status_song(ctx.author)
+            if spotify_track:
+                results = await self._get_lyrics(spotify_track)
                 if results:
-                    await self.send_results(ctx, lrc, results, "Spotify")
+                    await self._send_results(ctx, results, "Spotify")
                     return
 
             lastfm_cog = self.bot.get_cog("LastFM")
@@ -194,10 +199,9 @@ class SmartLyrics(commands.Cog):
                         await ctx.send("Please provide a query to search.")
                         return
 
-                    q = f"{trackname} {artistname}"
-                    results = await self.get_lyrics(query=q)
+                    results = await self._get_lyrics(f"{trackname} {artistname}")
                     if results:
-                        await self.send_results(ctx, lrc, results, "Last.fm")
+                        await self._send_results(ctx, results, "Last.fm")
                         return
 
             await ctx.send("Please provide a query to search.")

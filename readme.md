@@ -23,14 +23,12 @@ Please join the support server [here](https://discord.gg/p6ehU9qhg8) if you have
 | AIArt        | v1.17.6 | Generate incredible art using AI.                                                 |
 | AntiPhishing | v1.2.13 | Fight back against phishing attacks.                                              |
 | AutoAvatar   | v1.0.1  | Automatically changes the bot avatar.                                             |
-| BlenderBot   | v1.0.4  | Discord version of blenderbot.ai.                                                 |
-| ChatBot      | v1.0.4  | Talk to a ChatBot!                                                                |
 | GuildManager | v1.0.3  | Automatically leaves guilds that are not approved by the bot owner.               |
 | NTFYStatus   | v1.0.6  | Send push notifications using ntfy.sh when a bot goes offline.                    |
 | OCR          | v1.0.4  | Converts images to text.                                                          |
 | Radio        | v1.0.3  | Saves radio URLs for easy access.                                                 |
 | Search       | v1.0.2  | Search the web, from Discord.                                                     |
 | SFX          | v6.1.4  | Allow users to play TTS, SFX, and Join/Leave sounds. (originally made by baiumbg) |
-| SmartLyrics  | v2.1.5  | Gets lyrics for your current song.                                                |
+| SmartLyrics  | v2.1.6  | Gets lyrics for your current song.                                                |
 | Tio          | v1.0.0  | Runs arbitrary code using tio.run.                                                |
 | YTDL         | v1.0.11 | Download YouTube videos.                                                          |

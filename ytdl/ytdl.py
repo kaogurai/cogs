@@ -79,7 +79,6 @@ class YTDL(commands.Cog):
         return data, await coro
 
     async def _fix_urls(self, data: dict) -> dict:
-
         things = []
 
         for video_format in data["adaptiveFormats"]:
@@ -143,7 +142,6 @@ class YTDL(commands.Cog):
             description += "\n**Split Formats:**\n"
 
             for video_format in video_info["adaptiveFormats"]:
-
                 if not video_format.get("container") or not video_format.get(
                     "encoding"
                 ):

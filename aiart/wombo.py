@@ -138,7 +138,6 @@ class WomboCommand(MixinMeta):
                 return media_id
 
     async def _get_wombo_app_image_link(self, arguments: dict) -> Optional[str]:
-
         token = await self._get_wombo_app_token()
         if not token:
             return
@@ -226,7 +225,6 @@ class WomboCommand(MixinMeta):
 
         m = await ctx.reply("Generating art... This may take a while.")
         async with ctx.typing():
-
             tasks = [
                 asyncio.create_task(self._get_wombo_app_image_link(arguments))
                 for x in range(arguments["amount"])
