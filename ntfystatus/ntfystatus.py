@@ -49,7 +49,7 @@ class NTFYStatus(commands.Cog):
         )
 
     @commands.Cog.listener()
-    async def on_member_update(self, before: discord.Member, after: discord.Member):
+    async def on_presence_update(self, before: discord.Member, after: discord.Member):
         if not before.bot:
             return
 

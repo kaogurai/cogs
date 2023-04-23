@@ -209,23 +209,25 @@ class KaoTools(
         """
         if not user:
             user = ctx.author
-        png = user.avatar_url_as(format="png", size=4096)
-        jpg = user.avatar_url_as(format="jpg", size=4096)
-        gif = user.avatar_url_as(static_format="png", size=4096)
-        size_512 = user.avatar_url_as(size=512)
-        size_1024 = user.avatar_url_as(size=1024)
-        size_2048 = user.avatar_url_as(size=2048)
-        size_4096 = user.avatar_url_as(size=4096)
+        png = user.display_avatar.with_format("png").url
+        jpg = user.display_avatar.with_format("jpg").url
+        if user.display_avatar.is_animated():
+            gif = user.display_avatar.with_format("gif").url
+        size_512 = user.display_avatar.with_size(512).url
+        size_1024 = user.display_avatar.with_size(1024).url
+        size_2048 = user.display_avatar.with_size(2048).url
+        size_4096 = user.display_avatar.with_size(4096).url
         m = (
-            f"Formats: [PNG]({png}) | [JPG]({jpg}) | [GIF]({gif})\n"
-            f"Sizes: [512]({size_512}) | [1024]({size_1024}) | [2048]({size_2048}) | [4096]({size_4096})"
+            f"Formats: [PNG]({png}) | [JPG]({jpg})"
+            + (f" | [GIF]({gif})\n" if user.display_avatar.is_animated() else "\n")
+            + f"Sizes: [512]({size_512}) | [1024]({size_1024}) | [2048]({size_2048}) | [4096]({size_4096})"
         )
         embed = discord.Embed(
             color=await ctx.embed_color(),
             title=f"{user.name}'s avatar",
             description=m,
         )
-        embed.set_image(url=user.avatar_url_as(size=4096))
+        embed.set_image(url=user.display_avatar.url)
         await ctx.send(embed=embed)
 
     @commands.command(aliases=["oldestmessage"])
