@@ -46,8 +46,8 @@ class WomboConverter(Converter):
         if values["amount"] not in range(1, 10):
             raise BadArgument("The amount needs to be between 1 and 9.")
 
-        if len(values["prompt"]) > 100 and not values["styles"]:
-            raise BadArgument("The prompt needs to be 100 characters or less.")
+        if len(values["prompt"]) > 200 and not values["styles"]:
+            raise BadArgument("The prompt needs to be 200 characters or less.")
 
         styles = await ctx.cog._get_wombo_app_styles()
         if not styles:
