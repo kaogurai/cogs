@@ -3,5 +3,6 @@
     "description": "Downloads YouTube videos.",
     "install_msg": "Thanks for installing!",
     "name": "YTDL",
-    "short": "Downloads YouTube videos."
+    "short": "Downloads YouTube videos.",
+    "min_bot_version": "3.5.0"
 }

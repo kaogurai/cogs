@@ -3,6 +3,7 @@
     "description": "Search the web, from Discord.",
     "install_msg": "Thanks for installing.",
     "name": "Search",
-    "short": "Search the web, from Discord."
+    "short": "Search the web, from Discord.",
+    "min_bot_version": "3.5.0"
 }
 

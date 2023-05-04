@@ -66,8 +66,8 @@ class ImageMixin(MixinMeta):
         if user2 is None:
             user2 = ctx.author
         love = (user.id + user2.id) % 100
-        ua = user.avatar_url_as(static_format="png")
-        u2a = user2.avatar_url_as(static_format="png")
+        ua = user.display_avatar.with_format("png").url
+        u2a = user2.display_avatar.with_format("png").url
         u = f"https://api.martinebot.com/v1/imagesgen/ship?percent={love}&first_user={ua}&second_user={u2a}&no_69_percent_emoji=false"
         t = f"{user.name} and {user2.name} have {love}% compatibility."
         e = discord.Embed(color=await ctx.embed_color(), title=t)

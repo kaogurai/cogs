@@ -36,12 +36,17 @@ class AIArt(
     Generate incredible art using AI.
     """
 
-    __version__ = "1.17.6"
+    __version__ = "2.0.0"
 
     def __init__(self, bot: Red):
         self.bot = bot
         self.session = aiohttp.ClientSession()
-        self.wombo_data = {"app_token": None, "app_token_expires": None}
+        self.wombo_data = {
+            "app_token": None,
+            "app_token_expires": None,
+            "api_token": None,
+        }
+        self.bot.loop.create_task(self.set_token())
 
     def cog_unload(self):
         self.bot.loop.create_task(self.session.close())
@@ -52,6 +57,22 @@ class AIArt(
     def format_help_for_context(self, ctx: Context) -> str:
         pre_processed = super().format_help_for_context(ctx)
         return f"{pre_processed}\n\nCog Version: {self.__version__}"
+
+    async def set_token(self) -> None:
+        """
+        Possibly sets the token for the Wombo Dream API.
+        """
+        tokens = await self.bot.get_shared_api_tokens("wombo")
+        self.wombo_data["api_token"] = tokens.get("token")
+
+    @commands.Cog.listener()
+    async def on_red_api_tokens_update(self, service_name: str, api_tokens: dict):
+        """
+        Updates the token when the API tokens are updated.
+        Possibly sets the token for the Wombo Dream API.
+        """
+        if service_name == "wombo":
+            self.wombo_data["api_token"] = api_tokens.get("token")
 
     async def _get_firebase_bearer_token(self, key: str) -> Optional[str]:
         params = {"key": key}
@@ -153,7 +174,7 @@ class AIArt(
                     return await req.read()
 
     async def send_images(
-        self, ctx: Context, images: List[bytes], footer: Optional[str] = None
+        self, ctx: Context, images: List[bytes], footer: Optional[str] = ""
     ) -> None:
         """
         Params:
@@ -174,13 +195,12 @@ class AIArt(
             embed.set_image(url="attachment://image.webp")
             if len(images) > 1:
                 embed.description = "Type the number of the image to download it. If you want more than one image, seperate the numbers with a comma. If you want all of the images, type `all`."
-                embed.set_footer(text="Image selection will time out in 5 minutes.")
 
-            base_footer = "Image selection will time out in 5 minutes."
-            if footer:
-                embed.set_footer(text=f"{footer} | {base_footer}")
-            else:
-                embed.set_footer(text=base_footer)
+                if footer:
+                    footer += " | "
+                footer += "Image selection will time out in 5 minutes."
+
+            embed.set_footer(text=footer)
 
             file = discord.File(BytesIO(image), filename="image.webp")
 

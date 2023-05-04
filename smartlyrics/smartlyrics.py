@@ -23,7 +23,7 @@ class SmartLyrics(commands.Cog):
     Gets lyrics for your current song.
     """
 
-    __version__ = "2.1.7"
+    __version__ = "3.0.0"
 
     def __init__(self, bot: Red):
         self.bot = bot
@@ -139,9 +139,7 @@ class SmartLyrics(commands.Cog):
     @commands.bot_has_permissions(embed_links=True)
     @commands.guild_only()
     @commands.command(aliases=["l", "ly"])
-    async def lyrics(
-        self, ctx: Context, query: Optional[str] = None
-    ):
+    async def lyrics(self, ctx: Context, query: Optional[str] = None):
         """
         Gets the lyrics for your current song.
 
