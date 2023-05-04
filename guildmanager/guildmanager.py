@@ -13,7 +13,7 @@ class GuildManager(commands.Cog):
     Allows you to whitelist servers that you want to use the bot in.
     """
 
-    __version__ = "1.0.3"
+    __version__ = "2.0.0"
 
     def __init__(self, bot: Red):
         self.bot = bot

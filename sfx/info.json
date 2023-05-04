@@ -5,6 +5,6 @@
     "name": "SFX",
     "short": "Allow users to play TTS, SFX, and Join/Leave sounds.",
     "requirements": ["thefuzz"],
-    "min_bot_version": "3.5.0.dev0"
+    "min_bot_version": "3.5.0"
 }
 

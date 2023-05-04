@@ -18,7 +18,7 @@ class Search(commands.Cog):
     Search the web, from Discord.
     """
 
-    __version__ = "1.0.2"
+    __version__ = "2.0.0"
 
     def __init__(self, bot: Red):
         self.bot = bot
@@ -190,8 +190,6 @@ class Search(commands.Cog):
             return
 
         _, results = results
-
-        print(len(results))
 
         embeds = []
 

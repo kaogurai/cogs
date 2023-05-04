@@ -21,7 +21,7 @@ class AntiPhishing(commands.Cog):
     Protects users against phishing attacks.
     """
 
-    __version__ = "1.2.13"
+    __version__ = "2.0.0"
 
     def __init__(self, bot: Red):
         self.bot = bot

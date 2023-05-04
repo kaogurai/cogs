@@ -5,5 +5,5 @@
     "name": "AIArt",
     "requirements": ["pillow", "thefuzz"],
     "short": "Generate incredible art using AI.",
-    "min_bot_version": "3.5.0.dev0"
+    "min_bot_version": "3.5.0"
 }

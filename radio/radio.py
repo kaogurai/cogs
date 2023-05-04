@@ -14,7 +14,7 @@ class Radio(commands.Cog):
     Saves radio stations for easy access.
     """
 
-    __version__ = "1.0.3"
+    __version__ = "2.0.0"
 
     def __init__(self, bot: Red):
         self.bot = bot

@@ -17,7 +17,7 @@ class Tio(commands.Cog):
     A cog that interfaces with the tio.run website.
     """
 
-    __version__ = "1.0.0"
+    __version__ = "2.0.0"
 
     def __init__(self, bot: Red):
         self.bot = bot

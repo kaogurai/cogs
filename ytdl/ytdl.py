@@ -21,7 +21,7 @@ class YTDL(commands.Cog):
     Downloads YouTube videos.
     """
 
-    __version__ = "1.0.11"
+    __version__ = "2.0.0"
 
     def __init__(self, bot: Red):
         self.bot = bot

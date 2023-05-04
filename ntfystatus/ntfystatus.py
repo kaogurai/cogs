@@ -12,7 +12,7 @@ class NTFYStatus(commands.Cog):
     Send push notifications using ntfy.sh when a bot goes offline.
     """
 
-    __version__ = "1.0.6"
+    __version__ = "2.0.0"
 
     def __init__(self, bot: Red):
         self.bot = bot

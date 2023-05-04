@@ -5,5 +5,5 @@
     "name": "Tio",
     "requirements": ["thefuzz"],
     "short": "Runs arbitrary code using tio.run.",
-    "min_bot_version": "3.5.0.dev0"
+    "min_bot_version": "3.5.0"
 }

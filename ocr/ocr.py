@@ -14,7 +14,7 @@ class OCR(commands.Cog):
     Converts an image to text.
     """
 
-    __version__ = "1.0.4"
+    __version__ = "2.0.0"
 
     def __init__(self, bot: Red):
         self.bot = bot

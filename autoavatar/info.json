@@ -1,9 +1,0 @@
-{
-    "author": ["ryan"],
-    "description": "Automatically changes the bot avatar.",
-    "install_msg": "Thanks for installing!",
-    "name": "AutoAvatar",
-    "requirements": ["apscheduler", "colorgram.py", "beautifulsoup4"],
-    "short": "Automatically changes the bot avatar.",
-    "min_bot_version": "3.5.0.dev0"
-}

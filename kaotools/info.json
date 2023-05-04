@@ -6,5 +6,5 @@
     "requirements": ["pillow"],
     "short": "A bunch of random tools for kaogurai.",
     "hidden": true,
-    "min_bot_version": "3.5.0.dev0"
+    "min_bot_version": "3.5.0"
 }

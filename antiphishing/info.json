@@ -4,5 +4,5 @@
     "install_msg": "Thanks for installing!",
     "name": "AntiPhishing",
     "short": "Fight back against phishing attacks.",
-    "min_bot_version": "3.5.0.dev0"
+    "min_bot_version": "3.5.0"
 }
