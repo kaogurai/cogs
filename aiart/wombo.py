@@ -9,7 +9,7 @@ from PIL import Image
 from redbot.core import commands
 from redbot.core.commands import BadArgument, Context, Converter
 from redbot.core.utils.chat_formatting import humanize_list
-from thefuzz import process
+from rapidfuzz import process
 
 from .abc import MixinMeta
 from .utils import NoExitParser
