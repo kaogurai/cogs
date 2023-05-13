@@ -139,7 +139,7 @@ class SmartLyrics(commands.Cog):
     @commands.bot_has_permissions(embed_links=True)
     @commands.guild_only()
     @commands.command(aliases=["l", "ly"])
-    async def lyrics(self, ctx: Context, query: Optional[str] = None):
+    async def lyrics(self, ctx: Context, *, query: Optional[str] = None):
         """
         Gets the lyrics for your current song.
 
