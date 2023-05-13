@@ -23,7 +23,7 @@ class SmartLyrics(commands.Cog):
     Gets lyrics for your current song.
     """
 
-    __version__ = "3.0.0"
+    __version__ = "3.0.1"
 
     def __init__(self, bot: Red):
         self.bot = bot
