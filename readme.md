@@ -20,7 +20,7 @@ Please join the support server [here](https://discord.gg/p6ehU9qhg8) if you have
 
 | Name         | Version | Description                                                                       |
 | ------------ | ------- | --------------------------------------------------------------------------------- |
-| AIArt        | v2.0.0  | Generate incredible art using AI.                                                 |
+| AIArt        | v2.0.1  | Generate incredible art using AI.                                                 |
 | AntiPhishing | v2.0.0  | Fight back against phishing attacks.                                              |
 | GuildManager | v2.0.0  | Automatically leaves guilds that are not approved by the bot owner.               |
 | NTFYStatus   | v2.0.0  | Send push notifications using ntfy.sh when a bot goes offline.                    |

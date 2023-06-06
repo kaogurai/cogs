@@ -1,3 +1,4 @@
+import asyncio
 import base64
 import contextlib
 
@@ -64,20 +65,62 @@ class NemuSonaCommands(MixinMeta):
                 "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.114 Safari/537.36",
             }
             async with self.session.post(
-                f"https://waifus-api.nemusona.com/generate/{model}",
+                f"https://waifus-api.nemusona.com/job/submit/{model}",
                 json=data,
                 headers=headers,
             ) as r:
-                with contextlib.suppress(discord.NotFound):
-                    await m.delete()
 
+                if r.status == 429:
+                    await ctx.send("Hit the rate limit. Please try again later.")
+                    return
+                elif r.status != 201:
+                    await ctx.send("Something went wrong. Please try again later.")
+                    return
+
+                id = await r.text()
+
+            for x in range(300):
+                async with self.session.get(
+                    f"https://waifus-api.nemusona.com/job/status/{model}/{id}",
+                    headers=headers,
+                ) as r:
+                    if r.status == 429:
+                        await ctx.send("Hit the rate limit. Please try again later.")
+                        return
+                    elif r.status != 200:
+                        await ctx.send("Something went wrong. Please try again later.")
+                        return
+
+                    status = await r.text()
+
+                    if status == "failed":
+                        with contextlib.suppress(discord.NotFound):
+                            await m.delete()
+                        await ctx.send("Something went wrong. Please try again later.")
+                        return
+                    elif status == "completed":
+                        break
+
+                    if x == 299:
+                        with contextlib.suppress(discord.NotFound):
+                            await m.delete()
+                        await ctx.send("Timed out. Please try again later.")
+                        return
+
+                    await asyncio.sleep(1)
+
+            async with self.session.get(
+                f"https://waifus-api.nemusona.com/job/result/{model}/{id}",
+                headers=headers,
+            ) as r:
                 if r.status == 429:
                     await ctx.send("Hit the rate limit. Please try again later.")
                     return
                 elif r.status != 200:
                     await ctx.send("Something went wrong. Please try again later.")
                     return
-                j = await r.json(content_type="text/html")
+
+                j = await r.json()
                 image = base64.b64decode(j["base64"])
 
         await self.send_images(ctx, [image], f"Seed: {j['seed']}")
