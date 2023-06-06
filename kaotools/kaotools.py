@@ -38,7 +38,7 @@ class KaoTools(
     Random tools for kaogurai.
     """
 
-    __version__ = "2.0.0"
+    __version__ = "2.0.1"
 
     FLOWERY_API_URL = "https://api.flowery.pw/v1"
 

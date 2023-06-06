@@ -106,7 +106,7 @@ class ImageMixin(MixinMeta):
         """
         if not link:
             if not ctx.message.attachments:
-                link = str(ctx.author.avatar_url_as(format="png"))
+                link = ctx.author.display_avatar.with_format("png").url
             else:
                 link = str(ctx.message.attachments[0].url)
 
