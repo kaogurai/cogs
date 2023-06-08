@@ -38,7 +38,7 @@ class KaoTools(
     Random tools for kaogurai.
     """
 
-    __version__ = "2.0.1"
+    __version__ = "2.0.2"
 
     FLOWERY_API_URL = "https://api.flowery.pw/v1"
 
@@ -315,17 +315,6 @@ class KaoTools(
                 f"• Average Users: {humanize_number(int(len(self.bot.users) / len(self.bot.guilds)))}\n"
             ),
         )
-        cog = self.bot.get_cog("CommandStats")
-        if cog:
-            embed.add_field(
-                name="Command Stats",
-                value=(
-                    f"• Commands Executed: {humanize_number(sum((await cog.config.all())['globaldata'].values()))}\n"
-                    f"• Commands Executed this session: {humanize_number(sum(cog.session.values()))}\n (since <t:{int(cog.session_time.timestamp())}>)\n"
-                    f"• Commands Executed this session per hour: {str(humanize_number(sum([cog.session[x] for x in cog.session]) / (time.time() - cog.session_time.timestamp() )*3600))}"
-                ),
-                inline=False,
-            )
         await ctx.send(embed=embed)
 
     @commands.command(alises=["echo"])
