@@ -27,12 +27,15 @@ class WaifuDiffusionCommand(MixinMeta):
 
     @commands.command()
     @commands.bot_has_permissions(embed_links=True)
-    async def waifudiffusion(self, ctx: Context, *, text: str):
+    async def waifudiffusion(self, ctx: Context, *, prompt: str):
         """
         Generate art using Waifu Diffusion.
+
+        **Arguments**
+            `prompt` The prompt to use for the art.
         """
-        if len(text) > 800:
-            await ctx.reply("The text needs to be 800 characters or less.")
+        if len(prompt) > 800:
+            await ctx.reply("The prompt needs to be 800 characters or less.")
             return
 
         m = await ctx.reply("Attempting to join queue... This may take a while.")
@@ -53,7 +56,7 @@ class WaifuDiffusionCommand(MixinMeta):
                         await session.send_json(
                             {
                                 "fn_index": 2,
-                                "data": [text],
+                                "data": [prompt],
                                 "session_hash": "".join(
                                     random.choice(string.ascii_letters + string.digits)
                                     for _ in range(11)

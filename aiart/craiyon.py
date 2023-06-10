@@ -11,16 +11,17 @@ from .abc import MixinMeta
 class CraiyonCommand(MixinMeta):
     @commands.command()
     @commands.bot_has_permissions(embed_links=True)
-    async def craiyon(self, ctx: Context, *, text: str):
+    async def craiyon(self, ctx: Context, *, prompt: str):
         """
         Generate art using Craiyon.
 
-        The only argument is the text to generate the image from.
+        **Arguments**
+            `prompt` The prompt to use for the art.
         """
         m = await ctx.reply("Generating art... This may take a while.")
         async with ctx.typing():
             json = {
-                "prompt": text,
+                "prompt": prompt,
             }
             async with self.session.post(
                 "https://backend.craiyon.com/generate", json=json

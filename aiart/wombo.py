@@ -6,10 +6,10 @@ from typing import Optional
 
 import discord
 from PIL import Image
+from rapidfuzz import process
 from redbot.core import commands
 from redbot.core.commands import BadArgument, Context, Converter
 from redbot.core.utils.chat_formatting import humanize_list
-from rapidfuzz import process
 
 from .abc import MixinMeta
 from .utils import NoExitParser
@@ -325,20 +325,21 @@ class WomboCommand(MixinMeta):
         If you would like to view the styles available, run `[p]wombo --styles`.
 
         **Arguments:**
-            - `prompt` The prompt to use for the art.
-            - `--style` The style to use for the art. Defaults to `Realistic v2`.
-            - `--image` The image to use for the art. You can also upload an attachment instead of using this argument.
-            - `--amount` The amount of images to generate.
+            `prompt` The prompt to use for the art.
+            `--style` The style to use for the art. Defaults to `Realistic v2`.
+            `--image` The image to use for the art. You can also upload an attachment instead of using this argument.
+            `--amount` The amount of images to generate.
 
-            These arguments may or may not be available depending on if the bot is using the official or app API.
-            - `--width` The width of the art. Defaults to 1024. Range is 100-10000
-            - `--height` The height of the art. Defaults to 1024. Range is 100-10000
-                - Note: If the total amount of pixels is greater than 35,000,000, it will return one image.
+            If the bot owner has set the Wombo API key, these parameters are also available:
+
+            `--width` The width of the art. Defaults to 1024. Range is 100-10000
+            `--height` The height of the art. Defaults to 1024. Range is 100-10000
             `--steps` The amount of steps to use for the art. Defaults to 40. Range is 20-50.
             `--text-cfg` The text cfg value to use for the art. Defaults to 7.5. Range is 1-30.
             `--negative` The negative prompt to use for the art. Defaults to `None`.
             `--seed` The seed to use for the art. Defaults to `None`.
 
+            **Note: If the total amount of pixels is greater than 35,000,000, it will return one image.**
 
         """
         if not arguments:
@@ -387,7 +388,7 @@ class WomboCommand(MixinMeta):
         Generate a prompt using MagicPrompt.
 
         **Arguments:**
-            - `prompt` The prompt to use for the art.
+            `prompt` The prompt to enhance.
         """
         async with ctx.typing():
             token = await self._get_wombo_app_token()

@@ -14,11 +14,14 @@ from .abc import MixinMeta
 class LatentDiffusionCommand(MixinMeta):
     @commands.command()
     @commands.bot_has_permissions(embed_links=True)
-    async def latentdiffusion(self, ctx: Context, *, text: str):
+    async def latentdiffusion(self, ctx: Context, *, prompt: str):
         """
         Generate art using Latent Diffusion.
+
+        **Arguments**
+            `prompt` The prompt to use for the art.
         """
-        if len(text) > 250:
+        if len(prompt) > 250:
             await ctx.reply("The text needs to be 250 characters or less.")
             return
 
@@ -27,7 +30,7 @@ class LatentDiffusionCommand(MixinMeta):
         async with ctx.typing():
             data = {
                 "data": [
-                    text,
+                    prompt,
                     50,
                     256,
                     256,

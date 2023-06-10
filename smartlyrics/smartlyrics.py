@@ -23,7 +23,7 @@ class SmartLyrics(commands.Cog):
     Gets lyrics for your current song.
     """
 
-    __version__ = "3.0.1"
+    __version__ = "3.0.2"
 
     def __init__(self, bot: Red):
         self.bot = bot
@@ -48,8 +48,9 @@ class SmartLyrics(commands.Cog):
         return f"{pre_processed}\n\nCog Version: {self.__version__}"
 
     async def _search(self, query: str) -> Optional[int]:
+        filtered = self.regex.sub("", query).strip()
         params = {
-            "q": query,
+            "q": filtered,
         }
 
         async with self.session.get(
