@@ -1,6 +1,7 @@
 import asyncio
 import base64
 import contextlib
+import re
 
 import discord
 from redbot.core import commands
@@ -54,6 +55,20 @@ class NemuSonaCommands(MixinMeta):
     ) -> None:
         m = await ctx.reply("Generating art... This may take a while.")
         async with ctx.typing():
+
+            r = re.compile(r"https://danbooru.donmai.us/posts/(\d+)")
+            matches = r.findall(args["prompt"])
+            if matches:
+                async with self.session.get(
+                    f"https://danbooru.donmai.us/posts/{matches[0]}.json"
+                ) as resp:
+                    if resp.status == 200:
+                        j = await resp.json()
+                        args["prompt"] = j["tag_string"]
+                    else:
+                        await ctx.send("Something went wrong when extracting tags.")
+                        return
+
             data = {
                 "prompt": args["prompt"],
                 "negative_prompt": args["negative"],
