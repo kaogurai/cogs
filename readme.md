@@ -30,4 +30,4 @@ Please join the support server [here](https://discord.gg/p6ehU9qhg8) if you have
 | SFX          | v7.0.0  | Allow users to play TTS, SFX, and Join/Leave sounds. (originally made by baiumbg) |
 | SmartLyrics  | v3.0.2  | Gets lyrics for your current song.                                                |
 | Tio          | v2.0.0  | Runs arbitrary code using tio.run.                                                |
-| YTDL         | v2.0.0  | Download YouTube videos.                                                          |
+| YTDL         | v2.0.1  | Download YouTube videos.                                                          |
