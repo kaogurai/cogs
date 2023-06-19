@@ -33,7 +33,7 @@ class SFX(
 ):
     """Plays sound effects, text-to-speech, and sounds when you join or leave a voice channel."""
 
-    __version__ = "7.0.0"
+    __version__ = "7.0.1"
 
     TTS_API_URL = "https://api.flowery.pw/v1/tts"
     TTS_API_HEADERS = {
@@ -240,7 +240,7 @@ class SFX(
                 await channel.send(
                     "Either the Audio cog is not loaded or lavalink has not been initialized yet. If this continues to happen, please contact the bot owner."
                 )
-                return
+            return
         except KeyError:
             player = await lavalink.connect(vc)
 
