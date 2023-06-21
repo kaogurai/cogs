@@ -107,7 +107,6 @@ class SmartLyrics(commands.Cog):
     async def _send_results(
         self, ctx: Context, data: dict, source: Optional[str] = None
     ):
-
         embeds = []
         embed_content = [p for p in pagify(data["lyrics"], page_length=750)]
         for index, page in enumerate(embed_content):

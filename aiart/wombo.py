@@ -347,7 +347,6 @@ class WomboCommand(MixinMeta):
 
         m = await ctx.reply("Generating art... This may take a while.")
         async with ctx.typing():
-
             tasks = []
             for x in range(arguments["amount"]):
                 if not self.wombo_data["api_token"]:

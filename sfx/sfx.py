@@ -5,6 +5,7 @@ import aiohttp
 import discord
 import lavalink
 from discord.ext import tasks
+from lavalink import PlayerNotFound
 from redbot.core import Config, commands
 from redbot.core.bot import Red
 from redbot.core.commands import Context
@@ -33,7 +34,7 @@ class SFX(
 ):
     """Plays sound effects, text-to-speech, and sounds when you join or leave a voice channel."""
 
-    __version__ = "7.0.1"
+    __version__ = "7.0.2"
 
     TTS_API_URL = "https://api.flowery.pw/v1/tts"
     TTS_API_HEADERS = {
@@ -241,7 +242,7 @@ class SFX(
                     "Either the Audio cog is not loaded or lavalink has not been initialized yet. If this continues to happen, please contact the bot owner."
                 )
             return
-        except KeyError:
+        except (KeyError, PlayerNotFound):
             player = await lavalink.connect(vc)
 
         repeat_state = player.repeat

@@ -55,7 +55,6 @@ class NemuSonaCommands(MixinMeta):
     ) -> None:
         m = await ctx.reply("Generating art... This may take a while.")
         async with ctx.typing():
-
             r = re.compile(r"https://danbooru.donmai.us/posts/(\d+)")
             matches = r.findall(args["prompt"])
             if matches:
@@ -84,7 +83,6 @@ class NemuSonaCommands(MixinMeta):
                 json=data,
                 headers=headers,
             ) as r:
-
                 if r.status == 429:
                     await ctx.send("Hit the rate limit. Please try again later.")
                     return
