@@ -18,6 +18,7 @@ from redbot.core.utils.chat_formatting import (
 )
 
 from .abc import CompositeMetaClass
+from .claude import ClaudeMixin
 from .image import ImageMixin
 from .media import MediaMixin
 from .owner import OwnerCommands
@@ -27,6 +28,7 @@ SUPPORT_SERVER = "https://discord.gg/p6ehU9qhg8"
 
 
 class KaoTools(
+    ClaudeMixin,
     ImageMixin,
     MediaMixin,
     OwnerCommands,
@@ -38,7 +40,7 @@ class KaoTools(
     Random tools for kaogurai.
     """
 
-    __version__ = "2.0.2"
+    __version__ = "2.1.0"
 
     FLOWERY_API_URL = "https://api.flowery.pw/v1"
 
@@ -76,8 +78,8 @@ class KaoTools(
         if service_name == "omdb":
             self.omdb_key = api_tokens.get("key")
 
-    @commands.Cog.listener()
-    async def on_message_without_command(self, message: discord.Message):
+    @commands.Cog.listener("on_message_without_command")
+    async def ping_message(self, message: discord.Message):
         if message.author.bot or not message.guild:
             return
         if not message.channel.permissions_for(message.guild.me).send_messages:
