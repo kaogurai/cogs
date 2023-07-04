@@ -18,7 +18,6 @@ from redbot.core.utils.chat_formatting import (
 )
 
 from .abc import CompositeMetaClass
-from .claude import ClaudeMixin
 from .image import ImageMixin
 from .media import MediaMixin
 from .owner import OwnerCommands
@@ -28,7 +27,6 @@ SUPPORT_SERVER = "https://discord.gg/p6ehU9qhg8"
 
 
 class KaoTools(
-    ClaudeMixin,
     ImageMixin,
     MediaMixin,
     OwnerCommands,
@@ -40,7 +38,7 @@ class KaoTools(
     Random tools for kaogurai.
     """
 
-    __version__ = "2.1.1"
+    __version__ = "2.1.2"
 
     FLOWERY_API_URL = "https://api.flowery.pw/v1"
 
