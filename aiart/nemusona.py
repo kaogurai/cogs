@@ -182,3 +182,18 @@ class NemuSonaCommands(MixinMeta):
             `--denoising-strength`: The denoising strength to use for the model. This is a number between 0 and 1, inclusive.
         """
         await self._generate_nemusona_images(ctx, "counterfeit", args)
+
+    @commands.command()
+    async def nemu(self, ctx: Context, *, args: NemuSonaConverter):
+        """
+        Generate art using the Nemu (WIP) model.
+
+        Warning: This model has a high likelihood of generating NSFW content (it will still be behind the NSFW filter.)
+
+        **Arguments:**
+            `prompt`: The prompt to use for the art.
+            `--negative`: The negative prompt to use for the model.
+            `--cfg-scale`: The cfg scale to use for the model. This is a number between 1 and 10, inclusive.
+            `--denoising-strength`: The denoising strength to use for the model. This is a number between 0 and 1, inclusive.
+        """
+        await self._generate_nemusona_images(ctx, "nemu", args)
