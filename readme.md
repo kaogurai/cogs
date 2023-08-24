@@ -20,11 +20,10 @@ Please join the support server [here](https://discord.gg/p6ehU9qhg8) if you have
 
 | Name         | Version | Description                                                                       |
 | ------------ | ------- | --------------------------------------------------------------------------------- |
-| AIArt        | v2.0.3  | Generate incredible art using AI.                                                 |
+| AIArt        | v2.1.0  | Generate incredible art using AI.                                                 |
 | AntiPhishing | v2.0.0  | Fight back against phishing attacks.                                              |
 | GuildManager | v2.0.0  | Automatically leaves guilds that are not approved by the bot owner.               |
 | NTFYStatus   | v2.0.0  | Send push notifications using ntfy.sh when a bot goes offline.                    |
-| OCR          | v2.0.0  | Converts images to text.                                                          |
 | Radio        | v2.0.0  | Saves radio URLs for easy access.                                                 |
 | Search       | v2.0.0  | Search the web, from Discord.                                                     |
 | SFX          | v7.0.2  | Allow users to play TTS, SFX, and Join/Leave sounds. (originally made by baiumbg) |

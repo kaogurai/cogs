@@ -139,11 +139,10 @@ class NemuSonaCommands(MixinMeta):
         await self.send_images(ctx, [image], f"Seed: {j['seed']}")
 
     @commands.command()
+    @commands.is_nsfw()
     async def anything(self, ctx: Context, *, args: NemuSonaConverter):
         """
         Generate art using the Anything v4.5 model.
-
-        Warning: This model has a high likelihood of generating NSFW content (it will still be behind the NSFW filter.)
 
         **Arguments:**
             `prompt`: The prompt to use for the art.
@@ -154,11 +153,10 @@ class NemuSonaCommands(MixinMeta):
         await self._generate_nemusona_images(ctx, "anything", args)
 
     @commands.command()
+    @commands.is_nsfw()
     async def aom(self, ctx: Context, *, args: NemuSonaConverter):
         """
         Generate art using the AOM3 model.
-
-        Warning: This model has a high likelihood of generating NSFW content (it will still be behind the NSFW filter.)
 
         **Arguments:**
             `prompt`: The prompt to use for the art.
@@ -169,11 +167,10 @@ class NemuSonaCommands(MixinMeta):
         await self._generate_nemusona_images(ctx, "aom", args)
 
     @commands.command()
+    @commands.is_nsfw()
     async def counterfeit(self, ctx: Context, *, args: NemuSonaConverter):
         """
         Generate art using the Counterfeit v2.5 model.
-
-        Warning: This model has a high likelihood of generating NSFW content (it will still be behind the NSFW filter.)
 
         **Arguments:**
             `prompt`: The prompt to use for the art.

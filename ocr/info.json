@@ -1,9 +1,0 @@
-{
-    "author": ["ryan"],
-    "description": "Converts images to text.",
-    "install_msg": "Thanks for installing.",
-    "name": "OCR",
-    "short": "Converts images to text.",
-    "min_bot_version": "3.5.0"
-}
-
