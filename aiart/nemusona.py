@@ -181,11 +181,10 @@ class NemuSonaCommands(MixinMeta):
         await self._generate_nemusona_images(ctx, "counterfeit", args)
 
     @commands.command()
+    @commands.is_nsfw()
     async def nemu(self, ctx: Context, *, args: NemuSonaConverter):
         """
-        Generate art using the Nemu (WIP) model.
-
-        Warning: This model has a high likelihood of generating NSFW content (it will still be behind the NSFW filter.)
+        Generate art using the Nemu model.
 
         **Arguments:**
             `prompt`: The prompt to use for the art.
