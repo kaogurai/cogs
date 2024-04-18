@@ -13,7 +13,7 @@ from redbot.core import commands
 from redbot.core.bot import Red
 from redbot.core.commands import Context
 
-INVIDIOUS_DOMAIN = "vid.priv.au"
+INVIDIOUS_DOMAIN = "yt.drgnz.club"
 
 
 class YTDL(commands.Cog):
@@ -21,7 +21,7 @@ class YTDL(commands.Cog):
     Downloads YouTube videos.
     """
 
-    __version__ = "2.0.1"
+    __version__ = "2.0.2"
 
     def __init__(self, bot: Red):
         self.bot = bot
