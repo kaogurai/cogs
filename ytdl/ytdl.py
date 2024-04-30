@@ -5,7 +5,6 @@ import random
 import re
 import string
 from typing import Coroutine, Optional, Tuple
-from urllib.parse import urlparse
 
 import aiohttp
 import discord
@@ -21,19 +20,33 @@ class YTDL(commands.Cog):
     Downloads YouTube videos.
     """
 
-    __version__ = "2.0.2"
+    __version__ = "2.1.0"
 
     def __init__(self, bot: Red):
+        """
+        Initializes the cog by setting up the HTTP session with the correct
+        headers and compiling the YouTube regex.
+        """
         self.bot = bot
-        self.session = aiohttp.ClientSession()
+        self.session = aiohttp.ClientSession(
+            headers={
+                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.149 Safari/537.36"
+            }
+        )
         self.youtube_regex = re.compile(
             r"(https?://)?(www\.)?(youtube|youtu|youtube-nocookie)\.(com|be)/(watch\?v=|embed/|v/|.+\?v=)?(?P<id>[A-Za-z0-9\-=_]{11})"
         )
 
-    async def red_delete_data_for_user(self, **kwargs):
+    async def red_delete_data_for_user(self, **kwargs) -> None:
+        """
+        This cog does not store any user data.
+        """
         return
 
-    def format_help_for_context(self, ctx: Context):
+    def format_help_for_context(self, ctx: Context) -> None:
+        """
+        Adds the cog version to the help menu.
+        """
         pre_processed = super().format_help_for_context(ctx)
         return f"{pre_processed}\n\nCog Version: {self.__version__}"
 
@@ -49,19 +62,15 @@ class YTDL(commands.Cog):
         """
         Gets the video info from the Invidious API.
         """
-        headers = {
-            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.149 Safari/537.36"
-        }
         async with self.session.get(
-            f"https://{INVIDIOUS_DOMAIN}/api/v1/videos/{video_id}",
-            headers=headers,
+            f"https://{INVIDIOUS_DOMAIN}/api/v1/videos/{video_id}"
         ) as response:
             if response.status == 200:
                 return await response.json()
 
     async def _shorten_url(self, url: str) -> Optional[str]:
         """
-        Shortens a URL so more can fit in an embed.
+        Returns a shortened version of a URL.
         """
         # 16 random chars
         key = "".join(
@@ -69,7 +78,9 @@ class YTDL(commands.Cog):
         )
 
         data = {"golink": key, "dest": url, "addLogo": False, "caption": ""}
-        async with self.session.post("https://zgzg.link/edit", json=data) as response:
+        async with self.session.post(
+            "https://zgzg.link/api/v2/edit", json=data
+        ) as response:
             if response.status == 200:
                 return f"https://zgzg.link/{key}"
 
@@ -128,7 +139,7 @@ class YTDL(commands.Cog):
 
             urls = []
 
-            description = "**Regular Formats:**\n"
+            regular_formats = ""
 
             for video_format in video_info["formatStreams"]:
                 if not video_format.get("container") or not video_format.get(
@@ -136,10 +147,11 @@ class YTDL(commands.Cog):
                 ):
                     continue
 
-                description += f"[{len(urls) + 1}. {video_format['resolution']} - {video_format['container']} ({video_format['encoding']})]({video_format['shortened_url']})\n"
+                regular_formats += f"[{len(urls) + 1}. {video_format['resolution']} - {video_format['container']} ({video_format['encoding']})]({video_format['shortened_url']})\n"
                 urls.append(video_format)
 
-            description += "\n**Split Formats:**\n"
+            video_only = ""
+            audio_only = ""
 
             for video_format in video_info["adaptiveFormats"]:
                 if not video_format.get("container") or not video_format.get(
@@ -148,12 +160,14 @@ class YTDL(commands.Cog):
                     continue
 
                 if "resolution" in video_format.keys():
-                    description += f"[{len(urls) + 1}. Video Only - {video_format['resolution']} - {video_format['container']} ({video_format['encoding']})]({video_format['shortened_url']})\n"
+                    video_only += f"[{len(urls) + 1}. {video_format['resolution']} - {video_format['container']} ({video_format['encoding']})]({video_format['shortened_url']})\n"
                 else:
-                    description += f"[{len(urls) + 1}. Audio Only - {float(video_format['bitrate']) / 1000} kb/s - {video_format['container']} ({video_format['encoding']})]({video_format['shortened_url']})\n"
+                    audio_only += f"[{len(urls) + 1}. {float(video_format['bitrate']) / 1000} kb/s - {video_format['container']} ({video_format['encoding']})]({video_format['shortened_url']})\n"
                 urls.append(video_format)
 
-            embed.description = description[:4000]
+            embed.add_field(name="Regular Formats", value=regular_formats, inline=False)
+            embed.add_field(name="Audio Only", value=audio_only, inline=False)
+            embed.add_field(name="Video Only", value=video_only, inline=False)
 
             await ctx.send(embed=embed)
 

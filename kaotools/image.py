@@ -1,4 +1,3 @@
-import asyncio
 from io import BytesIO
 from typing import Optional
 
@@ -12,70 +11,39 @@ from .abc import MixinMeta
 
 
 class ImageMixin(MixinMeta):
-    @commands.command()
-    @commands.bot_has_permissions(attach_files=True)
-    async def obama(self, ctx: Context, *, text: str):
-        """
-        Generate a video of Obama saying something.
-
-        There is a limit of 280 characters.
-        """
-        if len(text) > 280:
-            await ctx.send("Your message needs to be 280 characters or less.")
-            return
-        async with ctx.typing():
-            async with self.session.post(
-                "http://talkobamato.me/synthesize.py",
-                data={"input_text": text},
-            ) as resp:
-                if resp.status != 200:
-                    await ctx.send("Something went wrong when trying to get the video.")
-                    return
-                key = resp.url.query["speech_key"]
-
-            async with self.session.get(
-                f"http://talkobamato.me/synth/output/{key}/obama.mp4"
-            ) as resp:
-                if resp.status != 200:
-                    await ctx.send("Something went wrong when trying to get the video.")
-                    return
-                res = await resp.read()
-                if len(res) < 100:  # File incomplete
-                    await asyncio.sleep(3)  # Needs some more time to generate, I guess
-                    async with self.session.get(
-                        f"http://talkobamato.me/synth/output/{key}/obama.mp4"
-                    ) as resp:
-                        if resp.status != 200:
-                            await ctx.send(
-                                "Something went wrong when trying to get the video."
-                            )
-                            return
-                        res = await resp.read()
-            bfile = BytesIO(res)
-            bfile.seek(0)
-            await ctx.send(file=discord.File(bfile, filename="obama.mp4"))
-
-    @commands.bot_has_permissions(embed_links=True)
+    @commands.bot_has_permissions(embed_links=True, attach_files=True)
     @commands.command(aliases=["ship", "lovecalc"])
     async def lovecalculator(
-        self, ctx: Context, user: discord.User, user2: Optional[discord.User] = None
+        self,
+        ctx: Context,
+        user: discord.User,
+        other_user: Optional[discord.User] = None,
     ):
         """
         Calculates the amount of love between two users.
         """
-        if user2 is None:
-            user2 = ctx.author
-        love = (user.id + user2.id) % 100
-        ua = user.display_avatar.with_format("png").url
-        u2a = user2.display_avatar.with_format("png").url
-        u = f"https://api.martinebot.com/v1/imagesgen/ship?percent={love}&first_user={ua}&second_user={u2a}&no_69_percent_emoji=false"
-        t = f"{user.name} and {user2.name} have {love}% compatibility."
-        e = discord.Embed(color=await ctx.embed_color(), title=t)
-        e.set_image(url=u)
+        if other_user is None:
+            other_user = ctx.author
+        love = (user.id + other_user.id) % 100
+        user_avatar = user.display_avatar.with_format("png").url
+        other_user_avatar = other_user.display_avatar.with_format("png").url
+
+        e = discord.Embed(
+            color=await ctx.embed_color(),
+            title=f"{user.name} and {other_user.name} have {love}% compatibility.",
+        )
+        e.set_image(
+            url=f"https://api.martinebot.com/v1/imagesgen/ship?percent={love}&first_user={user_avatar}&second_user={other_user_avatar}&no_69_percent_emoji=false"
+        )
         e.set_footer(text="Powered by api.martinebot.com")
         await ctx.send(embed=e)
 
-    def get_color_palette(self, img: BytesIO) -> discord.File:
+    def _get_color_palette(self, img: BytesIO) -> discord.File:
+        """
+        Creates a color palette from a given image.
+
+        Credits to Flare for writing this code.
+        """
         colors = colorgram.extract(img, 10)
         if sorted:
             colors.sort(key=lambda c: c.rgb)
@@ -95,7 +63,7 @@ class ImageMixin(MixinMeta):
         return image
 
     @commands.command(aliases=["pfppalette", "pfpalette"])
-    @commands.bot_has_permissions(attach_files=True)
+    @commands.bot_has_permissions(embed_links=True, attach_files=True)
     async def palette(self, ctx: Context, link: Optional[str] = None, sorted=False):
         """
         Get the color palette of an image.
@@ -108,7 +76,7 @@ class ImageMixin(MixinMeta):
             if not ctx.message.attachments:
                 link = ctx.author.display_avatar.with_format("png").url
             else:
-                link = str(ctx.message.attachments[0].url)
+                link = ctx.message.attachments[0].url
 
         async with ctx.typing():
             try:
@@ -127,6 +95,6 @@ class ImageMixin(MixinMeta):
 
             await ctx.send(
                 file=await self.bot.loop.run_in_executor(
-                    None, self.get_color_palette, img
+                    None, self._get_color_palette, img
                 )
             )

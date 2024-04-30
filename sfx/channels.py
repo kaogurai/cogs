@@ -107,6 +107,10 @@ class TTSChannelMixin(MixinMeta):
 
     @commands.Cog.listener(name="on_message_without_command")
     async def ttschannels_message_listener(self, message: discord.Message):
+        """
+        Listens for messages to be sent and checks if they are
+        eligible to be spoken through TTS channels.
+        """
         if (
             not message.guild
             or message.author.bot
@@ -118,8 +122,8 @@ class TTSChannelMixin(MixinMeta):
         ):
             return
 
-        channel_list = await self.config.guild(message.guild).channels()
-        if message.channel.id not in channel_list:
+        guild_config = await self.config.guild(message.guild).all()
+        if message.channel.id not in guild_config["channels"]:
             return
 
         if not message.author.voice or not message.author.voice.channel:
@@ -132,10 +136,14 @@ class TTSChannelMixin(MixinMeta):
             )
             return
 
+        text = await self.process_text(
+            message.guild, message.author, message.clean_content
+        )
+
         await self.play_tts(
             message.author,
             message.author.voice.channel,
             message.channel,
             "ttschannel",
-            message.clean_content,
+            text,
         )

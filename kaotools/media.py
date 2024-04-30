@@ -1,18 +1,15 @@
-import asyncio
-import datetime
-from io import BytesIO
-
 import discord
 from redbot.core import commands
 from redbot.core.commands import Context
-from redbot.core.utils.chat_formatting import pagify
-from redbot.core.utils.menus import DEFAULT_CONTROLS, menu
 
 from .abc import MixinMeta
 
 
 class MediaMixin(MixinMeta):
-    async def get_omdb_info(self, type: str, query: str) -> dict:
+    async def _get_omdb_info(self, type: str, query: str) -> dict:
+        """
+        Gets information from the OMDB API.
+        """
         params = {"apikey": self.omdb_key, "type": type, "t": query}
         async with self.session.get("http://www.omdbapi.com/", params=params) as req:
             if req.status != 200:
@@ -28,7 +25,7 @@ class MediaMixin(MixinMeta):
         """
         Get information about a specific movie.
         """
-        data = await self.get_omdb_info("movie", movie)
+        data = await self._get_omdb_info("movie", movie)
         if not data:
             await ctx.send("I couldn't find that movie!")
             return
@@ -62,7 +59,7 @@ class MediaMixin(MixinMeta):
         """
         Get information about a specific show.
         """
-        data = await self.get_omdb_info("series", show)
+        data = await self._get_omdb_info("series", show)
         if not data:
             await ctx.send("I couldn't find that show!")
             return

@@ -11,23 +11,29 @@ from redbot.core.commands import Context
 from redbot.core.utils.chat_formatting import pagify
 from redbot.core.utils.menus import DEFAULT_CONTROLS, menu
 
-GENIUS_HEADERS = {
-    "X-Genius-iOS-Version": "6.7.0",
-    "X-Genius-Logged-Out": "true",
-    "User-Agent": "Genius/1015 CFNetwork/1390 Darwin/22.0.0",
-}
-
 
 class SmartLyrics(commands.Cog):
     """
     Gets lyrics for your current song.
     """
 
-    __version__ = "3.0.2"
+    __version__ = "3.0.3"
 
     def __init__(self, bot: Red):
+        """
+        Initalizes the cog by setting up the HTTP session with the
+        correct headers and setting the RegEx.
+        """
         self.bot = bot
-        self.session = aiohttp.ClientSession()
+        self.session = aiohttp.ClientSession(
+            headers={
+                "X-Genius-iOS-Version": "6.7.0",
+                "X-Genius-Logged-Out": "true",
+                "User-Agent": "Genius/1015 CFNetwork/1390 Darwin/22.0.0",
+            }
+        )
+        # thanks wyn for the RegEx
+        # https://github.com/TheWyn/Wyn-RedV3Cogs/blob/master/lyrics/lyrics.py#L12-13
         self.regex = re.compile(
             (
                 r"((\[)|(\()).*(of?ficial|feat\.?|"
@@ -35,26 +41,37 @@ class SmartLyrics(commands.Cog):
             ),
             flags=re.I,
         )
-        # thanks wyn - https://github.com/TheWyn/Wyn-RedV3Cogs/blob/master/lyrics/lyrics.py#L12-13
 
-    def cog_unload(self):
+    def cog_unload(self) -> None:
+        """
+        Closes the HTTP session when the cog is unloaded.
+        """
         self.bot.loop.create_task(self.session.close())
 
-    async def red_delete_data_for_user(self, **kwargs):
+    async def red_delete_data_for_user(self, **kwargs) -> None:
+        """
+        This cog does not store any user data.
+        """
         return
 
-    def format_help_for_context(self, ctx: Context):
+    def format_help_for_context(self, ctx: Context) -> None:
+        """
+        Adds the cog version to the help menu.
+        """
         pre_processed = super().format_help_for_context(ctx)
         return f"{pre_processed}\n\nCog Version: {self.__version__}"
 
     async def _search(self, query: str) -> Optional[int]:
+        """
+        Uses the Genius API to search for track IDs.
+        """
         filtered = self.regex.sub("", query).strip()
         params = {
             "q": filtered,
         }
 
         async with self.session.get(
-            "https://api.genius.com/search/multi", params=params, headers=GENIUS_HEADERS
+            "https://api.genius.com/search/multi", params=params
         ) as r:
             if r.status != 200:
                 raise Exception("Could not get search results.")
@@ -68,6 +85,9 @@ class SmartLyrics(commands.Cog):
             return tracks[0]["result"]["id"]
 
     async def _get_lyrics(self, query: str) -> Optional[dict]:
+        """
+        Uses the Genius API to get lyrics.
+        """
         track_id = await self._search(query)
         if not track_id:
             return
@@ -77,7 +97,6 @@ class SmartLyrics(commands.Cog):
         }
         async with self.session.get(
             "https://api.genius.com/songs/" + str(track_id),
-            headers=GENIUS_HEADERS,
             params=params,
         ) as r:
             if r.status != 200:
@@ -94,6 +113,9 @@ class SmartLyrics(commands.Cog):
     def _get_user_status_song(
         self, user: Union[discord.Member, discord.User]
     ) -> Optional[str]:
+        """
+        Possibly returns a string of the user's spotify status.
+        """
         return next(
             (
                 s.title + " " + s.artist
@@ -107,6 +129,9 @@ class SmartLyrics(commands.Cog):
     async def _send_results(
         self, ctx: Context, data: dict, source: Optional[str] = None
     ):
+        """
+        Package the results into embeds and sends them to the user.
+        """
         embeds = []
         embed_content = [p for p in pagify(data["lyrics"], page_length=750)]
         for index, page in enumerate(embed_content):

@@ -1,3 +1,4 @@
+import re
 from typing import Optional
 from urllib.parse import quote
 
@@ -32,20 +33,23 @@ class SFX(
     MyTTSCommand,
     metaclass=CompositeMetaClass,
 ):
-    """Plays sound effects, text-to-speech, and sounds when you join or leave a voice channel."""
+    """
+    Plays sound effects, text-to-speech, and join/leave sounds.
+    """
 
-    __version__ = "7.0.2"
+    __version__ = "7.1.0"
 
     TTS_API_URL = "https://api.flowery.pw/v1/tts"
-    TTS_API_HEADERS = {
-        "User-Agent": f"Red-DiscordBot, SFX/{__version__} (https://github.com/kaogurai/cogs)"
-    }
     SFX_API_URL = "https://freesound.org/apiv2"
 
     def __init__(self, bot: Red):
         self.bot = bot
         self.config = Config.get_conf(self, identifier=134621854878007296)
-        self.session = aiohttp.ClientSession()
+        self.session = aiohttp.ClientSession(
+            headers={
+                "User-Agent": f"Red-DiscordBot, SFX/{self.__version__} (https://github.com/kaogurai/cogs)"
+            }
+        )
         user_config = {
             "voice": "Christopher",
             "translate": False,
@@ -59,6 +63,9 @@ class SFX(
             "allow_autotts": True,
             "join_sound": "",
             "leave_sound": "",
+            "priority": "guild",
+            "disabled_users": [],
+            "say_name": False,
         }
         self.config.register_user(**user_config)
         self.config.register_guild(**guild_config)
@@ -72,7 +79,7 @@ class SFX(
         self.voices = []
         self.autotts = []
 
-    def cog_unload(self):
+    def cog_unload(self) -> None:
         """
         Runs when the cog is unloaded.
 
@@ -82,7 +89,7 @@ class SFX(
         self.bot.loop.create_task(self.reset_player_states())
         lavalink.unregister_event_listener(self.ll_check)
 
-    async def red_delete_data_for_user(self, **kwargs):
+    async def red_delete_data_for_user(self, **kwargs) -> None:
         """
         Clears a user's data when it's requested.
         """
@@ -90,30 +97,28 @@ class SFX(
 
     def format_help_for_context(self, ctx: Context) -> str:
         """
-        Adds the version to the help command.
+        Adds the cog version to the help menu.
         """
         pre_processed = super().format_help_for_context(ctx)
         return f"{pre_processed}\n\nCog Version: {self.__version__}"
 
-    @tasks.loop(hours=48)
+    @tasks.loop(hours=12)
     async def get_voices(self) -> None:
         """
         Stores all the available voices in a class attribute.
 
         We do this so we don't have to make a request every time we want to play a sound.
 
-        It runs every 48 hours since it's uncommon voices will change.
+        It runs every 12 hours since it's uncommon voices will change.
         """
-        async with self.session.get(
-            f"{self.TTS_API_URL}/voices", headers=self.TTS_API_HEADERS
-        ) as req:
+        async with self.session.get(f"{self.TTS_API_URL}/voices") as req:
             if req.status == 200:
                 self.voices = (await req.json())["voices"]
 
     @tasks.loop(seconds=5)
     async def maybe_get_voices(self) -> None:
         """
-        If the TTS API was down for some reason and we can't get the voices, we'll try again every 15 seconds.
+        If the TTS API was down for some reason and we can't get the voices, we'll try again every 5 seconds.
 
         If there's already voices, we can just ignore this since it'll try again in 48 hours.
         """
@@ -170,7 +175,10 @@ class SFX(
             if v["name"] == voice:
                 return v
 
-    async def can_tts(self, message: discord.Message):
+    async def can_tts(self, message: discord.Message) -> bool:
+        """
+        Checks if the user of the message can use the TTS command.
+        """
         ctx = await self.bot.get_context(message)
         command = self.bot.get_command("tts")
 
@@ -180,6 +188,27 @@ class SFX(
             can = False
 
         return can
+
+    async def process_text(
+        self, guild: discord.Guild, author: discord.User, text: str
+    ) -> str:
+        """
+        This processes text for being spoken by removing links and potentially
+        adding the users name. This is not used when TTS is downloaded.
+        """
+
+        # Remove links
+        text = re.sub(
+            r"http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\\(\\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+",
+            "link removed",
+            text,
+        )
+
+        # Display name
+        say_name = await self.config.guild(guild).say_name()
+        if say_name:
+            return f"{author.display_name} says {text}"
+        return text
 
     async def play_tts(
         self,

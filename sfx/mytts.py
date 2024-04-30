@@ -1,10 +1,7 @@
-from typing import Any, List, Optional
+from typing import Optional
 
-import discord
 from redbot.core import commands
 from redbot.core.commands import Context
-from redbot.core.utils import AsyncIter
-from redbot.core.utils.menus import DEFAULT_CONTROLS, menu
 
 from .abc import MixinMeta
 

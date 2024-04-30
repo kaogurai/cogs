@@ -1,7 +1,5 @@
 import datetime
-import random
 import re
-import time
 from typing import Optional
 
 import aiohttp
@@ -20,16 +18,12 @@ from redbot.core.utils.chat_formatting import (
 from .abc import CompositeMetaClass
 from .image import ImageMixin
 from .media import MediaMixin
-from .owner import OwnerCommands
 from .text import TextMixin
-
-SUPPORT_SERVER = "https://discord.gg/p6ehU9qhg8"
 
 
 class KaoTools(
     ImageMixin,
     MediaMixin,
-    OwnerCommands,
     TextMixin,
     commands.Cog,
     metaclass=CompositeMetaClass,
@@ -40,44 +34,47 @@ class KaoTools(
 
     __version__ = "2.1.2"
 
-    FLOWERY_API_URL = "https://api.flowery.pw/v1"
-
     def __init__(self, bot: Red):
+        """
+        Initalizes the cog by creating the HTTP session
+        and setting the OMBD token.
+        """
         self.bot = bot
         self.session = aiohttp.ClientSession()
-        self.bot.loop.create_task(self.set_token())
+        self.bot.loop.create_task(self._set_token())
 
-    def cog_unload(self):
-        self.bot.loop.create_task(self.session.close())
-
-    async def red_delete_data_for_user(self, **kwargs):
+    async def red_delete_data_for_user(self, **kwargs) -> None:
+        """
+        This cog does not store any user data.
+        """
         return
 
     def format_help_for_context(self, ctx: Context) -> str:
+        """
+        Adds the cog version to the help menu.
+        """
         pre_processed = super().format_help_for_context(ctx)
         return f"{pre_processed}\n\nCog Version: {self.__version__}"
 
-    async def invite_url(self, snowflake: Optional[int] = None) -> str:
-        scopes = ("bot", "applications.commands")
-        permissions = discord.Permissions(1642790907127)
-        if snowflake:
-            return discord.utils.oauth_url(
-                snowflake, permissions, scopes=("bot", "applications.commands")
-            )
-        app_info = await self.bot.application_info()
-        return discord.utils.oauth_url(app_info.id, permissions, scopes=scopes)
-
-    async def set_token(self):
-        token = await self.bot.get_shared_api_tokens("omdb")
-        self.omdb_key = token.get("key")
+    def cog_unload(self):
+        """
+        Closes the HTTP session when the cog is unloaded.
+        """
+        self.bot.loop.create_task(self.session.close())
 
     @commands.Cog.listener()
     async def on_red_api_tokens_update(self, service_name: str, api_tokens: dict):
+        """
+        Sets the OMBD token when it is changed.
+        """
         if service_name == "omdb":
             self.omdb_key = api_tokens.get("key")
 
     @commands.Cog.listener("on_message_without_command")
     async def ping_message(self, message: discord.Message):
+        """
+        Responds to pings with the bot's prefix.
+        """
         if message.author.bot or not message.guild:
             return
         if not message.channel.permissions_for(message.guild.me).send_messages:
@@ -105,6 +102,25 @@ class KaoTools(
         )
         await message.channel.send(embed=embed)
 
+    async def _invite_url(self, snowflake: Optional[int] = None) -> str:
+        """
+        Generates an invite URL for the given snowflake.
+        """
+        scopes = ("bot", "applications.commands")
+        permissions = discord.Permissions(1642790907127)
+        if snowflake:
+            return discord.utils.oauth_url(
+                snowflake,
+                permissions=permissions,
+                scopes=("bot", "applications.commands"),
+            )
+        app_info = await self.bot.application_info()
+        return discord.utils.oauth_url(app_info.id, permissions, scopes=scopes)
+
+    async def _set_token(self):
+        token = await self.bot.get_shared_api_tokens("omdb")
+        self.omdb_key = token.get("key")
+
     @commands.command()
     @commands.bot_has_permissions(add_reactions=True, use_external_emojis=True)
     async def poll(self, ctx: Context, *, question: str):
@@ -114,27 +130,20 @@ class KaoTools(
         if len(question) > 2000:
             await ctx.send("That question is too long.")
             return
+
         message = await ctx.send(f"**{ctx.author} asks:** " + question)
-        await message.add_reaction("👍")
-        await message.add_reaction("<:idk:838887174345588796>")
-        await message.add_reaction("👎")
+        await message.add_reaction("<:check:839940113671782410>")
+        await message.add_reaction("<:null:842192667496153098>")
+        await message.add_reaction("<:cross:839940112540499990>")
 
     @commands.bot_has_permissions(embed_links=True)
-    @commands.command(aliases=["support", "inv"])
+    @commands.command(aliases=["inv"])
     async def invite(self, ctx: Context, *, bot: Optional[discord.User] = None):
         """
         Invite me or another bot!
         """
         if bot is None:
-            t = "I am a private bot."
-            d = f"It is not possible to invite me at this time."
-            embed = discord.Embed(
-                color=await ctx.embed_color(),
-                title=t,
-                description=d,
-            )
-            await ctx.send(embed=embed)
-            return
+            bot = self.bot.user
 
         if not bot.bot:
             await ctx.send("That user isn't a bot, dumbass.")
@@ -143,9 +152,12 @@ class KaoTools(
         embed = discord.Embed(
             title=f"Click here to invite {bot}!",
             color=await ctx.embed_color(),
-            url=await self.invite_url(bot.id),
+            url=await self._invite_url(bot.id),
         )
-        embed.set_footer(text="Note: this link may not work for some bots.")
+
+        if bot != self.bot.user:
+            embed.set_footer(text="Note: this link may not work for some bots.")
+
         await ctx.send(embed=embed)
 
     @commands.command()
@@ -156,14 +168,6 @@ class KaoTools(
         """
         count = len(ctx.guild.members)
         await ctx.send(f"There are currently **{count}** members in this server.")
-
-    @commands.command(aliases=["someone", "pickuser", "randommember", "picksomeone"])
-    @commands.guild_only()
-    async def randomuser(self, ctx: Context):
-        """
-        Pick a random user in the server.
-        """
-        await ctx.send(f"<@{random.choice(ctx.guild.members).id}>")
 
     @commands.command(aliases=["colour"])
     @commands.bot_has_permissions(embed_links=True)
@@ -177,9 +181,7 @@ class KaoTools(
             if r.status == 200:
                 data = await r.json()
             else:
-                await ctx.send(
-                    "Something is wrong with the API I use, please try again later."
-                )
+                await ctx.send("Something went wrong, please try again later.")
                 return
 
         embed = discord.Embed(color=color, title=data["name"]["value"])
@@ -239,7 +241,7 @@ class KaoTools(
         Gets the first message in a channel.
         """
         c = channel if channel else ctx.channel
-        first = await c.history(limit=1, oldest_first=True).flatten()
+        first = [message async for message in c.history(limit=1, oldest_first=True)]
         if first:
             t = "Click here to jump to the first message."
             e = discord.Embed(
@@ -286,14 +288,14 @@ class KaoTools(
     @commands.command()
     async def botstats(self, ctx: Context):
         """
-        View statistics about [botname].
+        View statistics about kaogurai.
         """
         red_proccess = psutil.Process()
 
         with red_proccess.oneshot():
             memory_amount = int(red_proccess.memory_info().rss / 1024**2)
             memory_usage = red_proccess.memory_percent("rss")
-        delta = datetime.datetime.utcnow() - self.bot.uptime
+        delta = datetime.datetime.now(datetime.UTC) - self.bot.uptime
         uptime_str = humanize_timedelta(timedelta=delta) or "Less than one second."
 
         embed = discord.Embed(
@@ -376,3 +378,26 @@ class KaoTools(
                 everyone=True, roles=True, users=True
             ),
         )
+
+    @commands.command()
+    @commands.is_owner()
+    async def unusedrepos(self, ctx: Context):
+        """
+        View unused downloader repos.
+        """
+        repo_cog = self.bot.get_cog("Downloader")
+        if not repo_cog:
+            return await ctx.send("Downloader cog not found.")
+        repos = [r.name for r in repo_cog._repo_manager.repos]
+        active_repos = {c.repo_name for c in await repo_cog.installed_cogs()}
+        for r in active_repos:
+            try:
+                repos.remove(r)
+            except:
+                pass
+        if not repos:
+            await ctx.send("All repos are currently being used!")
+            return
+
+        embed = discord.Embed(title="Unused repos", description="\n".join(repos))
+        await ctx.send(embed=embed)

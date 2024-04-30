@@ -8,9 +8,6 @@ from redbot.core.commands import Context
 from redbot.core.utils.menus import DEFAULT_CONTROLS, menu
 
 QWANT_API_BASE = "https://api.qwant.com/v3"
-QWANT_HEADERS = {
-    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.114 Safari/537.36"
-}
 
 
 class Search(commands.Cog):
@@ -18,16 +15,29 @@ class Search(commands.Cog):
     Search the web, from Discord.
     """
 
-    __version__ = "2.0.0"
+    __version__ = "2.0.1"
 
     def __init__(self, bot: Red):
+        """
+        Initalizes the cog by creating an HTTP session with the correct headers.
+        """
         self.bot = bot
-        self.session = aiohttp.ClientSession()
+        self.session = aiohttp.ClientSession(
+            headers={
+                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.114 Safari/537.36"
+            }
+        )
 
     async def red_delete_data_for_user(self, **kwargs):
+        """
+        This cog does not store user data.
+        """
         return
 
     def format_help_for_context(self, ctx: Context):
+        """
+        Adds the cog version to the help menu.
+        """
         pre_processed = super().format_help_for_context(ctx)
         return f"{pre_processed}\n\nCog Version: {self.__version__}"
 
@@ -52,7 +62,7 @@ class Search(commands.Cog):
             "t": type,
         }
         async with self.session.get(
-            QWANT_API_BASE + "/search/" + type, params=params, headers=QWANT_HEADERS
+            QWANT_API_BASE + "/search/" + type, params=params
         ) as resp:
             if resp.status != 200:
                 return
@@ -80,17 +90,13 @@ class Search(commands.Cog):
 
         SafeSearch will be disabled in NSFW channels.
         """
-        results = await self._search_qwant(ctx, "web", 10, query)
+        sidebar, results = await self._search_qwant(ctx, "web", 10, query)
         if not results:
             await ctx.send("No results found.")
             return
 
-        sidebar, results = results
-
         if sidebar:
-            async with self.session.get(
-                QWANT_API_BASE + sidebar, headers=QWANT_HEADERS
-            ) as resp:
+            async with self.session.get(QWANT_API_BASE + sidebar) as resp:
                 if resp.status == 200:
                     sidebar = (await resp.json())["data"]["result"]
 
@@ -134,12 +140,10 @@ class Search(commands.Cog):
 
         SafeSearch will be disabled in NSFW channels.
         """
-        results = await self._search_qwant(ctx, "images", 50, query)
+        _, results = await self._search_qwant(ctx, "images", 50, query)
         if not results:
             await ctx.send("No results found.")
             return
-
-        _, results = results
 
         embeds = []
         for i, result in enumerate(results):
@@ -160,12 +164,10 @@ class Search(commands.Cog):
 
         SafeSearch will be disabled in NSFW channels.
         """
-        results = await self._search_qwant(ctx, "videos", 10, query)
+        _, results = await self._search_qwant(ctx, "videos", 10, query)
         if not results:
             await ctx.send("No results found.")
             return
-
-        _, results = results
 
         embeds = []
         for i, result in enumerate(results):
@@ -184,12 +186,10 @@ class Search(commands.Cog):
         """
         Search for news on the web.
         """
-        results = await self._search_qwant(ctx, "news", 10, query)
+        _, results = await self._search_qwant(ctx, "news", 10, query)
         if not results:
             await ctx.send("No results found.")
             return
-
-        _, results = results
 
         embeds = []
 

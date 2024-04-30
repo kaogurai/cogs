@@ -27,7 +27,15 @@ class TTSConverter(Converter):
             yield list[i : i + n]
 
     async def convert(self, ctx: Context, argument: str) -> int:
-        argument = argument.replace("—", "--")  # For iOS's weird smart punctuation
+        """
+        The tts command as a large amount of arguments, so a
+        seperate class that facilates argparse-based arguments
+        is needed.
+        """
+
+        # iOS usually converts a double dash into a longer single one
+        # this reverts it so the parser works correctly
+        argument = argument.replace("—", "--")
 
         user_config = await ctx.cog.config.user(ctx.author).all()
 
@@ -156,11 +164,15 @@ class BaseCommandsMixin(MixinMeta):
                 )
                 return
 
+            args["text"] = await self.process_text(ctx.guild, ctx.author, args["text"])
+
         url = self.generate_url(
             args["voice"],
             args["translate"],
             args["text"],
             args["speed"],
+            # MP3 is more widely supported (for downloading)
+            # but Opus doesn't need to be transcoded with Lavalink
             "mp3" if args["download"] else "ogg_opus",
         )
 
@@ -171,7 +183,7 @@ class BaseCommandsMixin(MixinMeta):
                 )
                 return
 
-            async with self.session.get(url, headers=self.TTS_API_HEADERS) as resp:
+            async with self.session.get(url) as resp:
                 if resp.status != 200:
                     await ctx.send("Something went wrong. Try again later.")
                     return
@@ -193,7 +205,10 @@ class BaseCommandsMixin(MixinMeta):
             track_info,
         )
 
-    async def sfx_check(ctx):
+    async def sfx_check(ctx) -> bool:
+        """
+        Checks if the user has a Freesound API key set.
+        """
         token = await ctx.bot.get_shared_api_tokens("freesound")
         if token.get("id") and token.get("key"):
             return True
@@ -306,3 +321,18 @@ class BaseCommandsMixin(MixinMeta):
                 url,
                 track_info,
             )
+
+    @commands.command()
+    @commands.guild_only()
+    @commands.admin_or_permissions(manage_guild=True)
+    async def ttsname(self, ctx: Context):
+        """
+        Toggle whether to use the author's name in TTS.
+        """
+        current = await self.config.guild(ctx.guild).say_name()
+        await self.config.guild(ctx.guild).say_name.set(not current)
+
+        if current:
+            await ctx.send("I will no longer say the author's name in TTS.")
+        else:
+            await ctx.send("I will now say the author's name in TTS.")

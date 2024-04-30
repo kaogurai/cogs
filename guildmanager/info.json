@@ -1,8 +1,8 @@
 {
-    "author": ["ryan"],
-    "description": "Automatically leaves guilds that are not approved by the bot owner.",
-    "install_msg": "Thanks for installing!",
+    "author": ["ryan5453"],
+    "description": "Manages the servers your bot is in.",
+    "install_msg": "Thanks for installing!\n\nGuildManager is disabled by default. Do NOT enable the cog until you have added all your desired servers or it will leave them all. Look at the help menu to view all the commands to manage the list.",
     "name": "GuildManager",
-    "short": "Automatically leaves guilds that are not approved by the bot owner.",
+    "short": "Manages the servers your bot is in.",
     "min_bot_version": "3.5.0"
 }

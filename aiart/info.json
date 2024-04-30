@@ -1,9 +1,9 @@
 {
-    "author": ["ryan"],
-    "description": "Generate incredible art using AI.",
-    "install_msg": "Thanks for installing!",
+    "author": ["ryan5453"],
+    "description": "Generate art using AI.",
+    "install_msg": "Thanks for installing!\n\nTo use this cog, you must set up a Wombo API key. You can get one at https://api.dream.ai/dashboard and then use `[p]set api wombo token <key>` to set it.",
     "name": "AIArt",
     "requirements": ["pillow"],
-    "short": "Generate incredible art using AI.",
+    "short": "Generate art using AI.",
     "min_bot_version": "3.5.0"
 }

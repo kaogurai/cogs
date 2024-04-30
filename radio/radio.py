@@ -14,21 +14,30 @@ class Radio(commands.Cog):
     Saves radio stations for easy access.
     """
 
-    __version__ = "2.0.0"
+    __version__ = "2.0.1"
 
     def __init__(self, bot: Red):
+        """
+        Initializes the cog by setting up the datastore.
+        """
         self.bot = bot
         self.config = Config.get_conf(self, identifier=69420)
         self.config.register_global(stations={})
 
-    async def red_delete_data_for_user(self, **kwargs):
+    async def red_delete_data_for_user(self, **kwargs) -> None:
+        """
+        This cog doesn't store any user data.
+        """
         return
 
-    def format_help_for_context(self, ctx: Context):
+    def format_help_for_context(self, ctx: Context) -> None:
+        """
+        Adds the cog version to the help menu.
+        """
         pre_processed = super().format_help_for_context(ctx)
         return f"{pre_processed}\n\nCog Version: {self.__version__}"
 
-    def play_station(self, ctx: Context, name: str):
+    def play_station(self, ctx: Context, name: str) -> None:
         """
         Plays a radio station.
         """
@@ -131,3 +140,11 @@ class Radio(commands.Cog):
         del stations[name]
         await self.config.stations.set(stations)
         await ctx.send("Station removed.")
+
+    @radioset.command()
+    async def clear(self, ctx: Context):
+        """
+        Remove all radio stations.
+        """
+        await self.config.stations.clear()
+        await ctx.send("All stations removed.")

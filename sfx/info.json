@@ -1,7 +1,7 @@
 {
-    "author": ["baiumbg", "ryan"],
+    "author": ["baiumbg", "ryan5453"],
     "description": "Allow users to play TTS, SFX, and Join/Leave sounds.",
-    "install_msg": "**Thanks for installing!**\n\nNote: This cog bypasses Audio's `[p]audioset restrict` setting when using join/leave sounds.\n\nIf you want to use the `[p]sfx` command, you'll need to make a FreeSound API application.\n\nGo to https://freesound.org/apiv2/apply and make an account, and then submit a application.\n\nAfter you've submitted the application, the credentials should have appeared onscreen. Run `[p]set api freesound id <client_id> key <api_key>` and you'll be all set.",
+    "install_msg": "**Thanks for installing!**\n\nNote: This cog bypasses Audio's `[p]audioset restrict` setting when using join/leave sounds which could expose your bots IP address.\n\nIf you want to use the `[p]sfx` command, you'll need to make a FreeSound API application.\n\nGo to https://freesound.org/apiv2/apply and make an account, and then submit a application.\n\nAfter you've submitted the application, the credentials should have appeared onscreen. Run `[p]set api freesound id <client_id> key <api_key>` and you'll be all set.",
     "name": "SFX",
     "short": "Allow users to play TTS, SFX, and Join/Leave sounds.",
     "requirements": ["thefuzz"],

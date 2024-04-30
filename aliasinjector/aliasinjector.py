@@ -14,22 +14,49 @@ class AliasInjector(commands.Cog):
     Injects aliases into the command objects.
     """
 
-    __version__ = "3.0.0"
+    __version__ = "3.0.1"
 
     def __init__(self, bot: Red):
+        """
+        Initalizes the cog by setting up the datastore and loading aliases.
+        """
         self.bot = bot
         self.config = Config.get_conf(self, identifier=11133329439)
         self.config.register_global(aliases={})
         self.bot.loop.create_task(self.load_aliases())
 
     async def red_delete_data_for_user(self, **kwargs):
+        """
+        This cog does not store any user data.
+        """
         return
 
     def format_help_for_context(self, ctx: Context) -> str:
+        """
+        Adds the cog version to the help menu.
+        """
         pre_processed = super().format_help_for_context(ctx)
         return f"{pre_processed}\n\nCog Version: {self.__version__}"
 
+    def cog_unload(self):
+        """
+        Removes injected aliases when cog is unloaded.
+        """
+        self.bot.loop.create_task(self.remove_aliases())
+
+    @commands.Cog.listener()
+    async def on_cog_add(self, cog: commands.Cog):
+        """
+        Reloads aliases upon a cog being added.
+        """
+        if cog.__class__.__name__ != self.__class__.__name__:
+            await self.remove_aliases()
+            await self.load_aliases()
+
     async def load_aliases(self) -> None:
+        """
+        Injects all aliases into the command objects.
+        """
         aliases = await self.config.aliases()
 
         for command, aliases in aliases.items():
@@ -41,6 +68,9 @@ class AliasInjector(commands.Cog):
                     self.inject_alias(alias, command_obj)
 
     async def remove_aliases(self) -> None:
+        """
+        Removes all injected aliases from the command objects.
+        """
         aliases = await self.config.aliases()
 
         for command, aliases in aliases.items():
@@ -48,10 +78,10 @@ class AliasInjector(commands.Cog):
                 command_obj = self.bot.get_command(command)
                 self.remove_alias(alias, command_obj)
 
-    def cog_unload(self):
-        self.bot.loop.create_task(self.remove_aliases())
-
     def inject_alias(self, alias: str, command_obj: Command) -> None:
+        """
+        Injects an alias into the given command object.
+        """
         if " " not in alias:
             command_obj.aliases.append(alias)
             self.bot.all_commands[alias] = command_obj
@@ -70,6 +100,9 @@ class AliasInjector(commands.Cog):
             command_obj.aliases.append(new_alias)
 
     def remove_alias(self, alias: str, command_obj: Command) -> None:
+        """
+        Removes an alias from the given command object.
+        """
         if " " not in alias:
             if command_obj:
                 command_obj.aliases.remove(alias)
@@ -89,12 +122,6 @@ class AliasInjector(commands.Cog):
                 del c.all_commands[new_alias]
                 command_obj.aliases.remove(new_alias)
 
-    @commands.Cog.listener()
-    async def on_cog_add(self, cog: commands.Cog):
-        if cog.__class__.__name__ != self.__class__.__name__:
-            await self.remove_aliases()
-            await self.load_aliases()
-
     @commands.group()
     @commands.is_owner()
     async def aliasinjector(self, ctx: Context):
@@ -108,7 +135,9 @@ class AliasInjector(commands.Cog):
         """
         Adds an alias to a command.
 
-        If you want to be able to run `[p]resetqueue` by trigging the `[p]queue clear` command, you'd run `[p]aliasinjector add queue clear | resetqueue`, but if you wanted to be able to run `[p]queue reset`, you'd run  `[p]aliasinjector add queue clear | queue reset`.
+        If you want to be able to run `[p]resetqueue` by trigging the `[p]queue clear` command,
+        you'd run `[p]aliasinjector add queue clear | resetqueue`, but if you wanted to be able to
+        run `[p]queue reset`, you'd run  `[p]aliasinjector add queue clear | queue reset`.
         """
         split = args.split("|")
         if len(split) != 2:
@@ -147,7 +176,9 @@ class AliasInjector(commands.Cog):
         """
         Removes an alias from a command.
 
-        If you want to remove `[p]resetqueue` which triggers the  `[p]queue clear` command, you'd run `[p]aliasinjector remove queue clear | resetqueue`, but if you wanted to be able to remove `[p]queue reset`, you'd run  `[p]aliasinjector add queue clear | queue reset`.
+        If you want to remove `[p]resetqueue` which triggers the  `[p]queue clear` command,
+        you'd run `[p]aliasinjector remove queue clear | resetqueue`, but if you wanted to be
+        able to remove `[p]queue reset`, you'd run  `[p]aliasinjector add queue clear | queue reset`.
         """
         split = args.split("|")
         if len(split) != 2:
@@ -175,7 +206,7 @@ class AliasInjector(commands.Cog):
     @aliasinjector.command()
     async def clear(self, ctx: Context):
         """
-        Clears all monkeypatched aliases.
+        Clears all injected aliases.
         """
         a = await self.config.aliases()
         if not a:
@@ -184,7 +215,7 @@ class AliasInjector(commands.Cog):
 
         try:
             await ctx.send(
-                "Are you sure you want to clear all the monkeypatched aliases? Respond with yes or no."
+                "Are you sure you want to clear all the injected aliases? Respond with yes or no."
             )
             predictate = MessagePredicate.yes_or_no(ctx, user=ctx.author)
             await ctx.bot.wait_for("message", check=predictate, timeout=30)
@@ -204,7 +235,7 @@ class AliasInjector(commands.Cog):
     @aliasinjector.command()
     async def list(self, ctx: Context):
         """
-        Lists all monkeypatched aliases.
+        Lists all injected aliases.
         """
         a = await self.config.aliases()
         if not a:
@@ -224,7 +255,7 @@ class AliasInjector(commands.Cog):
         embeds = []
         for index, page in enumerate(pages):
             embed = discord.Embed(
-                title="Monkeypatched Aliases",
+                title="Injected Aliases",
                 color=await ctx.embed_colour(),
                 description=page,
             )

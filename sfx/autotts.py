@@ -43,6 +43,10 @@ class AutoTTSMixin(MixinMeta):
 
     @commands.Cog.listener(name="on_message_without_command")
     async def autotts_message_listener(self, message: discord.Message):
+        """
+        Listens for messages to be sent and checks if they are
+        eligible to be spoken through AutoTTS.
+        """
         if (
             message.author.id not in self.autotts
             or not message.guild
@@ -72,6 +76,10 @@ class AutoTTSMixin(MixinMeta):
         before: Optional[discord.VoiceChannel],
         after: Optional[discord.VoiceChannel],
     ):
+        """
+        Checks if a user has left a voice channel and disables
+        AutoTTS if it had previously been enabled.
+        """
         if (
             member.bot
             or not await self.bot.allowed_by_whitelist_blacklist(who=member)

@@ -1,10 +1,10 @@
 {
-    "author": ["ryan"],
-    "description": "A bunch of random tools for kaogurai.",
-    "install_msg": "**You should probably uninstall this.**\n\nIt may break your bot, as this is designed exclusively for kaogurai.\n\nIf there is a feature from here you would like, just let me know and I can make it into a seperate cog.",
+    "author": ["ryan5453"],
+    "description": "Random tools for kaogurai.",
+    "install_msg": "This cog is not meant to be installed on a bot other than kaogurai.\n\n**No support will be provided.**",
     "name": "KaoTools",
-    "requirements": ["pillow", "anthropic"],
-    "short": "A bunch of random tools for kaogurai.",
+    "requirements": ["pillow", "colorgram.py"],
+    "short": "Random tools for kaogurai.",
     "hidden": true,
     "min_bot_version": "3.5.0"
 }
