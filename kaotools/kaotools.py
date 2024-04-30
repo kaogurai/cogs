@@ -32,7 +32,7 @@ class KaoTools(
     Random tools for kaogurai.
     """
 
-    __version__ = "2.1.2"
+    __version__ = "2.1.3"
 
     def __init__(self, bot: Red):
         """
@@ -295,7 +295,7 @@ class KaoTools(
         with red_proccess.oneshot():
             memory_amount = int(red_proccess.memory_info().rss / 1024**2)
             memory_usage = red_proccess.memory_percent("rss")
-        delta = datetime.datetime.now(datetime.UTC) - self.bot.uptime
+        delta = datetime.datetime.utcnow() - self.bot.uptime
         uptime_str = humanize_timedelta(timedelta=delta) or "Less than one second."
 
         embed = discord.Embed(
