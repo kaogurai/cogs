@@ -19,11 +19,11 @@ Please join my support server [here](https://discord.gg/p6ehU9qhg8) if you have 
 ## Cogs
 
 | Name         | Version | Description                                                                              |
-| ------------ | ------- | ---------------------------------------------------------------------------------------- |
-| AIArt        | v2.2.0  | Generate art using AI.                                                                   |
+|--------------|---------|------------------------------------------------------------------------------------------|
+| AIArt        | v2.3.0  | Generate art using AI.                                                                   |
 | GuildManager | v2.1.0  | Manages the servers your bot is in.                                                      |
 | Radio        | v2.0.1  | Saves radio URLs for easy access.                                                        |
-| Search       | v2.0.1  | Search the web from Discord.                                                             |
+| Search       | v2.0.2  | Search the web from Discord.                                                             |
 | SFX          | v7.1.0  | Plays sound effects, text-to-speech, and join/leave sounds. (originally made by baiumbg) |
 | SmartLyrics  | v3.0.3  | Gets lyrics for your current song.                                                       |
 | YTDL         | v2.1.0  | Download YouTube videos.                                                                 |

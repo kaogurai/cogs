@@ -15,7 +15,7 @@ class Search(commands.Cog):
     Search the web, from Discord.
     """
 
-    __version__ = "2.0.1"
+    __version__ = "2.0.2"
 
     def __init__(self, bot: Red):
         """
@@ -72,6 +72,8 @@ class Search(commands.Cog):
             sidebar = None
 
             if type == "web":
+
+                items = {}
                 for result in _items["mainline"]:
                     if result["type"] == type:
                         items = result["items"]  # Filters out ads
