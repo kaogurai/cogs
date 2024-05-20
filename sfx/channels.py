@@ -117,7 +117,7 @@ class TTSChannelMixin(MixinMeta):
             or not message.channel.permissions_for(message.guild.me).send_messages
             or not await self.bot.allowed_by_whitelist_blacklist(who=message.author)
             or await self.bot.cog_disabled_in_guild(self, message.guild)
-            or message.author.id in self.autotts
+            or message.author.id not in self.autotts
             or not await self.can_tts(message)
         ):
             return

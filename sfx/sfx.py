@@ -37,7 +37,7 @@ class SFX(
     Plays sound effects, text-to-speech, and join/leave sounds.
     """
 
-    __version__ = "7.1.0"
+    __version__ = "7.1.1"
 
     TTS_API_URL = "https://api.flowery.pw/v1/tts"
     SFX_API_URL = "https://freesound.org/apiv2"
