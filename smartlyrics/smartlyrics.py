@@ -17,7 +17,7 @@ class SmartLyrics(commands.Cog):
     Gets lyrics for your current song.
     """
 
-    __version__ = "3.0.3"
+    __version__ = "3.0.4"
 
     def __init__(self, bot: Red):
         """
@@ -179,8 +179,13 @@ class SmartLyrics(commands.Cog):
                     await ctx.send(f"No results were found for `{query[:500]}`")
                 return
 
-            if ctx.author.voice and ctx.guild.me.voice:
-                if ctx.author.voice.channel == ctx.guild.me.voice.channel:
+            if ctx.author.voice and ctx.guild.me.voice and ctx.author.voice.channel == ctx.guild.me.voice.channel:
+                try:
+                    player = ctx.pylav.get_player(ctx.guild.id)
+                    title = await player.current.title()
+                    if "-" not in title:
+                        title = (await player.current.author()) + " " + title
+                except AttributeError:
                     try:
                         player = lavalink.get_player(ctx.guild.id)
                     except KeyError:  # no player for that guild
@@ -189,11 +194,13 @@ class SmartLyrics(commands.Cog):
                         title = player.current.title
                         if "-" not in title:
                             title = player.current.author + " " + title
-
-                        results = await self._get_lyrics(title)
-                        if results:
-                            await self._send_results(ctx, results, "Voice Channel")
-                            return
+                    else:
+                        title = None
+                if title:
+                    results = await self._get_lyrics(title)
+                    if results:
+                        await self._send_results(ctx, results, "Voice Channel")
+                        return
 
             spotify_track = self._get_user_status_song(ctx.author)
             if spotify_track:
