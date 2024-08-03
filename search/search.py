@@ -65,7 +65,7 @@ class Search(commands.Cog):
             QWANT_API_BASE + "/search/" + type, params=params
         ) as resp:
             if resp.status != 200:
-                return
+                return None, None
             data = await resp.json()
             _items = data["data"]["result"]["items"]
             items = _items
