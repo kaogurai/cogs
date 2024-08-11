@@ -28,7 +28,7 @@ class WomboConverter(Converter):
         parser = NoExitParser(add_help=False)
         parser.add_argument("prompt", type=str, nargs="*")
         parser.add_argument("--styles", action="store_true")
-        parser.add_argument("--style", type=str, default=["Realistic v2"], nargs="*")
+        parser.add_argument("--style", type=str, default=["Dreamland v3"], nargs="*")
         parser.add_argument("--image", type=str, default=None, nargs="?")
         parser.add_argument("--image-weight", type=float, default=0.5, nargs="?")
         parser.add_argument(
@@ -201,7 +201,7 @@ class WomboCommand(MixinMeta):
 
         **Arguments:**
             `prompt` The prompt to use for the art.
-            `--style` The style to use for the art. Defaults to `Realistic v2`.
+            `--style` The style to use for the art. Defaults to `Dreamland v3`.
             `--image` The image to use for the art. You can also upload an attachment instead of using this argument.
             `--amount` The amount of images to generate.
             `--width` The width of the art. Defaults to 1024. Range is 100-10000

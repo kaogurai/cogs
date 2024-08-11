@@ -10,6 +10,7 @@ class MixinMeta(ABC):
         self.config: Config
         self.bot: Red
         self.session: aiohttp.ClientSession
+        self.api_token: str
 
 
 class CompositeMetaClass(type(commands.Cog), type(ABC)):

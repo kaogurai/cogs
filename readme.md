@@ -20,7 +20,7 @@ Please join my support server [here](https://discord.gg/p6ehU9qhg8) if you have 
 
 | Name         | Version | Description                                                                              |
 |--------------|---------|------------------------------------------------------------------------------------------|
-| AIArt        | v2.3.0  | Generate art using AI.                                                                   |
+| AIArt        | v2.3.1  | Generate art using AI.                                                                   |
 | GuildManager | v2.1.0  | Manages the servers your bot is in.                                                      |
 | Radio        | v2.0.1  | Saves radio URLs for easy access.                                                        |
 | Search       | v2.0.3  | Search the web from Discord.                                                             |
