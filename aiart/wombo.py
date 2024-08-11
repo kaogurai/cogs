@@ -160,7 +160,7 @@ class WomboCommand(MixinMeta):
             "input_spec": {
                 "style": arguments["style"],
                 "prompt": arguments["prompt"],
-                "target_image_weight": 0.5,
+                "target_image_weight": arguments["image_weight"],
                 "width": arguments["width"],
                 "height": arguments["height"],
                 "allow_nsfw": arguments["nsfw"],
@@ -203,6 +203,7 @@ class WomboCommand(MixinMeta):
             `prompt` The prompt to use for the art.
             `--style` The style to use for the art. Defaults to `Dreamland v3`.
             `--image` The image to use for the art. You can also upload an attachment instead of using this argument.
+            `--image-weight` The weight of the image. Defaults to 0.5. Range is 0-1.
             `--amount` The amount of images to generate.
             `--width` The width of the art. Defaults to 1024. Range is 100-10000
             `--height` The height of the art. Defaults to 1024. Range is 100-10000

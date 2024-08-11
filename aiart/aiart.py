@@ -26,7 +26,7 @@ class AIArt(
     Generate art using AI.
     """
 
-    __version__ = "2.3.1"
+    __version__ = "2.3.2"
 
     # noinspection PyMissingConstructor
     def __init__(self, bot: Red):
