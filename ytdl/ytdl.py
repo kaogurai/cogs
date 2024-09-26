@@ -77,18 +77,11 @@ class YTDL(commands.Cog):
             "url": url,
             "type": "json",  # We want the response in JSON format
         }
-
         async with self.session.get(base_url, params=params) as response:
             if response.status == 200:
                 data = await response.json()
                 if data.get("success"):
                     return data["data"]["url"]
-                else:
-                    print(f"Error: {data.get('error', {}).get('msg', 'Unknown error')}")
-            else:
-                print(f"Failed to reach Ulvis API, status code: {response.status}")
-
-        return None
 
     async def _injector(
         self, data: dict, coro: Coroutine
