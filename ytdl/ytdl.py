@@ -70,19 +70,25 @@ class YTDL(commands.Cog):
 
     async def _shorten_url(self, url: str) -> Optional[str]:
         """
-        Returns a shortened version of a URL.
+        Returns a shortened version of a URL using the Ulvis API.
         """
-        # 16 random chars
-        key = "".join(
-            random.choice(string.ascii_lowercase + string.digits) for _ in range(24)
-        )
+        base_url = "https://ulvis.net/API/write/get"
+        params = {
+            "url": url,
+            "type": "json",  # We want the response in JSON format
+        }
 
-        data = {"golink": key, "dest": url, "addLogo": False, "caption": ""}
-        async with self.session.post(
-            "https://zgzg.link/api/v2/edit", json=data
-        ) as response:
+        async with self.session.get(base_url, params=params) as response:
             if response.status == 200:
-                return f"https://zgzg.link/{key}"
+                data = await response.json()
+                if data.get("success"):
+                    return data["data"]["url"]
+                else:
+                    print(f"Error: {data.get('error', {}).get('msg', 'Unknown error')}")
+            else:
+                print(f"Failed to reach Ulvis API, status code: {response.status}")
+
+        return None
 
     async def _injector(
         self, data: dict, coro: Coroutine
