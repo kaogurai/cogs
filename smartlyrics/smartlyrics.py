@@ -17,7 +17,7 @@ class SmartLyrics(commands.Cog):
     Gets lyrics for your current song.
     """
 
-    __version__ = "3.0.4"
+    __version__ = "3.0.5"
 
     def __init__(self, bot: Red):
         """
@@ -27,9 +27,9 @@ class SmartLyrics(commands.Cog):
         self.bot = bot
         self.session = aiohttp.ClientSession(
             headers={
-                "X-Genius-iOS-Version": "6.7.0",
+                "X-Genius-iOS-Version": "7.1.0",
                 "X-Genius-Logged-Out": "true",
-                "User-Agent": "Genius/1015 CFNetwork/1390 Darwin/22.0.0",
+                "User-Agent": "Genius/1160 CFNetwork/1568.100.1.2.1 Darwin/24.0.0",
             }
         )
         # thanks wyn for the RegEx
@@ -74,7 +74,7 @@ class SmartLyrics(commands.Cog):
             "https://api.genius.com/search/multi", params=params
         ) as r:
             if r.status != 200:
-                raise Exception("Could not get search results.")
+                return
 
             j = await r.json()
 
